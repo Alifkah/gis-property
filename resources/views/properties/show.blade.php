@@ -125,7 +125,7 @@
                     <div class="rounded-2xl overflow-hidden shadow-xs ring-1 ring-slate-200/50" style="height:280px;min-height:280px">
                         <div id="miniMap" class="relative z-0" style="height:280px;width:100%"></div>
                     </div>
-                    <div class="flex flex-col gap-4">
+                    <div class="flex flex-col gap-4 min-w-0">
                         @if ($isFloodSafe)
                             <div class="rounded-2xl bg-emerald-50/60 p-4 ring-1 ring-emerald-500/20 shadow-xs">
                                 <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Status Banjir</div>
@@ -154,10 +154,10 @@
                             </div>
                         @endif
 
-                        <div class="rounded-2xl bg-slate-50/70 p-4 ring-1 ring-slate-200/70 shadow-xs flex-1 flex flex-col justify-between">
-                            <div>
+                        <div class="rounded-2xl bg-slate-50/70 p-4 ring-1 ring-slate-200/70 shadow-xs flex-1 flex flex-col justify-between min-w-0">
+                            <div class="min-w-0">
                                 <div class="text-xs font-bold text-slate-500 uppercase tracking-wider">Aksesibilitas Fasilitas Terdekat</div>
-                                <div class="mt-3 grid gap-2">
+                                <div class="mt-3 grid gap-2 min-w-0">
                                     @foreach ($nearestAmenities as $amenity)
                                         @php
                                             $amenityType = strtolower($amenity->type ?? '');
@@ -178,7 +178,7 @@
                                                 $iconColor = 'text-teal-600 bg-teal-50';
                                             }
                                         @endphp
-                                        <div class="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1 ring-slate-200/50 shadow-2xs hover:ring-slate-300/60 transition">
+                                        <div class="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1 ring-slate-200/50 shadow-2xs hover:ring-slate-300/60 transition min-w-0">
                                             <div class="flex items-center gap-2.5 min-w-0">
                                                 <span class="grid size-8 shrink-0 place-items-center rounded-lg {{ $iconColor }}">
                                                     <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
