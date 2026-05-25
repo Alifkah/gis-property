@@ -122,8 +122,25 @@
                     <span>Analisis Geospasial & Lingkungan</span>
                 </div>
                 <div class="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
-                    <div class="rounded-2xl overflow-hidden shadow-xs ring-1 ring-slate-200/50" style="height:280px;min-height:280px">
-                        <div id="miniMap" class="relative z-0" style="height:280px;width:100%"></div>
+                    <div class="flex flex-col">
+                        <div class="rounded-2xl overflow-hidden shadow-xs ring-1 ring-slate-200/50" style="height:320px;min-height:320px">
+                            <div id="miniMap" class="relative z-0" style="height:320px;width:100%"></div>
+                        </div>
+                        <div class="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-slate-50/80 p-4 ring-1 ring-slate-200/50 shadow-2xs">
+                            <div class="min-w-0">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Koordinat Properti</div>
+                                <div class="mt-0.5 text-xs font-semibold text-slate-700 truncate">
+                                    {{ number_format((float) $point['lat'], 6) }}, {{ number_format((float) $point['lng'], 6) }}
+                                </div>
+                            </div>
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $point['lat'] }},{{ $point['lng'] }}" target="_blank" rel="noopener" class="btn btn-outline py-2 px-3 text-xs flex items-center gap-1.5 shrink-0 shadow-3xs hover:bg-indigo-50 hover:text-indigo-700 hover:ring-indigo-200 transition">
+                                <svg class="size-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                                </svg>
+                                <span>Petunjuk Arah</span>
+                            </a>
+                        </div>
                     </div>
                     <div class="flex flex-col gap-4 min-w-0">
                         @if ($isFloodSafe)
