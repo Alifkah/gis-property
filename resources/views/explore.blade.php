@@ -3,18 +3,17 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     @endpush
 
-    <div class="flex h-dvh w-full">
+    <div class="flex h-dvh w-full overflow-hidden bg-slate-100">
 
         {{-- Kiri: Hasil Pencarian --}}
-        <div class="flex shrink-0 flex-col border-r border-slate-200 bg-white" style="width:300px;min-width:300px">
-
+        <aside class="flex shrink-0 flex-col border-r border-slate-200/80 bg-white shadow-sm z-10" style="width:310px;min-width:310px">
             {{-- Header: branding + tombol kembali --}}
-            <div style="border-bottom:1px solid #e2e8f0" class="px-4 py-3">
+            <div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between">
                 <a
                     href="{{ route('home') }}"
-                    class="group inline-flex w-full items-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600 ring-1 ring-slate-200/70 transition hover:bg-indigo-50 hover:text-indigo-700 hover:ring-indigo-200"
+                    class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-50 border border-slate-200/60 px-3 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 shadow-3xs"
                 >
-                    <svg class="size-4 shrink-0 transition group-hover:-translate-x-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <svg class="size-4 shrink-0 transition group-hover:-translate-x-0.5 text-slate-500 group-hover:text-indigo-600" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
                     <span>Kembali ke Beranda</span>
@@ -22,51 +21,58 @@
             </div>
 
             {{-- Results count --}}
-            <div style="border-bottom:1px solid #e2e8f0" class="px-4 py-2.5">
-                <div class="text-xs font-extrabold text-slate-900">Hasil Pencarian</div>
-                <div id="resultCount" class="mt-0.5 text-xs font-semibold text-slate-400">Memuat data...</div>
+            <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hasil Pencarian</div>
+                <div id="resultCount" class="mt-1 text-xs font-black text-slate-700">Memuat data...</div>
             </div>
 
-            <div class="flex-1 overflow-y-auto px-3 py-3">
-                <div id="propertyList" class="grid gap-2"></div>
+            <div class="flex-1 overflow-y-auto px-3.5 py-4 scrollbar-thin">
+                <div id="propertyList" class="grid gap-3"></div>
             </div>
-        </div>
-
+        </aside>
 
         {{-- Tengah: Peta --}}
-        <div class="relative flex-1">
-            <div id="map" class="h-full w-full"></div>
-        </div>
+        <main class="relative flex-1">
+            <div id="map" class="h-full w-full z-0"></div>
+        </main>
 
         {{-- Layer Control Panel (injected as Leaflet control via JS) --}}
         <div id="layerControlPanel" style="display:none">
-            <div style="width:200px;background:#fff;border-radius:1rem;padding:12px;box-shadow:0 4px 24px rgba(15,23,42,.15);border:1px solid #e2e8f0">
-                <div class="text-xs font-extrabold text-slate-900">Lapisan Peta</div>
-                <div class="mt-2 grid gap-1.5">
-                    <label class="flex items-center justify-between gap-3">
+            <div class="w-[220px] bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-slate-200/60 transition duration-300">
+                <div class="text-xs font-black text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-1.5">
+                    <svg class="size-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+                    </svg>
+                    <span>Lapisan Peta</span>
+                </div>
+                <div class="mt-3 grid gap-2.5">
+                    <label class="flex items-center justify-between gap-3 cursor-pointer">
                         <span class="text-xs font-semibold text-slate-700">Zona Banjir</span>
-                        <input id="toggleFlood" type="checkbox" class="size-4 accent-indigo-600" checked />
+                        <input id="toggleFlood" type="checkbox" class="size-4.5 rounded border-slate-300 accent-indigo-600 cursor-pointer" checked />
                     </label>
-                    <label class="flex items-center justify-between gap-3">
+                    <label class="flex items-center justify-between gap-3 cursor-pointer">
                         <span class="text-xs font-semibold text-slate-700">Batas Admin</span>
-                        <input id="toggleDistricts" type="checkbox" class="size-4 accent-indigo-600" checked />
+                        <input id="toggleDistricts" type="checkbox" class="size-4.5 rounded border-slate-300 accent-indigo-600 cursor-pointer" checked />
                     </label>
-                    <label class="flex items-center justify-between gap-3">
+                    <label class="flex items-center justify-between gap-3 cursor-pointer">
                         <span class="text-xs font-semibold text-slate-700">Mode Gelap Peta</span>
-                        <input id="toggleDarkMode" type="checkbox" class="size-4 accent-indigo-600" />
+                        <input id="toggleDarkMode" type="checkbox" class="size-4.5 rounded border-slate-300 accent-indigo-600 cursor-pointer" />
                     </label>
                 </div>
-                <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
-                    <div class="text-xs font-extrabold text-slate-900">Legenda</div>
-                    <div class="mt-1.5 grid gap-1">
-                        <div class="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
-                            <span style="width:10px;height:10px;border-radius:2px;background:#10b981;display:inline-block"></span> Bebas banjir
+                <div class="mt-3.5 pt-3.5 border-t border-slate-100">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Legenda</div>
+                    <div class="mt-2 grid gap-1.5">
+                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                            <span class="size-2.5 rounded-sm bg-emerald-500 ring-1 ring-emerald-600/10 shadow-3xs"></span>
+                            <span>Bebas Banjir</span>
                         </div>
-                        <div class="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
-                            <span style="width:10px;height:10px;border-radius:2px;background:#f43f5e;display:inline-block"></span> Zona banjir
+                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                            <span class="size-2.5 rounded-sm bg-rose-500 ring-1 ring-rose-600/10 shadow-3xs"></span>
+                            <span>Zona Banjir</span>
                         </div>
-                        <div class="flex items-center gap-1.5 text-xs font-semibold text-slate-600">
-                            <span style="width:10px;height:10px;border-radius:2px;background:#f97316;display:inline-block"></span> Properti
+                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-600">
+                            <span class="size-2.5 rounded-sm bg-orange-500 ring-1 ring-orange-600/10 shadow-3xs"></span>
+                            <span>Properti</span>
                         </div>
                     </div>
                 </div>
@@ -74,15 +80,20 @@
         </div>
 
         {{-- Kanan: Filter Pencarian --}}
-        <div class="flex shrink-0 flex-col bg-white" style="width:300px;min-width:300px;border-left:1px solid #e2e8f0">
-            <div class="px-4 py-3" style="border-bottom:1px solid #e2e8f0">
-                <div class="text-xs font-extrabold text-slate-900">Filter Pencarian</div>
+        <aside class="flex shrink-0 flex-col bg-white border-l border-slate-200/80 shadow-sm z-10" style="width:310px;min-width:310px">
+            <div class="px-4 py-4 border-b border-slate-100 bg-slate-50/50">
+                <div class="text-xs font-black text-slate-900 flex items-center gap-2">
+                    <svg class="size-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
+                    </svg>
+                    <span>Filter Pencarian</span>
+                </div>
             </div>
-            <div class="flex-1 overflow-y-auto px-4 py-4">
-                <div class="grid gap-3">
+            <div class="flex-1 overflow-y-auto px-4 py-4 scrollbar-thin">
+                <div class="grid gap-4">
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Tipe</label>
-                        <select id="filterType" class="select mt-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipe Properti</label>
+                        <select id="filterType" class="select mt-1.5">
                             <option value="">Semua</option>
                             @foreach ($types as $type)
                                 <option value="{{ $type }}">{{ $type }}</option>
@@ -90,8 +101,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Kecamatan</label>
-                        <select id="filterDistrict" class="select mt-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kecamatan</label>
+                        <select id="filterDistrict" class="select mt-1.5">
                             <option value="">Semua</option>
                             @foreach ($districtFeatures['features'] as $feature)
                                 <option value="{{ $feature['properties']['name'] }}">{{ $feature['properties']['name'] }}</option>
@@ -99,8 +110,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Rentang Harga</label>
-                        <select id="filterPrice" class="select mt-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rentang Harga</label>
+                        <select id="filterPrice" class="select mt-1.5">
                             <option value="">Semua</option>
                             <option value="0-250000000">0 – 250 jt</option>
                             <option value="250000000-750000000">250 jt – 750 jt</option>
@@ -109,8 +120,8 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Dekat Fasilitas</label>
-                        <select id="filterAmenityType" class="select mt-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dekat Fasilitas</label>
+                        <select id="filterAmenityType" class="select mt-1.5">
                             <option value="">Semua</option>
                             @foreach ($amenityTypes as $amenityType)
                                 <option value="{{ $amenityType }}">{{ $amenityType }}</option>
@@ -118,14 +129,14 @@
                         </select>
                     </div>
                     <div id="amenityIdGroup" class="opacity-40 transition-opacity">
-                        <label class="text-xs font-semibold text-slate-600">Pilih Fasilitas <span class="text-[10px] font-normal text-slate-400">(pilih tipe dulu)</span></label>
-                        <select id="filterAmenityId" class="select mt-1" disabled>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Fasilitas <span class="text-[9px] font-normal text-slate-400">(pilih tipe dulu)</span></label>
+                        <select id="filterAmenityId" class="select mt-1.5" disabled>
                             <option value="">Semua</option>
                         </select>
                     </div>
                     <div id="amenityRadiusGroup" class="opacity-40 transition-opacity">
-                        <label class="text-xs font-semibold text-slate-600">Radius Fasilitas <span class="text-[10px] font-normal text-slate-400">(pilih tipe dulu)</span></label>
-                        <select id="filterAmenityRadius" class="select mt-1" disabled>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Radius Fasilitas <span class="text-[9px] font-normal text-slate-400">(pilih tipe dulu)</span></label>
+                        <select id="filterAmenityRadius" class="select mt-1.5" disabled>
                             <option value="500">500 m</option>
                             <option value="1000" selected>1 km</option>
                             <option value="2000">2 km</option>
@@ -133,42 +144,48 @@
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Status</label>
-                        <select id="filterStatus" class="select mt-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status Listing</label>
+                        <select id="filterStatus" class="select mt-1.5">
                             <option value="">Semua</option>
                             <option value="Tersedia">Tersedia</option>
                             <option value="Terjual">Terjual</option>
                         </select>
                     </div>
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Urutkan Harga</label>
-                        <select id="filterSort" class="select mt-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Urutan Harga</label>
+                        <select id="filterSort" class="select mt-1.5">
                             <option value="desc">Tertinggi</option>
                             <option value="asc">Terendah</option>
                         </select>
                     </div>
 
-                    <div class="flex flex-wrap gap-2 pt-1">
+                    <div class="flex flex-wrap gap-2 pt-1 border-t border-slate-100 pt-3">
                         <button type="button" class="pill" data-pill="Rumah">Rumah</button>
                         <button type="button" class="pill" data-pill="Tanah">Tanah</button>
                         <button type="button" class="pill" data-pill="BebasBanjir">Bebas Banjir</button>
                     </div>
 
-                    <div class="rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200/70">
-                        <div class="text-xs font-extrabold text-slate-900">Cari di Sekitar Titik</div>
-                        <div class="mt-1 text-xs font-semibold text-slate-500">Klik peta untuk menentukan titik pusat.</div>
-                        <div class="mt-2 grid grid-cols-2 gap-2">
+                    <div class="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60 shadow-3xs mt-2">
+                        <div class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                            <svg class="size-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                            </svg>
+                            <span>Cari Sekitar Titik</span>
+                        </div>
+                        <div class="mt-1 text-[10px] font-semibold text-slate-500">Klik lokasi mana saja di peta untuk menentukan koordinat pusat.</div>
+                        <div class="mt-3 grid grid-cols-2 gap-2">
                             <div>
-                                <label class="text-[11px] font-semibold text-slate-600">Lat</label>
-                                <input id="centerLat" type="text" class="input mt-1" readonly />
+                                <label class="text-[9px] font-bold text-slate-400 uppercase">Latitude</label>
+                                <input id="centerLat" type="text" class="input mt-1 text-center" readonly />
                             </div>
                             <div>
-                                <label class="text-[11px] font-semibold text-slate-600">Lng</label>
-                                <input id="centerLng" type="text" class="input mt-1" readonly />
+                                <label class="text-[9px] font-bold text-slate-400 uppercase">Longitude</label>
+                                <input id="centerLng" type="text" class="input mt-1 text-center" readonly />
                             </div>
                         </div>
-                        <div class="mt-2">
-                            <label class="text-[11px] font-semibold text-slate-600">Radius</label>
+                        <div class="mt-3.5">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase">Radius Jangkauan</label>
                             <select id="radiusM" class="select mt-1">
                                 <option value="">Tanpa radius</option>
                                 <option value="500">500 m</option>
@@ -177,14 +194,14 @@
                                 <option value="5000">5 km</option>
                             </select>
                         </div>
-                        <button id="clearCenter" type="button" class="btn btn-outline mt-2 w-full">Reset Titik</button>
+                        <button id="clearCenter" type="button" class="btn btn-outline mt-3 w-full py-2.5 text-xs font-bold">Reset Titik Pusat</button>
                     </div>
                 </div>
             </div>
-            <div class="p-4" style="border-top:1px solid #e2e8f0">
-                <button id="applyFilters" class="btn btn-primary w-full">Terapkan Filter</button>
+            <div class="p-4 border-t border-slate-100 bg-slate-50/50">
+                <button id="applyFilters" class="btn btn-primary w-full py-3 font-bold shadow-md hover:shadow-indigo-500/20 transition">Terapkan Filter</button>
             </div>
-        </div>
+        </aside>
 
     </div>
 
@@ -254,9 +271,9 @@
 
             const markerIcon = L.divIcon({
                 className: '',
-                html: '<div style="width:14px;height:14px;border-radius:9999px;background:#f97316;border:2px solid #ffffff;box-shadow:0 8px 20px rgba(15,23,42,.2)"></div>',
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
+                html: '<div style="width:16px;height:16px;border-radius:9999px;background:#f97316;border:3.5px solid #ffffff;box-shadow:0 4px 10px rgba(15,23,42,.35)"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
             });
 
             const propertyList = document.getElementById('propertyList');
@@ -316,28 +333,28 @@
                 }
 
                 propertyList.innerHTML = items.length === 0
-                    ? '<div class="py-6 text-center text-xs font-semibold text-slate-400">Tidak ada properti sesuai filter.</div>'
+                    ? '<div class="py-12 text-center text-xs font-semibold text-slate-400">Tidak ada properti sesuai filter.</div>'
                     : items.map((p) => {
                     const isSold = p.status === 'Terjual';
                     const badges = isSold
-                        ? '<span class="inline-flex items-center rounded-full bg-slate-700 px-2 py-1 text-xs font-semibold text-white">Terjual</span>'
+                        ? '<span class="inline-flex items-center rounded-full bg-slate-700 px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Terjual</span>'
                         : [
-                            p.is_new ? '<span class="inline-flex items-center rounded-full bg-indigo-600 px-2 py-1 text-xs font-semibold text-white">Rumah Baru</span>' : '',
-                            p.is_flood_safe ? '<span class="inline-flex items-center rounded-full bg-emerald-500 px-2 py-1 text-xs font-semibold text-white">Bebas Banjir</span>' : ''
+                            p.is_new ? '<span class="inline-flex items-center rounded-full bg-indigo-600 px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Rumah Baru</span>' : '',
+                            p.is_flood_safe ? '<span class="inline-flex items-center rounded-full bg-emerald-500 px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Bebas Banjir</span>' : ''
                           ].join('');
 
                     return `
-                        <button type="button" class="w-full text-left card overflow-hidden hover:shadow-md transition" data-id="${p.id}">
+                        <button type="button" class="w-full text-left card overflow-hidden hover:shadow-md hover:ring-indigo-100/50 transition min-w-0" data-id="${p.id}">
                             <div class="relative overflow-hidden bg-slate-100" style="height:120px">
-                                <img src="${imageUrl(p.type, p.image_url)}" alt="${p.title}" class="h-full w-full object-cover ${isSold ? 'opacity-60' : ''}" loading="lazy" />
-                                <div class="absolute left-2 top-2 flex flex-wrap gap-1">${badges}</div>
+                                <img src="${imageUrl(p.type, p.image_url)}" alt="${p.title}" class="h-full w-full object-cover transition duration-300 hover:scale-[1.03] ${isSold ? 'opacity-60' : ''}" loading="lazy" />
+                                <div class="absolute left-2.5 top-2.5 flex flex-wrap gap-1">${badges}</div>
                             </div>
                             <div class="p-3">
-                                <div class="text-xs font-extrabold text-slate-900 truncate">${p.title}</div>
-                                <div class="mt-0.5 text-[11px] font-semibold text-slate-500 truncate">${p.district_name ?? 'Kota Samarinda'}</div>
-                                <div class="mt-2 flex items-center justify-between gap-2">
+                                <div class="text-xs font-extrabold text-slate-800 truncate">${p.title}</div>
+                                <div class="mt-0.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">${p.district_name ?? 'Samarinda'}</div>
+                                <div class="mt-2.5 flex items-center justify-between gap-2 border-t border-slate-50 pt-2">
                                     <div class="text-xs font-extrabold ${isSold ? 'text-slate-400' : 'text-indigo-700'}">Rp ${formatCurrency(p.price)}</div>
-                                    <span class="text-[11px] font-semibold text-slate-500">${p.amenity_distance_m !== null && p.amenity_distance_m !== undefined ? formatDistance(p.amenity_distance_m) : `${p.land_area} m²`}</span>
+                                    <span class="text-[10px] font-bold text-slate-500">${p.amenity_distance_m !== null && p.amenity_distance_m !== undefined ? formatDistance(p.amenity_distance_m) : `${p.land_area} m²`}</span>
                                 </div>
                             </div>
                         </button>
@@ -423,12 +440,12 @@
                     const imgSrc = imageUrl(p.type, listItem?.image_url ?? null);
 
                     const popupHtml = `
-                        <div style="width:240px">
-                            <img src="${imgSrc}" alt="${p.title}" style="width:100%;height:120px;object-fit:cover;border-radius:12px" />
-                            <div style="padding-top:10px">
-                                <div style="font-weight:800;color:#4338ca">Rp ${formatCurrency(p.price)}</div>
-                                <div style="margin-top:4px;font-weight:700;color:#0f172a">${p.title}</div>
-                                <a href="/properties/${p.id}" style="margin-top:10px;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:12px;background:#4f46e5;color:#fff;font-weight:700;text-decoration:none;width:100%">Lihat Detail</a>
+                        <div style="width:240px; font-family:'Instrument Sans', sans-serif">
+                            <img src="${imgSrc}" alt="${p.title}" style="width:100%;height:120px;object-fit:cover;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06)" />
+                            <div style="padding:12px 0 0 0">
+                                <div style="font-size:14px;font-weight:900;color:#4f46e5">Rp ${formatCurrency(p.price)}</div>
+                                <div style="margin-top:4px;font-size:12px;font-weight:800;color:#0f172a;line-height:1.4">${p.title}</div>
+                                <a href="/properties/${p.id}" style="margin-top:12px;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:10px;background:#4f46e5;color:#fff;font-size:11px;font-weight:800;text-decoration:none;width:100%;box-shadow:0 4px 12px rgba(79,70,229,0.15)">Lihat Detail Properti</a>
                             </div>
                         </div>
                     `;
@@ -451,10 +468,10 @@
                 const isNextDisabled = current >= totalPages;
 
                 const html = `
-                    <div class="mt-3 flex items-center justify-between gap-2 rounded-2xl bg-white p-3 ring-1 ring-slate-200/60">
-                        <button type="button" id="prevPage" class="btn btn-outline ${isPrevDisabled ? 'pointer-events-none opacity-50' : ''}">Prev</button>
-                        <div class="text-xs font-extrabold text-slate-700">Halaman ${current} / ${totalPages}</div>
-                        <button type="button" id="nextPage" class="btn btn-outline ${isNextDisabled ? 'pointer-events-none opacity-50' : ''}">Next</button>
+                    <div class="mt-4 flex items-center justify-between gap-2 rounded-2xl bg-slate-50 p-3 ring-1 ring-slate-200/50 shadow-3xs">
+                        <button type="button" id="prevPage" class="btn btn-outline py-1.5 px-3 text-xs font-extrabold ${isPrevDisabled ? 'pointer-events-none opacity-50' : ''}">Prev</button>
+                        <div class="text-[10px] font-black text-slate-500">Hal ${current} / ${totalPages}</div>
+                        <button type="button" id="nextPage" class="btn btn-outline py-1.5 px-3 text-xs font-extrabold ${isNextDisabled ? 'pointer-events-none opacity-50' : ''}">Next</button>
                     </div>
                 `;
 
@@ -607,7 +624,7 @@
                     filterAmenityId.innerHTML = [
                         '<option value="">Semua</option>',
                         ...amenities.map((a) => `<option value="${a.id}">${a.name}</option>`)
-                    ].join('');
+                     ].join('');
                 } catch (e) {
                     filterAmenityId.innerHTML = '<option value="">Gagal memuat</option>';
                 }
@@ -696,15 +713,27 @@
             });
         </script>
         <style>
-            .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; padding:8px 12px; font-size:12px; font-weight:700; background:#f8fafc; color:#334155; border:1px solid rgba(148,163,184,.5); transition:all .2s }
-            .pill:hover { background:#f1f5f9 }
+            .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:12px; padding:7px 11px; font-size:11px; font-weight:800; background:#f8fafc; color:#475569; border:1px solid #e2e8f0; transition:all .2s; cursor:pointer; }
+            .pill:hover { background:#f1f5f9; border-color:#cbd5e1 }
             .pill-active { background:#4f46e5; color:#fff; border-color:#4f46e5 }
+            .pill-active:hover { background:#4338ca; border-color:#4338ca }
 
-            .card {
-                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Custom Leaflet overrides */
+            .leaflet-popup-content-wrapper {
+                border-radius: 16px !important;
+                padding: 4px !important;
+                box-shadow: 0 10px 30px rgba(15,23,42,0.15) !important;
+                border: 1px solid rgba(226,232,240,0.8) !important;
             }
-            .card:hover {
-                transform: translateY(-2px);
+            .leaflet-popup-tip {
+                box-shadow: 0 10px 30px rgba(15,23,42,0.15) !important;
+            }
+            .leaflet-container a.leaflet-popup-close-button {
+                top: 12px !important;
+                right: 12px !important;
+                color: #64748b !important;
+                font-size: 16px !important;
+                font-weight: bold !important;
             }
         </style>
     @endpush
