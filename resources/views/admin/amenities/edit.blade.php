@@ -5,8 +5,8 @@
 
     <div class="card p-6">
         <div class="mb-6">
-            <div class="text-sm font-extrabold text-slate-900">Edit Fasilitas: {{ $amenity->name }}</div>
-            <div class="mt-1 text-sm text-slate-500">Perbarui detail dan geser pin di peta jika lokasi berubah.</div>
+            <h1 class="text-sm font-bold text-slate-900">Edit Fasilitas (POI)</h1>
+            <p class="mt-1 text-xs text-slate-500">Perbarui detail fasilitas publik di bawah, atau seret penanda di peta untuk memposisikan ulang titik koordinat.</p>
         </div>
 
         <form method="POST" action="{{ route('admin.amenities.update', $amenity->id) }}" class="grid gap-6 lg:grid-cols-[380px_minmax(0,1fr)]">
@@ -14,54 +14,55 @@
             @method('PUT')
 
             {{-- Form fields --}}
-            <div class="grid gap-4 self-start">
+            <div class="grid gap-4.5 self-start">
                 <div>
-                    <label class="text-xs font-semibold text-slate-600" for="name">Nama Fasilitas <span class="text-rose-500">*</span></label>
+                    <label class="text-xs font-bold text-slate-700" for="name">Nama Fasilitas <span class="text-rose-500">*</span></label>
                     <input
                         id="name" name="name" type="text" value="{{ old('name', $amenity->name) }}"
-                        class="input mt-1 @error('name') ring-rose-400 @enderror"
+                        class="input mt-1.5 @error('name') ring-2 ring-rose-200 border-rose-300 @enderror"
                     />
                     @error('name')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                        <div class="mt-1 text-xs font-bold text-rose-600">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="text-xs font-semibold text-slate-600" for="type">Tipe Fasilitas <span class="text-rose-500">*</span></label>
+                    <label class="text-xs font-bold text-slate-700" for="type">Tipe / Kategori Fasilitas <span class="text-rose-500">*</span></label>
                     <input
                         id="type" name="type" type="text" value="{{ old('type', $amenity->type) }}"
-                        class="input mt-1 @error('type') ring-rose-400 @enderror"
+                        class="input mt-1.5 @error('type') ring-2 ring-rose-200 border-rose-300 @enderror"
                     />
                     @error('type')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                        <div class="mt-1 text-xs font-bold text-rose-600">{{ $message }}</div>
                     @enderror
                 </div>
 
-                <div class="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70">
-                    <div class="text-xs font-extrabold text-slate-700">Koordinat</div>
-                    <div class="mt-3 grid grid-cols-2 gap-3">
+                <div class="rounded-2xl bg-slate-50 p-4 border border-slate-100">
+                    <div class="text-xs font-bold text-slate-700">Koordinat Lokasi</div>
+                    <p class="text-[11px] text-slate-400 mt-0.5 font-medium">Klik peta atau seret marker untuk mengubah posisi.</p>
+                    <div class="mt-3.5 grid grid-cols-2 gap-3">
                         <div>
-                            <label class="text-xs font-semibold text-slate-500">Latitude</label>
-                            <input id="latDisplay" type="text" class="input mt-1 bg-white font-mono text-xs" readonly />
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Latitude</label>
+                            <input id="latDisplay" type="text" class="input mt-1 bg-white font-mono text-xs border-slate-200" readonly />
                         </div>
                         <div>
-                            <label class="text-xs font-semibold text-slate-500">Longitude</label>
-                            <input id="lngDisplay" type="text" class="input mt-1 bg-white font-mono text-xs" readonly />
+                            <label class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Longitude</label>
+                            <input id="lngDisplay" type="text" class="input mt-1 bg-white font-mono text-xs border-slate-200" readonly />
                         </div>
                     </div>
                     <input type="hidden" id="latInput" name="lat" value="{{ old('lat', $amenity->lat) }}" />
                     <input type="hidden" id="lngInput" name="lng" value="{{ old('lng', $amenity->lng) }}" />
                 </div>
 
-                <div class="flex gap-3">
+                <div class="flex gap-3 pt-2">
                     <a href="{{ route('admin.amenities.index') }}" class="btn btn-outline flex-1">Batal</a>
-                    <button type="submit" class="btn btn-primary flex-1">Perbarui</button>
+                    <button type="submit" class="btn btn-primary flex-1 cursor-pointer">Simpan Perubahan</button>
                 </div>
             </div>
 
             {{-- Peta --}}
-            <div class="overflow-hidden rounded-2xl ring-1 ring-slate-200/70">
-                <div id="map" style="height:480px" class="relative z-0 w-full"></div>
+            <div class="overflow-hidden rounded-2xl border border-slate-200/50 shadow-xs relative z-0">
+                <div id="map" style="height:480px" class="w-full"></div>
             </div>
         </form>
     </div>

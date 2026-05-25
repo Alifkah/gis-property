@@ -34,4 +34,3 @@ it('can login with valid credentials', function () {
     $response->assertRedirect(route('seller.listings.index'));
     $this->assertAuthenticatedAs($user);
 });
-

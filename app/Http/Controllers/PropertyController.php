@@ -57,9 +57,9 @@ class PropertyController extends Controller
 
         // Sort
         match ($request->get('sort', 'newest')) {
-            'price_asc'  => $query->orderBy('price'),
+            'price_asc' => $query->orderBy('price'),
             'price_desc' => $query->orderByDesc('price'),
-            default      => $query->orderByDesc('created_at'),
+            default => $query->orderByDesc('created_at'),
         };
 
         $properties = $query->paginate(12)->withQueryString();
@@ -69,7 +69,7 @@ class PropertyController extends Controller
             ? Auth::user()->favorites()->pluck('property_id')->all()
             : [];
 
-        $types     = Property::distinct()->orderBy('type')->pluck('type');
+        $types = Property::distinct()->orderBy('type')->pluck('type');
         $districts = District::orderBy('name')->get(['name']);
 
         return view('properties.index', compact('properties', 'favoritedIds', 'types', 'districts'));
@@ -239,4 +239,3 @@ class PropertyController extends Controller
         return $earthRadius * 2 * asin(min(1.0, sqrt($a)));
     }
 }
-

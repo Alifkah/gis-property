@@ -14,8 +14,11 @@ use Illuminate\Support\Facades\Storage;
 class ExploreApiController extends Controller
 {
     private const DEFAULT_LAT = -0.5;
+
     private const DEFAULT_LNG = 117.15;
+
     private const PER_PAGE = 20;
+
     private const MAX_PER_PAGE = 100;
 
     public function amenities(Request $request): JsonResponse
@@ -23,7 +26,7 @@ class ExploreApiController extends Controller
         $isPgsql = DB::getDriverName() === 'pgsql';
         $type = $request->filled('type') ? $request->string('type')->toString() : null;
 
-        $cacheKey = 'amenities_api_' . ($type ?? 'all');
+        $cacheKey = 'amenities_api_'.($type ?? 'all');
         $data = Cache::remember($cacheKey, 300, function () use ($isPgsql, $type) {
             if ($isPgsql) {
                 $query = Amenity::query()
@@ -37,11 +40,11 @@ class ExploreApiController extends Controller
                 }
 
                 return $query->get()->map(fn ($a) => [
-                    'id'   => (int) $a->id,
+                    'id' => (int) $a->id,
                     'name' => $a->name,
                     'type' => $a->type,
-                    'lat'  => (float) $a->lat,
-                    'lng'  => (float) $a->lng,
+                    'lat' => (float) $a->lat,
+                    'lng' => (float) $a->lng,
                 ])->values()->all();
             }
 
@@ -54,11 +57,11 @@ class ExploreApiController extends Controller
                     $point = $this->extractPoint($amenity->geom);
 
                     return [
-                        'id'   => (int) $amenity->id,
+                        'id' => (int) $amenity->id,
                         'name' => $amenity->name,
                         'type' => $amenity->type,
-                        'lat'  => (float) $point['lat'],
-                        'lng'  => (float) $point['lng'],
+                        'lat' => (float) $point['lat'],
+                        'lng' => (float) $point['lng'],
                     ];
                 })->values()->all();
         });
@@ -146,7 +149,8 @@ class ExploreApiController extends Controller
                     'amenity_distance_m' => isset($property->amenity_distance_m) ? (float) $property->amenity_distance_m : null,
                     'image_url' => $property->first_image_path ? Storage::url($property->first_image_path) : null,
                 ];
-            })->values();        } else {
+            })->values();
+        } else {
             $query = $this->baseSqliteQuery($request);
             $total = (clone $query)->count();
 
@@ -158,27 +162,27 @@ class ExploreApiController extends Controller
             $rows->load('images');
 
             $rows = $rows->map(function (Property $property) {
-                    $point = $this->extractPoint($property->geom);
-                    $firstImage = $property->images->first();
+                $point = $this->extractPoint($property->geom);
+                $firstImage = $property->images->first();
 
-                    return [
-                        'id' => (int) $property->id,
-                        'type' => $property->type,
-                        'title' => $property->title,
-                        'price' => (float) $property->price,
-                        'land_area' => (int) $property->land_area,
-                        'bedroom' => (int) $property->bedroom,
-                        'bathroom' => (int) $property->bathroom,
-                        'lat' => (float) $point['lat'],
-                        'lng' => (float) $point['lng'],
-                        'district_name' => null,
-                        'status' => $property->status,
-                        'is_new' => false,
-                        'is_flood_safe' => true,
-                        'amenity_distance_m' => null,
-                        'image_url' => $firstImage ? Storage::url($firstImage->path) : null,
-                    ];
-                })
+                return [
+                    'id' => (int) $property->id,
+                    'type' => $property->type,
+                    'title' => $property->title,
+                    'price' => (float) $property->price,
+                    'land_area' => (int) $property->land_area,
+                    'bedroom' => (int) $property->bedroom,
+                    'bathroom' => (int) $property->bathroom,
+                    'lat' => (float) $point['lat'],
+                    'lng' => (float) $point['lng'],
+                    'district_name' => null,
+                    'status' => $property->status,
+                    'is_new' => false,
+                    'is_flood_safe' => true,
+                    'amenity_distance_m' => null,
+                    'image_url' => $firstImage ? Storage::url($firstImage->path) : null,
+                ];
+            })
                 ->values();
 
             if ($amenityRadius !== null && ($amenityType !== null || $amenityId !== null)) {

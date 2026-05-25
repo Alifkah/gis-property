@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\FloodZone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -56,7 +57,7 @@ class FloodZoneController extends Controller
             ]);
         }
 
-        \Illuminate\Support\Facades\Cache::forget('explore_flood_zone_features');
+        Cache::forget('explore_flood_zone_features');
 
         return redirect()->route('admin.flood-zones.index')
             ->with('success', "Zona banjir \"{$data['area_name']}\" berhasil ditambahkan.");
@@ -111,7 +112,7 @@ class FloodZoneController extends Controller
             ]);
         }
 
-        \Illuminate\Support\Facades\Cache::forget('explore_flood_zone_features');
+        Cache::forget('explore_flood_zone_features');
 
         return redirect()->route('admin.flood-zones.index')
             ->with('success', "Zona banjir \"{$data['area_name']}\" berhasil diperbarui.");
@@ -122,7 +123,7 @@ class FloodZoneController extends Controller
         $name = $floodZone->area_name;
         $floodZone->delete();
 
-        \Illuminate\Support\Facades\Cache::forget('explore_flood_zone_features');
+        Cache::forget('explore_flood_zone_features');
 
         return redirect()->route('admin.flood-zones.index')
             ->with('success', "Zona banjir \"{$name}\" berhasil dihapus.");
@@ -144,9 +145,9 @@ class FloodZoneController extends Controller
         $ringStrings = array_map(function (array $ring): string {
             $pairs = array_map(fn (array $coord) => "{$coord[0]} {$coord[1]}", $ring);
 
-            return '(' . implode(', ', $pairs) . ')';
+            return '('.implode(', ', $pairs).')';
         }, $rings);
 
-        return 'POLYGON(' . implode(', ', $ringStrings) . ')';
+        return 'POLYGON('.implode(', ', $ringStrings).')';
     }
 }

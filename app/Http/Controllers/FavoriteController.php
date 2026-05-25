@@ -4,13 +4,15 @@ namespace App\Http\Controllers;
 
 use App\Models\Favorite;
 use App\Models\Property;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FavoriteController extends Controller
 {
     /** Toggle favorite status for a property (AJAX-friendly). */
-    public function toggle(Property $property): \Illuminate\Http\JsonResponse
+    public function toggle(Property $property): JsonResponse
     {
         $user = Auth::user();
 
@@ -39,9 +41,9 @@ class FavoriteController extends Controller
             ->favorites()
             ->with(['property' => function ($q) {
                 $q->with('images');
-                if (\Illuminate\Support\Facades\DB::getDriverName() === 'pgsql') {
+                if (DB::getDriverName() === 'pgsql') {
                     $q->select('properties.*')
-                        ->addSelect(\Illuminate\Support\Facades\DB::raw('(select name from districts d where ST_Contains(d.geom, properties.geom) limit 1) as district_name'));
+                        ->addSelect(DB::raw('(select name from districts d where ST_Contains(d.geom, properties.geom) limit 1) as district_name'));
                 }
             }])
             ->latest('favorites.created_at')

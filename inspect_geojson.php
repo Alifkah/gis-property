@@ -1,7 +1,7 @@
 <?php
 
-$filePath = __DIR__ . '/database/data/amenities_samarinda.geojson';
-if (!file_exists($filePath)) {
+$filePath = __DIR__.'/database/data/amenities_samarinda.geojson';
+if (! file_exists($filePath)) {
     echo "File not found\n";
     exit;
 }
@@ -22,7 +22,7 @@ foreach ($features as $feature) {
         $shopTypes[$props['shop']] = ($shopTypes[$props['shop']] ?? 0) + 1;
     }
     foreach ($props as $key => $val) {
-        if (!in_array($key, ['name', 'amenity', 'shop', 'id', 'type', '@id'])) {
+        if (! in_array($key, ['name', 'amenity', 'shop', 'id', 'type', '@id'])) {
             $otherTypes[$key] = ($otherTypes[$key] ?? 0) + 1;
         }
     }

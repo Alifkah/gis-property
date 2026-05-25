@@ -65,7 +65,7 @@ return new class extends Migration
 
         if ($driver === 'pgsql') {
             return (bool) $connection->selectOne(
-                "SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?",
+                'SELECT 1 FROM pg_indexes WHERE tablename = ? AND indexname = ?',
                 [$table, $indexName]
             );
         }

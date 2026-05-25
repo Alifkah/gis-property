@@ -11,8 +11,9 @@ class AmenitySeeder extends Seeder
     {
         $filePath = database_path('data/amenities_samarinda.geojson');
 
-        if (!file_exists($filePath)) {
+        if (! file_exists($filePath)) {
             $this->command->error("File GeoJSON tidak ditemukan di: {$filePath}");
+
             return;
         }
 
@@ -20,14 +21,14 @@ class AmenitySeeder extends Seeder
         $features = $geoJson['features'] ?? [];
         $totalRaw = count($features);
 
-        $this->command->info("Memproses " . $totalRaw . " data POI dari GeoJSON...");
+        $this->command->info('Memproses '.$totalRaw.' data POI dari GeoJSON...');
 
         // Kosongkan tabel amenities terlebih dahulu untuk menghapus data lama/dummy
         DB::statement('TRUNCATE TABLE amenities RESTART IDENTITY CASCADE');
 
         $driver = DB::getDriverName();
         $records = [];
-        
+
         // Trackers untuk deduplikasi
         $seenCoords = [];
         $seenNamesNear = [];
@@ -36,7 +37,7 @@ class AmenitySeeder extends Seeder
         foreach ($features as $feature) {
             // Dapatkan koordinat [longitude, latitude]
             $coords = $feature['geometry']['coordinates'] ?? null;
-            if (!$coords || $feature['geometry']['type'] !== 'Point') {
+            if (! $coords || $feature['geometry']['type'] !== 'Point') {
                 continue;
             }
 
@@ -44,9 +45,10 @@ class AmenitySeeder extends Seeder
             $latitude = (float) $coords[1];
 
             // 1. Cek duplikasi koordinat persis (dibulatkan ke 6 angka di belakang koma, ~11 cm)
-            $coordKey = round($longitude, 6) . ',' . round($latitude, 6);
+            $coordKey = round($longitude, 6).','.round($latitude, 6);
             if (isset($seenCoords[$coordKey])) {
                 $duplicateCount++;
+
                 continue;
             }
 
@@ -62,9 +64,10 @@ class AmenitySeeder extends Seeder
 
             // 2. Cek duplikasi nama yang berada di radius yang sangat dekat (~11 meter)
             // Membulatkan koordinat ke 4 angka di belakang koma untuk pengelompokan area dekat
-            $nameNearKey = strtolower($name) . '|' . round($longitude, 4) . ',' . round($latitude, 4);
+            $nameNearKey = strtolower($name).'|'.round($longitude, 4).','.round($latitude, 4);
             if (isset($seenNamesNear[$nameNearKey])) {
                 $duplicateCount++;
+
                 continue;
             }
 
@@ -83,13 +86,13 @@ class AmenitySeeder extends Seeder
                 $records[] = [
                     'name' => $name,
                     'type' => $type,
-                    'geom' => DB::raw("ST_GeomFromText('POINT({$longitude} {$latitude})', 4326)")
+                    'geom' => DB::raw("ST_GeomFromText('POINT({$longitude} {$latitude})', 4326)"),
                 ];
             } else {
                 $records[] = [
                     'name' => $name,
                     'type' => $type,
-                    'geom' => "POINT({$longitude} {$latitude})"
+                    'geom' => "POINT({$longitude} {$latitude})",
                 ];
             }
         }
@@ -102,10 +105,10 @@ class AmenitySeeder extends Seeder
         $chunks = array_chunk($records, 500);
         foreach ($chunks as $index => $chunk) {
             DB::table('amenities')->insert($chunk);
-            $this->command->info("Mengimpor baris " . (($index * 500) + 1) . " sampai " . min(($index + 1) * 500, $totalImport) . "...");
+            $this->command->info('Mengimpor baris '.(($index * 500) + 1).' sampai '.min(($index + 1) * 500, $totalImport).'...');
         }
 
-        $this->command->info("Impor data POI selesai! Berhasil memasukkan " . $totalImport . " data unik ke database.");
+        $this->command->info('Impor data POI selesai! Berhasil memasukkan '.$totalImport.' data unik ke database.');
     }
 
     /**
@@ -133,9 +136,9 @@ class AmenitySeeder extends Seeder
 
         // 4. Perdagangan (Toko, Cafe, Restoran, Mall, Swalayan, Pasar, dll.)
         if (in_array($rawType, [
-            'supermarket', 'mall', 'marketplace', 'convenience', 'shop', 
-            'bakery', 'restaurant', 'cafe', 'fast_food', 'food_court', 
-            'pub', 'bar', 'coffee', 'marketplace'
+            'supermarket', 'mall', 'marketplace', 'convenience', 'shop',
+            'bakery', 'restaurant', 'cafe', 'fast_food', 'food_court',
+            'pub', 'bar', 'coffee', 'marketplace',
         ])) {
             return 'Perdagangan';
         }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\District;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -13,26 +14,29 @@ class DistrictSeeder extends Seeder
     {
         $filePath = database_path('data/districts_samarinda.geojson');
 
-        if (!File::exists($filePath)) {
+        if (! File::exists($filePath)) {
             $this->command->warn("File GeoJSON kecamatan asli tidak ditemukan di: {$filePath}");
-            $this->command->info("Menggunakan fallback grid kecamatan default...");
-            
+            $this->command->info('Menggunakan fallback grid kecamatan default...');
+
             // Fallback grid default agar seeder tidak error
             $this->seedDefaultGrid();
+
             return;
         }
 
-        $this->command->info("Membaca file GeoJSON kecamatan asli..");
+        $this->command->info('Membaca file GeoJSON kecamatan asli..');
         $geoJsonData = json_decode(File::get($filePath), true);
 
-        if (!$geoJsonData || !isset($geoJsonData['features'])) {
-            $this->command->error("Format file GeoJSON tidak valid.");
+        if (! $geoJsonData || ! isset($geoJsonData['features'])) {
+            $this->command->error('Format file GeoJSON tidak valid.');
+
             return;
         }
 
         $driver = DB::getDriverName();
         if ($driver !== 'pgsql') {
-            $this->command->error("Seeder GeoJSON kecamatan asli hanya didukung pada database PostgreSQL.");
+            $this->command->error('Seeder GeoJSON kecamatan asli hanya didukung pada database PostgreSQL.');
+
             return;
         }
 
@@ -41,14 +45,14 @@ class DistrictSeeder extends Seeder
 
         foreach ($geoJsonData['features'] as $feature) {
             $properties = $feature['properties'] ?? [];
-            
+
             // Cari nama kecamatan dari tag OSM yang umum
-            $name = $properties['name'] 
-                ?? $properties['local_name'] 
-                ?? $properties['official_name'] 
+            $name = $properties['name']
+                ?? $properties['local_name']
+                ?? $properties['official_name']
                 ?? null;
 
-            if (!$name) {
+            if (! $name) {
                 continue;
             }
 
@@ -60,14 +64,14 @@ class DistrictSeeder extends Seeder
             // Simpan ke database dengan casting ke MultiPolygon menggunakan ST_Multi
             District::create([
                 'name' => $name,
-                'geom' => DB::raw("ST_SetSRID(ST_Multi(ST_GeomFromGeoJSON('{$geometryJson}')), 4326)")
+                'geom' => DB::raw("ST_SetSRID(ST_Multi(ST_GeomFromGeoJSON('{$geometryJson}')), 4326)"),
             ]);
 
             $count++;
         }
 
         $this->command->info("Berhasil mengimpor {$count} kecamatan asli Samarinda dari GeoJSON!");
-        \Illuminate\Support\Facades\Cache::forget('explore_district_features');
+        Cache::forget('explore_district_features');
     }
 
     private function seedDefaultGrid(): void
@@ -93,9 +97,9 @@ class DistrictSeeder extends Seeder
                 'name' => $d['name'],
                 'geom' => $driver === 'pgsql'
                     ? DB::raw("ST_SetSRID(ST_GeomFromText('{$d['wkt']}'), 4326)")
-                    : $d['wkt']
+                    : $d['wkt'],
             ]);
         }
-        \Illuminate\Support\Facades\Cache::forget('explore_district_features');
+        Cache::forget('explore_district_features');
     }
 }

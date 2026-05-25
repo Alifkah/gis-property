@@ -59,4 +59,3 @@ it('prevents other users from deleting a listing', function () {
     $this->actingAs($other);
     $this->delete(route('seller.listings.destroy', ['property' => $property->id]))->assertForbidden();
 });
-

@@ -6,10 +6,10 @@
 
     <div class="card p-6">
         <div class="mb-6">
-            <div class="text-sm font-extrabold text-slate-900">Edit Zona Banjir: {{ $floodZone->area_name }}</div>
-            <div class="mt-1 text-sm text-slate-500">
-                Polygon lama ditampilkan di peta. Hapus dan gambar ulang jika batas kawasan berubah.
-            </div>
+            <h1 class="text-sm font-bold text-slate-900">Edit Zona Banjir: {{ $floodZone->area_name }}</h1>
+            <p class="mt-1 text-xs text-slate-500">
+                Polygon area saat ini ditampilkan di peta. Anda dapat memodifikasi polygon langsung atau menghapus dan menggambar ulang polygon baru.
+            </p>
         </div>
 
         <form method="POST" action="{{ route('admin.flood-zones.update', $floodZone->id) }}" id="floodZoneForm" class="grid gap-6 lg:grid-cols-[340px_minmax(0,1fr)]">
@@ -17,45 +17,47 @@
             @method('PUT')
 
             {{-- Form fields --}}
-            <div class="grid gap-4 self-start">
+            <div class="grid gap-4.5 self-start">
                 <div>
-                    <label class="text-xs font-semibold text-slate-600" for="area_name">Nama Area <span class="text-rose-500">*</span></label>
+                    <label class="text-xs font-bold text-slate-700" for="area_name">Nama Area / Kawasan <span class="text-rose-500">*</span></label>
                     <input
                         id="area_name" name="area_name" type="text" value="{{ old('area_name', $floodZone->area_name) }}"
-                        class="input mt-1 @error('area_name') ring-rose-400 @enderror"
+                        class="input mt-1.5 @error('area_name') ring-2 ring-rose-200 border-rose-300 @enderror"
                     />
                     @error('area_name')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                        <div class="mt-1 text-xs font-bold text-rose-600">{{ $message }}</div>
                     @enderror
                 </div>
 
                 <div>
-                    <label class="text-xs font-semibold text-slate-600" for="risk_level">Tingkat Risiko <span class="text-rose-500">*</span></label>
-                    <select id="risk_level" name="risk_level" class="select mt-1">
+                    <label class="text-xs font-bold text-slate-700" for="risk_level">Tingkat Risiko <span class="text-rose-500">*</span></label>
+                    <select id="risk_level" name="risk_level" class="select mt-1.5">
                         <option value="Rendah" @selected(old('risk_level', $floodZone->risk_level) === 'Rendah')>Rendah</option>
                         <option value="Sedang" @selected(old('risk_level', $floodZone->risk_level) === 'Sedang')>Sedang</option>
                         <option value="Tinggi" @selected(old('risk_level', $floodZone->risk_level) === 'Tinggi')>Tinggi</option>
                     </select>
                 </div>
 
-                <div id="polygonStatus" class="rounded-2xl bg-emerald-50 p-3 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200/70">
-                    Polygon lama dimuat. Edit atau gambar ulang bila perlu.
+                {{-- Status --}}
+                <div id="polygonStatus" class="rounded-2xl bg-emerald-50/50 p-3 text-xs font-bold text-emerald-700 border border-emerald-100/50 flex items-center gap-2">
+                    <div class="size-2 rounded-full bg-emerald-500 shrink-0"></div>
+                    <span>Polygon lama berhasil dimuat. Siap diedit.</span>
                 </div>
 
                 <input type="hidden" id="geojsonInput" name="geojson" value="{{ old('geojson') }}" />
                 @error('geojson')
-                    <div class="text-xs font-semibold text-rose-600">{{ $message }}</div>
+                    <div class="text-xs font-bold text-rose-600">{{ $message }}</div>
                 @enderror
 
-                <div class="flex gap-3">
+                <div class="flex gap-3 pt-2">
                     <a href="{{ route('admin.flood-zones.index') }}" class="btn btn-outline flex-1">Batal</a>
-                    <button type="submit" id="submitBtn" class="btn btn-primary flex-1">Perbarui Zona</button>
+                    <button type="submit" id="submitBtn" class="btn btn-primary flex-1 cursor-pointer">Perbarui Zona</button>
                 </div>
             </div>
 
             {{-- Peta --}}
-            <div class="overflow-hidden rounded-2xl ring-1 ring-slate-200/70">
-                <div id="map" style="height:520px" class="relative z-0 w-full"></div>
+            <div class="overflow-hidden rounded-2xl border border-slate-200/50 shadow-xs relative z-0">
+                <div id="map" style="height:520px" class="w-full"></div>
             </div>
         </form>
     </div>
@@ -85,7 +87,7 @@
             const statusEl = document.getElementById('polygonStatus');
             const submitBtn = document.getElementById('submitBtn');
 
-            // Load existing polygon (only available on pgsql)
+            // Load existing polygon
             if (existingGeojson) {
                 try {
                     const parsed = JSON.parse(existingGeojson);
@@ -111,8 +113,8 @@
                 drawnItems.addLayer(e.layer);
                 const geojson = e.layer.toGeoJSON().geometry;
                 geojsonInput.value = JSON.stringify(geojson);
-                statusEl.className = 'rounded-2xl bg-emerald-50 p-3 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200/70';
-                statusEl.textContent = 'Polygon baru digambar. Klik "Perbarui Zona" untuk menyimpan.';
+                statusEl.className = 'rounded-2xl bg-emerald-50/50 p-3 text-xs font-bold text-emerald-700 border border-emerald-100/50 flex items-center gap-2';
+                statusEl.innerHTML = '<div class="size-2 rounded-full bg-emerald-500 shrink-0"></div><span>Polygon baru digambar! Simpan untuk merekam perubahan.</span>';
             });
 
             map.on(L.Draw.Event.EDITED, function () {
@@ -123,8 +125,8 @@
 
             map.on(L.Draw.Event.DELETED, function () {
                 geojsonInput.value = '';
-                statusEl.className = 'rounded-2xl bg-amber-50 p-3 text-xs font-semibold text-amber-700 ring-1 ring-amber-200/70';
-                statusEl.textContent = 'Polygon dihapus. Gambar ulang polygon baru sebelum menyimpan.';
+                statusEl.className = 'rounded-2xl bg-amber-50/50 p-3 text-xs font-bold text-amber-700 border border-amber-100/50 flex items-center gap-2';
+                statusEl.innerHTML = '<div class="size-2 rounded-full bg-amber-500 shrink-0"></div><span>Polygon kosong. Gambar ulang sebelum menyimpan.</span>';
             });
         </script>
     @endpush

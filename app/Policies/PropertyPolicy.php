@@ -17,4 +17,3 @@ class PropertyPolicy
         return $property->user_id === $user->id;
     }
 }
-
