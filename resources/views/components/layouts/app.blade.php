@@ -37,6 +37,41 @@
                 from { opacity: 0; transform: scale(.96) translateY(6px); }
                 to   { opacity: 1; transform: scale(1) translateY(0); }
             }
+
+            @media print {
+                /* Hide headers, footers, navigation, sidebars, buttons */
+                nav, aside, header, footer, button, .btn, .print\:hidden, #clearCenter, #applyFilters, #layerControlPanel, .modal-overlay {
+                    display: none !important;
+                }
+                
+                /* Reset grid columns to stack nicely */
+                .grid {
+                    display: block !important;
+                }
+                
+                /* Reset standard containers */
+                main {
+                    padding: 0 !important;
+                    margin: 0 !important;
+                    max-width: 100% !important;
+                    width: 100% !important;
+                }
+                
+                .card {
+                    border: none !important;
+                    box-shadow: none !important;
+                    padding: 0 !important;
+                    margin-bottom: 2rem !important;
+                    page-break-inside: avoid;
+                }
+                
+                /* Ensure maps print nicely */
+                #map, .leaflet-container {
+                    height: 400px !important;
+                    width: 100% !important;
+                    page-break-inside: avoid;
+                }
+            }
         </style>
 
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))

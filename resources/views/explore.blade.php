@@ -51,6 +51,10 @@
                         <span class="text-xs font-semibold text-slate-700">Batas Admin</span>
                         <input id="toggleDistricts" type="checkbox" class="size-4 accent-indigo-600" checked />
                     </label>
+                    <label class="flex items-center justify-between gap-3">
+                        <span class="text-xs font-semibold text-slate-700">Mode Gelap Peta</span>
+                        <input id="toggleDarkMode" type="checkbox" class="size-4 accent-indigo-600" />
+                    </label>
                 </div>
                 <div style="margin-top:8px;padding-top:8px;border-top:1px solid #f1f5f9">
                     <div class="text-xs font-extrabold text-slate-900">Legenda</div>
@@ -207,10 +211,28 @@
             });
             new LayerPanel().addTo(map);
 
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; OpenStreetMap contributors'
-            }).addTo(map);
+            });
+
+            const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd',
+                maxZoom: 20
+            });
+
+            osmTiles.addTo(map);
+
+            document.getElementById('toggleDarkMode').addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    map.removeLayer(osmTiles);
+                    darkTiles.addTo(map);
+                } else {
+                    map.removeLayer(darkTiles);
+                    osmTiles.addTo(map);
+                }
+            });
 
             const markerLayer = L.layerGroup().addTo(map);
 
@@ -471,7 +493,20 @@
                 const amenityId = filterAmenityId.value || '';
                 const amenityRadius = filterAmenityRadius.disabled ? '' : (filterAmenityRadius.value || '');
 
-                propertyList.innerHTML = '<div class="text-sm font-semibold text-slate-600">Memuat data...</div>';
+                const skeletonHtml = Array.from({ length: 4 }).map(() => `
+                    <div class="w-full card overflow-hidden animate-pulse border border-slate-100 bg-white rounded-2xl">
+                        <div class="bg-slate-200" style="height:120px"></div>
+                        <div class="p-3 space-y-2.5">
+                            <div class="h-3.5 bg-slate-200 rounded w-3/4"></div>
+                            <div class="h-3 bg-slate-200 rounded w-1/2"></div>
+                            <div class="pt-2 flex items-center justify-between gap-2">
+                                <div class="h-4 bg-slate-200 rounded w-1/3"></div>
+                                <div class="h-3 bg-slate-200 rounded w-1/4"></div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                propertyList.innerHTML = skeletonHtml;
 
                 try {
                     const [priceMin, priceMax] = price ? price.split('-') : ['', ''];
@@ -664,6 +699,13 @@
             .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:9999px; padding:8px 12px; font-size:12px; font-weight:700; background:#f8fafc; color:#334155; border:1px solid rgba(148,163,184,.5); transition:all .2s }
             .pill:hover { background:#f1f5f9 }
             .pill-active { background:#4f46e5; color:#fff; border-color:#4f46e5 }
+
+            .card {
+                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .card:hover {
+                transform: translateY(-2px);
+            }
         </style>
     @endpush
 </x-layouts.blank>

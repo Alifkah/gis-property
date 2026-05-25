@@ -16,8 +16,54 @@
                     <div class="text-sm font-extrabold text-slate-900">Listing Saya</div>
                     <div class="mt-1 text-sm text-slate-600">Kelola properti yang kamu pasang.</div>
                 </div>
-                <a href="{{ route('seller.listings.create') }}" class="btn btn-primary">Tambah Listing</a>
+                <div class="flex items-center gap-2 print:hidden">
+                    <a href="{{ route('seller.listings.export') }}" class="btn btn-outline flex items-center gap-2">
+                        <svg class="size-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>Ekspor CSV</span>
+                    </a>
+                    <button onclick="window.print()" class="btn btn-outline flex items-center gap-2">
+                        <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                            <path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span>Cetak</span>
+                    </button>
+                    <a href="{{ route('seller.listings.create') }}" class="btn btn-primary">Tambah Listing</a>
+                </div>
             </div>
+
+            {{-- Charts Section --}}
+            @if ($properties->isNotEmpty())
+                <div x-data="{ open: false }" class="mt-6 border-b border-slate-100 pb-6 print:block">
+                    <button @click="open = !open" class="flex w-full items-center justify-between gap-3 rounded-2xl bg-slate-50 p-4 font-bold text-slate-700 ring-1 ring-slate-200/60 hover:bg-slate-100 transition print:hidden">
+                        <span class="flex items-center gap-2">
+                            <svg class="size-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                            Statistik & Analisis Listing Saya
+                        </span>
+                        <svg class="size-4 transition-transform duration-200" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </button>
+
+                    <div x-show="open || window.matchMedia('print').matches" x-cloak class="mt-4 grid gap-6 lg:grid-cols-2">
+                        <div class="card p-4 bg-white border border-slate-100">
+                            <div class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-4">Sebaran Properti per Kecamatan</div>
+                            <div id="districtChart" style="min-height: 250px;"></div>
+                        </div>
+                        <div class="card p-4 bg-white border border-slate-100">
+                            <div class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-4">Status Kerawanan Banjir</div>
+                            <div id="floodChart" style="min-height: 250px;"></div>
+                        </div>
+                        <div class="lg:col-span-2 card p-4 bg-white border border-slate-100">
+                            <div class="text-xs font-extrabold uppercase tracking-widest text-slate-400 mb-4">Tren Harga Properti Saya vs Rata-rata Pasar (per m²)</div>
+                            <div id="priceTrendChart" style="min-height: 250px;"></div>
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 @forelse ($properties as $property)
@@ -80,4 +126,163 @@
             </div>
         </section>
     </div>
+
+    @if ($properties->isNotEmpty())
+        @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // 1. District Bar Chart
+                const districtData = @json($propertiesPerDistrict);
+                const districtLabels = districtData.map(d => d.name);
+                const districtTotals = districtData.map(d => d.total);
+
+                const districtOptions = {
+                    series: [{
+                        name: 'Properti Saya',
+                        data: districtTotals
+                    }],
+                    chart: {
+                        type: 'bar',
+                        height: 240,
+                        toolbar: { show: false },
+                        fontFamily: 'Inter, system-ui, sans-serif'
+                    },
+                    plotOptions: {
+                        bar: {
+                            borderRadius: 4,
+                            horizontal: true,
+                            barHeight: '50%'
+                        }
+                    },
+                    colors: ['#4f46e5'],
+                    dataLabels: { enabled: false },
+                    xaxis: {
+                        categories: districtLabels,
+                        labels: { style: { colors: '#64748b', fontWeight: 600 } }
+                    },
+                    yaxis: {
+                        labels: { style: { colors: '#64748b', fontWeight: 600 } }
+                    },
+                    grid: { borderColor: '#f1f5f9' }
+                };
+                new ApexCharts(document.querySelector("#districtChart"), districtOptions).render();
+
+                // 2. Flood Donut Chart
+                const floodSafe = {{ $floodSafeCount }};
+                const floodRisk = {{ $floodRiskCount }};
+
+                const floodOptions = {
+                    series: [floodSafe, floodRisk],
+                    chart: {
+                        type: 'donut',
+                        height: 240,
+                        fontFamily: 'Inter, system-ui, sans-serif'
+                    },
+                    labels: ['Bebas Banjir', 'Rawan Banjir'],
+                    colors: ['#10b981', '#f43f5e'],
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '65%',
+                                labels: {
+                                    show: true,
+                                    total: {
+                                        show: true,
+                                        label: 'Total Listing',
+                                        color: '#64748b',
+                                        fontWeight: 700,
+                                        formatter: function (w) {
+                                            return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'bottom',
+                        fontWeight: 600,
+                        labels: { colors: '#475569' }
+                    },
+                    dataLabels: { enabled: false }
+                };
+                new ApexCharts(document.querySelector("#floodChart"), floodOptions).render();
+
+                // 3. Price Trend Comparison Chart
+                const sellerTrend = @json($sellerPriceTrend);
+                const marketTrend = @json($marketPriceTrend);
+
+                const periods = Array.from(new Set([
+                    ...sellerTrend.map(t => t.period),
+                    ...marketTrend.map(t => t.period)
+                ])).sort();
+
+                const sellerPrices = periods.map(p => {
+                    const item = sellerTrend.find(t => t.period === p);
+                    return item ? Math.round(item.avg_price_per_sqm) : null;
+                });
+
+                const marketPrices = periods.map(p => {
+                    const item = marketTrend.find(t => t.period === p);
+                    return item ? Math.round(item.avg_price_per_sqm) : null;
+                });
+
+                const trendOptions = {
+                    series: [
+                        {
+                            name: 'Properti Saya',
+                            data: sellerPrices
+                        },
+                        {
+                            name: 'Rata-rata Pasar',
+                            data: marketPrices
+                        }
+                    ],
+                    chart: {
+                        type: 'line',
+                        height: 260,
+                        toolbar: { show: false },
+                        fontFamily: 'Inter, system-ui, sans-serif',
+                        zoom: { enabled: false }
+                    },
+                    stroke: {
+                        curve: 'smooth',
+                        width: [3, 2],
+                        dashArray: [0, 5]
+                    },
+                    colors: ['#4f46e5', '#94a3b8'],
+                    xaxis: {
+                        categories: periods,
+                        labels: { style: { colors: '#64748b', fontWeight: 600 } }
+                    },
+                    yaxis: {
+                        labels: {
+                            formatter: function (val) {
+                                return 'Rp ' + new Intl.NumberFormat('id-ID').format(val);
+                            },
+                            style: { colors: '#64748b', fontWeight: 600 }
+                        }
+                    },
+                    grid: { borderColor: '#f1f5f9' },
+                    markers: {
+                        size: 4,
+                        colors: ['#4f46e5', '#94a3b8'],
+                        strokeColors: '#fff',
+                        strokeWidth: 2
+                    },
+                    tooltip: {
+                        y: {
+                            formatter: function(val) {
+                                if (val === null) return 'N/A';
+                                return 'Rp ' + new Intl.NumberFormat('id-ID').format(val) + ' / m²';
+                            }
+                        }
+                    }
+                };
+                new ApexCharts(document.querySelector("#priceTrendChart"), trendOptions).render();
+            });
+        </script>
+        @endpush
+    @endif
 </x-layouts.app>

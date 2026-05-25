@@ -7,7 +7,7 @@
     ];
 @endphp
 
-<header class="sticky top-0 z-40 border-b border-slate-200 bg-white/85 backdrop-blur">
+<header class="sticky top-0 z-[1050] border-b border-slate-200 bg-white/85 backdrop-blur">
     <div class="mx-auto flex h-16 w-full max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
         <a href="{{ route('home') }}" class="flex items-center gap-2">
             <div class="grid size-9 place-items-center rounded-xl bg-indigo-600 text-white">

@@ -61,7 +61,7 @@
 
             {{-- Peta --}}
             <div class="overflow-hidden rounded-2xl ring-1 ring-slate-200/70">
-                <div id="map" style="height:480px" class="w-full"></div>
+                <div id="map" style="height:480px" class="relative z-0 w-full"></div>
             </div>
         </form>
     </div>

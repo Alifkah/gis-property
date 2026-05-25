@@ -85,7 +85,7 @@
                 <div class="text-sm font-extrabold text-slate-900">GIS Analysis</div>
                 <div class="mt-4 grid gap-4 lg:grid-cols-[340px_minmax(0,1fr)]">
                     <div class="rounded-2xl bg-slate-100" style="height:260px;min-height:260px">
-                        <div id="miniMap" style="height:260px;width:100%"></div>
+                        <div id="miniMap" class="relative z-0" style="height:260px;width:100%"></div>
                     </div>
                     <div class="grid gap-4">
                         <div class="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70">
@@ -183,7 +183,8 @@
                 <div class="mt-4 grid gap-3">
                     <div>
                         <label class="text-xs font-semibold text-slate-600">Uang Muka</label>
-                        <input id="dpInput" type="number" class="input mt-1" value="100000000" min="0" step="1000000" />
+                        <input id="dpInputDisplay" type="text" class="input mt-1" placeholder="100.000.000" />
+                        <input id="dpInput" type="hidden" value="100000000" />
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-600">Jangka Waktu (tahun)</label>
@@ -215,6 +216,7 @@
 
             const price = {{ (float) $property->price }};
             const dpInput = document.getElementById('dpInput');
+            const dpInputDisplay = document.getElementById('dpInputDisplay');
             const termInput = document.getElementById('termInput');
             const out = document.getElementById('installment');
 
@@ -232,8 +234,34 @@
                 out.textContent = `Rp ${formatCurrency(m)}`;
             }
 
-            dpInput.addEventListener('input', calc);
+            function formatNumberString(str) {
+                return str.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            function updateDp() {
+                let cleanVal = dpInputDisplay.value.replace(/\D/g, '');
+                if (cleanVal === '') {
+                    dpInput.value = '0';
+                    dpInputDisplay.value = '';
+                    calc();
+                    return;
+                }
+                const num = parseInt(cleanVal, 10);
+                dpInput.value = num;
+                dpInputDisplay.value = formatNumberString(num);
+                calc();
+            }
+
+            dpInputDisplay.addEventListener('input', updateDp);
             termInput.addEventListener('input', calc);
+
+            // Initialize formatting
+            if (dpInput.value) {
+                const initialVal = parseInt(dpInput.value, 10);
+                if (!isNaN(initialVal)) {
+                    dpInputDisplay.value = formatNumberString(initialVal);
+                }
+            }
             calc();
         </script>
     @endpush

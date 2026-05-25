@@ -12,6 +12,7 @@ use Illuminate\View\View;
 class CompetitorAnalysisController extends Controller
 {
     private const DEFAULT_LAT = -0.5;
+
     private const DEFAULT_LNG = 117.15;
 
     public function index(): View
@@ -281,5 +282,90 @@ class CompetitorAnalysisController extends Controller
             + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
 
         return $earthRadius * 2 * asin(min(1.0, sqrt($a)));
+    }
+
+    public function exportCsv(Request $request, Property $property)
+    {
+        $this->authorize('update', $property);
+
+        $radius = (float) $request->input('radius', 1000);
+        $radius = min(max($radius, 100), 10000);
+
+        $isPgsql = DB::getDriverName() === 'pgsql';
+
+        if ($isPgsql) {
+            $response = $this->analyzePgsql($property, $radius);
+        } else {
+            $response = $this->analyzeSqlite($property, $radius);
+        }
+
+        $data = json_decode($response->getContent(), true);
+
+        if (isset($data['error'])) {
+            return redirect()->back()->with('error', $data['error']);
+        }
+
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="analisis_kompetitor_'.$property->id.'_'.date('Ymd_His').'.csv"',
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($data) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
+
+            // Section 1: Properti Acuan
+            fputcsv($file, ['PROPERTI ACUAN']);
+            fputcsv($file, ['ID Properti', 'Judul', 'Tipe', 'Harga (Rp)', 'Luas Tanah (m2)', 'Harga/m2 (Rp)']);
+            fputcsv($file, [
+                $data['property']['id'],
+                $data['property']['title'],
+                $data['property']['type'],
+                (float) $data['property']['price'],
+                $data['property']['land_area'],
+                round($data['property']['price_per_sqm']),
+            ]);
+            fputcsv($file, []);
+
+            // Section 2: Ringkasan Analisis
+            fputcsv($file, ['RINGKASAN ANALISIS (RADIUS '.$data['statistics']['radius_m'].' Meter)']);
+            fputcsv($file, ['Total Kompetitor', 'Harga Rata-rata (Rp)', 'Harga/m2 Rata-rata (Rp)', 'Posisi Harga Properti Anda']);
+            fputcsv($file, [
+                $data['statistics']['total_competitors'],
+                round($data['statistics']['avg_price']),
+                round($data['statistics']['avg_price_per_sqm']),
+                $data['statistics']['price_position'],
+            ]);
+            fputcsv($file, []);
+
+            // Section 3: Daftar Kompetitor
+            fputcsv($file, ['DAFTAR PROPERTI KOMPETITOR DI SEKITAR']);
+            fputcsv($file, [
+                'No', 'Judul', 'Jarak (meter)', 'Harga (Rp)', 'Luas Tanah (m2)',
+                'Harga/m2 (Rp)', 'Status', 'Kecamatan', 'Pemilik', 'Nomor HP Pemilik',
+            ]);
+
+            foreach ($data['competitors'] as $index => $comp) {
+                fputcsv($file, [
+                    $index + 1,
+                    $comp['title'],
+                    round($comp['distance_m'], 1),
+                    (float) $comp['price'],
+                    $comp['land_area'],
+                    round($comp['price_per_sqm']),
+                    $comp['status'],
+                    $comp['district_name'] ?? 'Samarinda',
+                    $comp['owner_name'],
+                    $comp['owner_phone'] ?? '-',
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 }

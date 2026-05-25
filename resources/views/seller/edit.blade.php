@@ -43,7 +43,8 @@
                     </div>
                     <div>
                         <label class="text-xs font-semibold text-slate-600">Harga (IDR)</label>
-                        <input name="price" type="number" class="input mt-1" value="{{ old('price', (float) $property->price) }}" min="0" step="1000" required />
+                        <input id="price_display" type="text" class="input mt-1" placeholder="500.000.000" required />
+                        <input id="price_real" name="price" type="hidden" value="{{ old('price', (float) $property->price) }}" />
                         @error('price')
                             <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
                         @enderror
@@ -200,6 +201,36 @@
                     }
                 });
             });
+
+            // Price formatter logic
+            const priceReal = document.getElementById('price_real');
+            const priceDisplay = document.getElementById('price_display');
+
+            function formatNumber(num) {
+                return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+            }
+
+            function updatePrice() {
+                let cleanVal = priceDisplay.value.replace(/\D/g, '');
+                if (cleanVal === '') {
+                    priceReal.value = '';
+                    priceDisplay.value = '';
+                    return;
+                }
+                const num = parseInt(cleanVal, 10);
+                priceReal.value = num;
+                priceDisplay.value = formatNumber(num);
+            }
+
+            priceDisplay.addEventListener('input', updatePrice);
+
+            // Initialize formatting
+            if (priceReal.value) {
+                const initialVal = parseInt(priceReal.value, 10);
+                if (!isNaN(initialVal)) {
+                    priceDisplay.value = formatNumber(initialVal);
+                }
+            }
         </script>
     @endpush
 </x-layouts.app>

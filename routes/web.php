@@ -1,23 +1,24 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
+use App\Http\Controllers\Admin\AmenityController as AdminAmenityController;
+use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\FloodZoneController as AdminFloodZoneController;
+use App\Http\Controllers\Admin\ListingController as AdminListingController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ExploreApiController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\PropertyController;
+use App\Http\Controllers\Seller\CompetitorAnalysisController;
 use App\Http\Controllers\Seller\ListingController;
 use App\Http\Controllers\Seller\ProfileController;
-use App\Http\Controllers\Seller\CompetitorAnalysisController;
-use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Admin\AmenityController as AdminAmenityController;
-use App\Http\Controllers\Admin\FloodZoneController as AdminFloodZoneController;
-use App\Http\Controllers\Admin\ListingController as AdminListingController;
 use App\Models\Amenity;
-use App\Models\Property;
 use App\Models\District;
 use App\Models\FloodZone;
+use App\Models\Property;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     $isPgsql = DB::getDriverName() === 'pgsql';
@@ -61,6 +62,7 @@ Route::get('/', function () {
     }
 
     $recentProperties->load('images');
+
     return view('home', [
         'types' => $types,
         'districts' => $districts,
@@ -84,7 +86,7 @@ Route::get('/explore', function (Request $request) {
         ->pluck('type');
 
     if ($isPgsql) {
-        $districtFeatures = \Illuminate\Support\Facades\Cache::remember('explore_district_features', 3600, function () {
+        $districtFeatures = Cache::remember('explore_district_features', 3600, function () {
             return District::query()
                 ->select('id', 'name')
                 ->addSelect(DB::raw('ST_AsGeoJSON(geom) as geojson'))
@@ -99,10 +101,11 @@ Route::get('/explore', function (Request $request) {
                         'geometry' => json_decode($district->geojson, true),
                     ];
                 })
-                ->values();
+                ->values()
+                ->all();
         });
 
-        $floodZoneFeatures = \Illuminate\Support\Facades\Cache::remember('explore_flood_zone_features', 3600, function () {
+        $floodZoneFeatures = Cache::remember('explore_flood_zone_features', 3600, function () {
             return FloodZone::query()
                 ->select('id', 'area_name', 'risk_level')
                 ->addSelect(DB::raw('ST_AsGeoJSON(geom) as geojson'))
@@ -118,7 +121,8 @@ Route::get('/explore', function (Request $request) {
                         'geometry' => json_decode($zone->geojson, true),
                     ];
                 })
-                ->values();
+                ->values()
+                ->all();
         });
     } else {
         $districtFeatures = collect();
@@ -161,6 +165,7 @@ Route::post('/register', [AuthController::class, 'register'])->name('register.st
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::middleware('auth')->prefix('seller')->name('seller.')->group(function () {
+    Route::get('/listings/export', [ListingController::class, 'exportCsv'])->name('listings.export');
     Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
     Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
     Route::post('/listings', [ListingController::class, 'store'])->name('listings.store');
@@ -174,11 +179,13 @@ Route::middleware('auth')->prefix('seller')->name('seller.')->group(function () 
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
+    Route::get('/competitor-analysis/export/{property}', [CompetitorAnalysisController::class, 'exportCsv'])->name('competitor-analysis.export');
     Route::get('/competitor-analysis', [CompetitorAnalysisController::class, 'index'])->name('competitor-analysis.index');
     Route::get('/competitor-analysis/{property}', [CompetitorAnalysisController::class, 'analyze'])->name('competitor-analysis.analyze');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/listings/export', [AdminDashboardController::class, 'exportCsv'])->name('listings.export');
     Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('amenities', AdminAmenityController::class);

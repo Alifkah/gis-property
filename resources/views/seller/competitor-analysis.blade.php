@@ -45,6 +45,24 @@
             </div>
 
             <div id="resultsSection" class="hidden grid gap-6">
+                <div class="flex items-center justify-between gap-4 print:hidden">
+                    <div class="text-xs font-semibold text-slate-500">Hasil Analisis</div>
+                    <div class="flex gap-2">
+                        <a id="exportCsvBtn" href="#" class="btn btn-outline flex items-center gap-2">
+                            <svg class="size-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Ekspor CSV</span>
+                        </a>
+                        <button onclick="window.print()" class="btn btn-primary flex items-center gap-2">
+                            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Cetak PDF</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="card p-6">
                     <div class="text-sm font-extrabold text-slate-900">Statistik Kompetitor</div>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -73,9 +91,17 @@
                 </div>
 
                 <div class="card p-6">
-                    <div class="text-sm font-extrabold text-slate-900">Peta Buffer Zone</div>
-                    <div class="mt-1 text-sm text-slate-600">Visualisasi properti kompetitor dalam radius yang dipilih.</div>
-                    <div id="map" class="mt-4 h-[500px] w-full rounded-2xl overflow-hidden ring-1 ring-slate-200"></div>
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <div class="text-sm font-extrabold text-slate-900">Peta Buffer Zone</div>
+                            <div class="mt-1 text-sm text-slate-600">Visualisasi properti kompetitor dalam radius yang dipilih.</div>
+                        </div>
+                        <label class="flex items-center gap-2 print:hidden cursor-pointer select-none">
+                            <input id="toggleDarkMode" type="checkbox" class="size-4 accent-indigo-600 rounded" />
+                            <span class="text-xs font-bold text-slate-700">Mode Gelap Peta</span>
+                        </label>
+                    </div>
+                    <div id="map" class="relative z-0 mt-4 h-[500px] w-full rounded-2xl overflow-hidden ring-1 ring-slate-200"></div>
                 </div>
 
                 <div class="card p-6">
@@ -183,6 +209,10 @@
             function renderResults(data) {
                 resultsSection.classList.remove('hidden');
 
+                // Update CSV link
+                const prop = data.property;
+                document.getElementById('exportCsvBtn').href = `/seller/competitor-analysis/export/${prop.id}?radius=${data.statistics.radius_m}`;
+
                 // Statistics
                 statTotal.textContent = data.statistics.total_competitors;
                 statAvgPrice.textContent = formatCurrency(data.statistics.avg_price);
@@ -192,7 +222,6 @@
                 statPosition.textContent = data.statistics.price_position;
 
                 // My property info
-                const prop = data.property;
                 myPropertyInfo.innerHTML = `
                     <div class="grid gap-2">
                         <div><span class="font-semibold">Judul:</span> ${prop.title}</div>
@@ -220,10 +249,37 @@
                 map = L.map('map', { zoomControl: false }).setView([data.property.lat, data.property.lng], 14);
                 L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
                     attribution: '&copy; OpenStreetMap contributors'
-                }).addTo(map);
+                });
+
+                const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                    subdomains: 'abcd',
+                    maxZoom: 20
+                });
+
+                const toggleDark = document.getElementById('toggleDarkMode');
+                if (toggleDark && toggleDark.checked) {
+                    darkTiles.addTo(map);
+                } else {
+                    osmTiles.addTo(map);
+                }
+
+                if (toggleDark) {
+                    const newToggle = toggleDark.cloneNode(true);
+                    toggleDark.parentNode.replaceChild(newToggle, toggleDark);
+                    newToggle.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            map.removeLayer(osmTiles);
+                            darkTiles.addTo(map);
+                        } else {
+                            map.removeLayer(darkTiles);
+                            osmTiles.addTo(map);
+                        }
+                    });
+                }
 
                 markerLayer = L.layerGroup().addTo(map);
 

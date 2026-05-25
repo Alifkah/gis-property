@@ -1,4 +1,25 @@
 <x-layouts.admin>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-extrabold text-slate-900">Dashboard Admin</h1>
+            <p class="text-sm text-slate-500 mt-1">Kelola data properti, fasilitas, dan zona rawan banjir di Samarinda.</p>
+        </div>
+        <div class="flex items-center gap-2 print:hidden">
+            <a href="{{ route('admin.listings.export') }}" class="btn btn-outline flex items-center gap-2">
+                <svg class="size-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Ekspor Excel (CSV)</span>
+            </a>
+            <button onclick="window.print()" class="btn btn-primary flex items-center gap-2">
+                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>Cetak PDF</span>
+            </button>
+        </div>
+    </div>
+
     {{-- Stat Cards --}}
     <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div class="card p-5">
@@ -96,6 +117,23 @@
         </a>
     </div>
 
+    {{-- Charts Section --}}
+    <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <div class="card p-5">
+            <div class="text-sm font-extrabold text-slate-900 mb-4">Sebaran Properti per Kecamatan</div>
+            <div id="districtChart" style="min-height: 280px;"></div>
+        </div>
+        <div class="card p-5">
+            <div class="text-sm font-extrabold text-slate-900 mb-4">Persentase Risiko Genangan Banjir</div>
+            <div id="floodChart" style="min-height: 280px;"></div>
+        </div>
+    </div>
+
+    <div class="mt-6 card p-5">
+        <div class="text-sm font-extrabold text-slate-900 mb-4">Tren Rata-rata Harga Properti (per m²)</div>
+        <div id="priceTrendChart" style="min-height: 280px;"></div>
+    </div>
+
     {{-- Listing Terbaru --}}
     <div class="mt-6 card p-6">
         <div class="flex items-center justify-between">
@@ -146,4 +184,149 @@
             </table>
         </div>
     </div>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. District Bar Chart
+            const districtData = @json($propertiesPerDistrict);
+            const districtLabels = districtData.map(d => d.name);
+            const districtTotals = districtData.map(d => d.total);
+
+            const districtOptions = {
+                series: [{
+                    name: 'Jumlah Properti',
+                    data: districtTotals
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 280,
+                    toolbar: { show: false },
+                    fontFamily: 'Inter, system-ui, sans-serif'
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 6,
+                        horizontal: true,
+                        barHeight: '60%'
+                    }
+                },
+                colors: ['#4f46e5'],
+                dataLabels: { enabled: false },
+                xaxis: {
+                    categories: districtLabels,
+                    labels: {
+                        style: { colors: '#64748b', fontWeight: 600 }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#64748b', fontWeight: 600 }
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f5f9'
+                }
+            };
+            new ApexCharts(document.querySelector("#districtChart"), districtOptions).render();
+
+            // 2. Flood Risk Pie Chart
+            const floodSafe = {{ $floodSafeCount }};
+            const floodRisk = {{ $floodRiskCount }};
+
+            const floodOptions = {
+                series: [floodSafe, floodRisk],
+                chart: {
+                    type: 'donut',
+                    height: 280,
+                    fontFamily: 'Inter, system-ui, sans-serif'
+                },
+                labels: ['Bebas Banjir', 'Rawan Banjir'],
+                colors: ['#10b981', '#f43f5e'],
+                plotOptions: {
+                    pie: {
+                        donut: {
+                           size: '70%',
+                           labels: {
+                               show: true,
+                               total: {
+                                   show: true,
+                                   label: 'Total Listing',
+                                   color: '#64748b',
+                                   fontWeight: 700,
+                                   formatter: function (w) {
+                                       return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                   }
+                               }
+                           }
+                        }
+                    }
+                },
+                legend: {
+                    position: 'bottom',
+                    fontWeight: 600,
+                    labels: { colors: '#475569' }
+                },
+                dataLabels: { enabled: false }
+            };
+            new ApexCharts(document.querySelector("#floodChart"), floodOptions).render();
+
+            // 3. Price Trend Line Chart
+            const trendData = @json($priceTrend);
+            const trendPeriods = trendData.map(t => t.period);
+            const trendAverages = trendData.map(t => Math.round(t.avg_price_per_sqm));
+
+            const trendOptions = {
+                series: [{
+                    name: 'Harga Rata-rata per m²',
+                    data: trendAverages
+                }],
+                chart: {
+                    type: 'line',
+                    height: 280,
+                    toolbar: { show: false },
+                    fontFamily: 'Inter, system-ui, sans-serif',
+                    zoom: { enabled: false }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+                colors: ['#6366f1'],
+                xaxis: {
+                    categories: trendPeriods,
+                    labels: {
+                        style: { colors: '#64748b', fontWeight: 600 }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function (val) {
+                            return 'Rp ' + new Intl.NumberFormat('id-ID').format(val);
+                        },
+                        style: { colors: '#64748b', fontWeight: 600 }
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f5f9'
+                },
+                markers: {
+                    size: 4,
+                    colors: ['#4f46e5'],
+                    strokeColors: '#fff',
+                    strokeWidth: 2
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return 'Rp ' + new Intl.NumberFormat('id-ID').format(val) + ' / m²';
+                        }
+                    }
+                }
+            };
+            new ApexCharts(document.querySelector("#priceTrendChart"), trendOptions).render();
+        });
+    </script>
+    @endpush
 </x-layouts.admin>

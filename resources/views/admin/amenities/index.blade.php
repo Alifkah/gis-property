@@ -22,15 +22,15 @@
                     @forelse ($amenities as $amenity)
                         <tr>
                             <td class="py-3 font-semibold text-slate-900">{{ $amenity->name }}</td>
-                            <td class="py-3">
-                                <span class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-200/70">
+                            <td class="py-3 whitespace-nowrap">
+                                <span class="inline-flex items-center rounded-full bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-200/70 whitespace-nowrap">
                                     {{ $amenity->type }}
                                 </span>
                             </td>
-                            <td class="py-3 font-mono text-xs text-slate-500">
+                            <td class="py-3 font-mono text-xs text-slate-500 whitespace-nowrap">
                                 {{ number_format((float) $amenity->lat, 6) }}, {{ number_format((float) $amenity->lng, 6) }}
                             </td>
-                            <td class="py-3">
+                            <td class="py-3 whitespace-nowrap">
                                 <div class="flex items-center gap-2">
                                     <a href="{{ route('admin.amenities.edit', $amenity->id) }}" class="btn btn-outline">Edit</a>
 
