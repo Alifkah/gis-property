@@ -23,10 +23,10 @@
     {{-- Stat Cards --}}
     <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {{-- Card 1: Total Listing --}}
-        <div class="card bg-linear-to-br from-indigo-500/5 via-white to-white p-5 border-l-4 border-l-indigo-500 transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-brand-primary/5 via-white to-white p-5 border-l-4 border-l-brand-primary transition hover:shadow-md">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Listing</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100/50">
+                <div class="grid size-9 place-items-center rounded-xl bg-brand-primary/5 text-brand-primary ring-1 ring-brand-primary/10">
                     <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
@@ -41,10 +41,10 @@
         </div>
 
         {{-- Card 2: Total Penjual --}}
-        <div class="card bg-linear-to-br from-violet-500/5 via-white to-white p-5 border-l-4 border-l-violet-500 transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-brand-accent/5 via-white to-white p-5 border-l-4 border-l-brand-accent transition hover:shadow-md">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Penjual</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-violet-50 text-violet-600 ring-1 ring-violet-100/50">
+                <div class="grid size-9 place-items-center rounded-xl bg-brand-accent/5 text-brand-accent ring-1 ring-brand-accent/10">
                     <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -52,7 +52,7 @@
             </div>
             <div class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalSellers) }}</div>
             <div class="mt-2 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center bg-violet-50/50 text-violet-700 px-2 py-0.5 rounded-md">Pengguna Terdaftar</span>
+                <span class="inline-flex items-center bg-brand-accent/5 text-brand-accent px-2 py-0.5 rounded-md">Pengguna Terdaftar</span>
             </div>
         </div>
 
@@ -74,10 +74,10 @@
         </div>
 
         {{-- Card 4: Zona Banjir --}}
-        <div class="card bg-linear-to-br from-rose-500/5 via-white to-white p-5 border-l-4 border-l-rose-500 transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-brand-warning/5 via-white to-white p-5 border-l-4 border-l-brand-warning transition hover:shadow-md">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Zona Banjir</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-100/50">
+                <div class="grid size-9 place-items-center rounded-xl bg-brand-warning/5 text-brand-warning ring-1 ring-brand-warning/10">
                     <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
@@ -85,7 +85,7 @@
             </div>
             <div class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalFloodZones) }}</div>
             <div class="mt-2 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center bg-rose-50/50 text-rose-700 px-2 py-0.5 rounded-md">Kawasan Rawan Genangan</span>
+                <span class="inline-flex items-center bg-brand-warning/5 text-brand-warning px-2 py-0.5 rounded-md">Kawasan Rawan Genangan</span>
             </div>
         </div>
     </div>
@@ -99,29 +99,29 @@
                 </svg>
             </div>
             <div>
-                <div class="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Tambah Fasilitas</div>
+                <div class="text-sm font-bold text-slate-900 group-hover:text-brand-primary transition-colors">Tambah Fasilitas</div>
                 <div class="text-xs text-slate-500 mt-0.5">Tandai titik POI baru pada peta</div>
             </div>
         </a>
-        <a href="{{ route('admin.flood-zones.create') }}" class="card flex items-center gap-4 p-4.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-rose-200/60 group">
-            <div class="grid size-11 shrink-0 place-items-center rounded-xl bg-rose-50 text-rose-600 ring-1 ring-rose-100/50 group-hover:bg-rose-100 transition-colors">
+        <a href="{{ route('admin.flood-zones.create') }}" class="card flex items-center gap-4 p-4.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-brand-warning/20 group">
+            <div class="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-warning/5 text-brand-warning ring-1 ring-brand-warning/10 group-hover:bg-brand-warning/10 transition-colors">
                 <svg class="size-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
             </div>
             <div>
-                <div class="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Tambah Zona Banjir</div>
+                <div class="text-sm font-bold text-slate-900 group-hover:text-brand-primary transition-colors">Tambah Zona Banjir</div>
                 <div class="text-xs text-slate-500 mt-0.5">Gambar batas wilayah genangan baru</div>
             </div>
         </a>
-        <a href="{{ route('admin.listings.index') }}" class="card flex items-center gap-4 p-4.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-indigo-200/60 group">
-            <div class="grid size-11 shrink-0 place-items-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100/50 group-hover:bg-indigo-100 transition-colors">
+        <a href="{{ route('admin.listings.index') }}" class="card flex items-center gap-4 p-4.5 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md hover:border-brand-primary/20 group">
+            <div class="grid size-11 shrink-0 place-items-center rounded-xl bg-brand-primary/5 text-brand-primary ring-1 ring-brand-primary/10 group-hover:bg-brand-primary/10 transition-colors">
                 <svg class="size-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
             </div>
             <div>
-                <div class="text-sm font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">Kelola Listing</div>
+                <div class="text-sm font-bold text-slate-900 group-hover:text-brand-primary transition-colors">Kelola Listing</div>
                 <div class="text-xs text-slate-500 mt-0.5">Moderasi & filter seluruh properti</div>
             </div>
         </a>
@@ -151,7 +151,7 @@
                 <div class="text-sm font-bold text-slate-900">Listing Terbaru</div>
                 <div class="text-xs text-slate-500 mt-0.5">Properti yang baru saja diunggah oleh penjual.</div>
             </div>
-            <a href="{{ route('admin.listings.index') }}" class="text-xs font-semibold text-indigo-600 hover:text-indigo-700 flex items-center gap-1 group">
+            <a href="{{ route('admin.listings.index') }}" class="text-xs font-semibold text-brand-primary hover:text-brand-primary/80 flex items-center gap-1 group">
                 <span>Lihat Semua</span>
                 <span class="transition-transform group-hover:translate-x-0.5">→</span>
             </a>
@@ -172,12 +172,12 @@
                         <tr class="group hover:bg-slate-50/50 transition-colors">
                             <td class="px-6 py-4.5">
                                 <div class="flex items-center gap-3">
-                                    <div class="grid size-9.5 shrink-0 place-items-center rounded-xl bg-indigo-50 border border-indigo-100/30 text-xs font-extrabold text-indigo-700">
+                                    <div class="grid size-9.5 shrink-0 place-items-center rounded-xl bg-brand-primary/5 border border-brand-primary/10 text-xs font-extrabold text-brand-primary">
                                         {{ strtoupper(substr($property->type, 0, 1)) }}
                                     </div>
                                     <div class="min-w-0">
                                         <a href="{{ route('properties.show', $property->id) }}" target="_blank"
-                                           class="block font-bold text-slate-900 hover:text-indigo-600 hover:underline truncate">
+                                           class="block font-bold text-slate-900 hover:text-brand-primary hover:underline truncate">
                                             {{ $property->title }}
                                         </a>
                                         <div class="text-[11px] text-slate-400 font-medium mt-0.5">{{ $property->district_name ?? 'Samarinda' }}</div>
@@ -185,7 +185,7 @@
                                 </div>
                             </td>
                             <td class="px-6 py-4.5 text-slate-600 font-medium text-xs">{{ $property->user?->name ?? '-' }}</td>
-                            <td class="px-6 py-4.5 font-bold text-indigo-600 text-xs whitespace-nowrap">
+                            <td class="px-6 py-4.5 font-bold text-brand-primary text-xs whitespace-nowrap">
                                 Rp {{ number_format((float) $property->price, 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4.5 whitespace-nowrap">
@@ -238,7 +238,7 @@
                         barHeight: '55%'
                     }
                 },
-                colors: ['#4f46e5'],
+                colors: ['#0F4C5C'],
                 dataLabels: { enabled: false },
                 xaxis: {
                     categories: districtLabels,
@@ -270,7 +270,7 @@
                     fontFamily: defaultFont
                 },
                 labels: ['Bebas Banjir', 'Rawan Banjir'],
-                colors: ['#10b981', '#f43f5e'],
+                colors: ['#10b981', '#9A031E'],
                 plotOptions: {
                     pie: {
                         donut: {
@@ -328,7 +328,7 @@
                     curve: 'smooth',
                     width: 3.5
                 },
-                colors: ['#6366f1'],
+                colors: ['#E36414'],
                 xaxis: {
                     categories: trendPeriods,
                     labels: {
@@ -349,7 +349,7 @@
                 },
                 markers: {
                     size: 5,
-                    colors: ['#4f46e5'],
+                    colors: ['#E36414'],
                     strokeColors: '#fff',
                     strokeWidth: 2,
                     hover: { size: 7 }

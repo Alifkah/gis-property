@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'phone', 'is_admin'])]
+#[Fillable(['name', 'email', 'password', 'phone', 'is_admin', 'company_name', 'description', 'logo_path'])]
 #[Hidden(['password'])]
 class User extends Authenticatable
 {
@@ -42,6 +42,16 @@ class User extends Authenticatable
     public function favoritedProperties(): BelongsToMany
     {
         return $this->belongsToMany(Property::class, 'favorites')->withTimestamps();
+    }
+
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(PropertyAlert::class);
+    }
+
+    public function notifications(): HasMany
+    {
+        return $this->hasMany(Notification::class)->orderByDesc('created_at');
     }
 
     /**

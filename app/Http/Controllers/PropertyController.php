@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Amenity;
 use App\Models\District;
+use App\Models\MarketDemand;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -134,6 +135,8 @@ class PropertyController extends Controller
 
     public function show(Property $property): View
     {
+        $property->increment('views_count');
+
         $isPgsql = DB::getDriverName() === 'pgsql';
 
         $property->load(['images', 'user']);
@@ -178,6 +181,13 @@ class PropertyController extends Controller
                 (float) $point->lat,
                 (float) $point->lng,
             );
+        }
+
+        if ($point && isset($point->lat) && isset($point->lng) && (float) $point->lat != 0.0 && (float) $point->lng != 0.0) {
+            MarketDemand::query()->create([
+                'latitude' => (float) $point->lat,
+                'longitude' => (float) $point->lng,
+            ]);
         }
 
         return view('properties.show', [
@@ -237,5 +247,12 @@ class PropertyController extends Controller
             + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLng / 2) ** 2;
 
         return $earthRadius * 2 * asin(min(1.0, sqrt($a)));
+    }
+
+    public function trackWhatsappClick(Property $property): JsonResponse
+    {
+        $property->increment('whatsapp_clicks_count');
+
+        return response()->json(['success' => true]);
     }
 }

@@ -1,20 +1,9 @@
-<x-layouts.app>
+<x-layouts.seller>
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     @endpush
 
-    <div class="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside class="card p-4">
-            <div class="px-2 pt-2 text-sm font-extrabold text-slate-900">Dashboard Penjual</div>
-            <nav class="mt-3 grid gap-1">
-                <a href="{{ route('seller.listings.index') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Listing Saya</a>
-                <a href="{{ route('seller.listings.create') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Tambah Baru</a>
-                <a href="{{ route('seller.competitor-analysis.index') }}" class="rounded-xl bg-indigo-50 px-3 py-2 text-sm font-extrabold text-indigo-700 ring-1 ring-indigo-100">Analisis Kompetitor</a>
-                <a href="{{ route('seller.profile.edit') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Pengaturan</a>
-            </nav>
-        </aside>
-
-        <section class="grid gap-6">
+    <section class="grid gap-6">
             <div class="card p-6">
                 <div class="text-sm font-extrabold text-slate-900">Analisis Kompetitor</div>
                 <div class="mt-1 text-sm text-slate-600">Lihat properti kompetitor di sekitar listing Anda dan bandingkan harga.</div>
@@ -66,9 +55,9 @@
                 <div class="card p-6">
                     <div class="text-sm font-extrabold text-slate-900">Statistik Kompetitor</div>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div class="rounded-2xl bg-indigo-50 p-4 ring-1 ring-indigo-100">
-                            <div class="text-xs font-semibold text-indigo-600">Total Kompetitor</div>
-                            <div id="statTotal" class="mt-2 text-2xl font-extrabold text-indigo-900">-</div>
+                        <div class="rounded-2xl bg-brand-primary/5 p-4 ring-1 ring-brand-primary/10">
+                            <div class="text-xs font-semibold text-brand-primary">Total Kompetitor</div>
+                            <div id="statTotal" class="mt-2 text-2xl font-extrabold text-brand-primary">-</div>
                         </div>
                         <div class="rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-100">
                             <div class="text-xs font-semibold text-emerald-600">Harga Rata-rata</div>
@@ -97,7 +86,7 @@
                             <div class="mt-1 text-sm text-slate-600">Visualisasi properti kompetitor dalam radius yang dipilih.</div>
                         </div>
                         <label class="flex items-center gap-2 print:hidden cursor-pointer select-none">
-                            <input id="toggleDarkMode" type="checkbox" class="size-4 accent-indigo-600 rounded" />
+                            <input id="toggleDarkMode" type="checkbox" class="size-4 accent-brand-primary rounded" />
                             <span class="text-xs font-bold text-slate-700">Mode Gelap Peta</span>
                         </label>
                     </div>
@@ -127,9 +116,7 @@
                         </table>
                     </div>
                 </div>
-            </div>
         </section>
-    </div>
 
     @push('scripts')
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -354,14 +341,14 @@
                                 <div class="text-xs text-slate-500">${comp.district_name || 'Samarinda'}</div>
                             </td>
                             <td class="py-3 text-slate-700">${formatDistance(comp.distance_m)}</td>
-                            <td class="py-3 font-semibold text-indigo-700">${formatCurrency(comp.price)}</td>
+                            <td class="py-3 font-semibold text-brand-accent">${formatCurrency(comp.price)}</td>
                             <td class="py-3 text-slate-700">${comp.land_area} m²</td>
                             <td class="py-3 text-slate-700">Rp ${Math.round(comp.price_per_sqm).toLocaleString('id-ID')}</td>
                             <td class="py-3">
                                 <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ${statusClass}">${comp.status}</span>
                             </td>
                             <td class="py-3">
-                                <a href="/properties/${comp.id}" target="_blank" class="text-sm font-semibold text-indigo-600 hover:text-indigo-700">Lihat</a>
+                                <a href="/properties/${comp.id}" target="_blank" class="text-sm font-semibold text-brand-primary hover:text-brand-primary-hover">Lihat</a>
                             </td>
                         </tr>
                     `;
@@ -369,4 +356,4 @@
             }
         </script>
     @endpush
-</x-layouts.app>
+</x-layouts.seller>

@@ -28,7 +28,7 @@
                 @foreach ($element as $page => $url)
                     @if ($page == $paginator->currentPage())
                         <span aria-current="page"
-                              class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-indigo-600 text-xs font-bold text-white shadow-sm">
+                              class="inline-flex h-8 w-8 items-center justify-center rounded-xl bg-brand-primary text-xs font-bold text-white shadow-sm">
                             {{ $page }}
                         </span>
                     @else

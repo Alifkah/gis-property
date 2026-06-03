@@ -76,38 +76,46 @@
                 </div>
 
                 <div class="mt-6 grid gap-4 grid-cols-2 sm:grid-cols-4">
-                    <div class="flex flex-col items-start rounded-2xl bg-white p-4 shadow-xs ring-1 ring-slate-200/60 transition hover:shadow-sm">
-                        <svg class="size-5 text-indigo-500 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M4 4h7v7H4z" /><path d="M13 13h7v7h-7z" /><path d="M13 4h7v7h-7z" /><path d="M4 13h7v7H4z" />
-                        </svg>
+                    <div class="flex flex-col items-start rounded-2xl bg-white p-4.5 border border-slate-200/50 hover:border-brand-primary/20 shadow-xs transition hover:shadow-md hover:-translate-y-0.5 duration-300">
+                        <span class="grid size-9 place-items-center rounded-xl bg-brand-primary/8 text-brand-primary mb-3">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h7v7H4z" /><path d="M13 13h7v7h-7z" /><path d="M13 4h7v7h-7z" /><path d="M4 13h7v7H4z" />
+                            </svg>
+                        </span>
                         <div class="text-xs font-semibold text-slate-500">Luas Tanah</div>
                         <div class="mt-1 text-lg font-extrabold text-slate-900">{{ (int) $property->land_area }} m²</div>
                     </div>
-                    <div class="flex flex-col items-start rounded-2xl bg-white p-4 shadow-xs ring-1 ring-slate-200/60 transition hover:shadow-sm">
-                        <svg class="size-5 text-indigo-500 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                            <polyline points="9 22 9 12 15 12 15 22" />
-                        </svg>
+                    <div class="flex flex-col items-start rounded-2xl bg-white p-4.5 border border-slate-200/50 hover:border-brand-primary/20 shadow-xs transition hover:shadow-md hover:-translate-y-0.5 duration-300">
+                        <span class="grid size-9 place-items-center rounded-xl bg-brand-primary/8 text-brand-primary mb-3">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <polyline points="9 22 9 12 15 12 15 22" />
+                            </svg>
+                        </span>
                         <div class="text-xs font-semibold text-slate-500">Luas Bangunan</div>
                         <div class="mt-1 text-lg font-extrabold text-slate-900">{{ (int) $property->building_area }} m²</div>
                     </div>
-                    <div class="flex flex-col items-start rounded-2xl bg-white p-4 shadow-xs ring-1 ring-slate-200/60 transition hover:shadow-sm">
-                        <svg class="size-5 text-indigo-500 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M2 4v16" />
-                            <path d="M2 17h20" />
-                            <path d="M22 8v12" />
-                            <path d="M2 8h20" />
-                            <path d="M6 12h4a2 2 0 0 0 2-2V8H4v2a2 2 0 0 0 2 2Z" />
-                        </svg>
+                    <div class="flex flex-col items-start rounded-2xl bg-white p-4.5 border border-slate-200/50 hover:border-brand-primary/20 shadow-xs transition hover:shadow-md hover:-translate-y-0.5 duration-300">
+                        <span class="grid size-9 place-items-center rounded-xl bg-brand-primary/8 text-brand-primary mb-3">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 4v16" />
+                                <path d="M2 17h20" />
+                                <path d="M22 8v12" />
+                                <path d="M2 8h20" />
+                                <path d="M6 12h4a2 2 0 0 0 2-2V8H4v2a2 2 0 0 0 2 2Z" />
+                            </svg>
+                        </span>
                         <div class="text-xs font-semibold text-slate-500">Kamar Tidur</div>
                         <div class="mt-1 text-lg font-extrabold text-slate-900">{{ (int) $property->bedroom }} Ruang</div>
                     </div>
-                    <div class="flex flex-col items-start rounded-2xl bg-white p-4 shadow-xs ring-1 ring-slate-200/60 transition hover:shadow-sm">
-                        <svg class="size-5 text-indigo-500 mb-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-1C4.3 2.5 3 4.3 3.5 5.5l2 2" />
-                            <path d="M3 11h18a2 2 0 0 1 2 2v2a6 6 0 0 1-6 6H7a6 6 0 0 1-6-6v-2a2 2 0 0 1-2-2Z" />
-                            <path d="M7 21v2M17 21v2" />
-                        </svg>
+                    <div class="flex flex-col items-start rounded-2xl bg-white p-4.5 border border-slate-200/50 hover:border-brand-primary/20 shadow-xs transition hover:shadow-md hover:-translate-y-0.5 duration-300">
+                        <span class="grid size-9 place-items-center rounded-xl bg-brand-primary/8 text-brand-primary mb-3">
+                            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-1C4.3 2.5 3 4.3 3.5 5.5l2 2" />
+                                <path d="M3 11h18a2 2 0 0 1 2 2v2a6 6 0 0 1-6 6H7a6 6 0 0 1-6-6v-2a2 2 0 0 1-2-2Z" />
+                                <path d="M7 21v2M17 21v2" />
+                            </svg>
+                        </span>
                         <div class="text-xs font-semibold text-slate-500">Kamar Mandi</div>
                         <div class="mt-1 text-lg font-extrabold text-slate-900">{{ (int) $property->bathroom }} Ruang</div>
                     </div>
@@ -116,7 +124,7 @@
 
             <section class="mt-8 card p-6">
                 <div class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-                    <svg class="size-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <svg class="size-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.89-1.63a1.875 1.875 0 001.108-1.723V1.35c0-.847-.788-1.54-1.618-1.328l-4.708 1.205M9.623 3.328L3.3 5.4a1.875 1.875 0 00-1.29 1.783v12.285c0 .762.583 1.417 1.34 1.328l6.233-1.205m0-14.542L15.5 1.3M9 6.75L15.5 4.5m-.5 10.5L9 15" />
                     </svg>
                     <span>Analisis Geospasial & Lingkungan</span>
@@ -133,8 +141,8 @@
                                     {{ number_format((float) $point['lat'], 6) }}, {{ number_format((float) $point['lng'], 6) }}
                                 </div>
                             </div>
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $point['lat'] }},{{ $point['lng'] }}" target="_blank" rel="noopener" class="btn btn-outline py-2 px-3 text-xs flex items-center gap-1.5 shrink-0 shadow-3xs hover:bg-indigo-50 hover:text-indigo-700 hover:ring-indigo-200 transition">
-                                <svg class="size-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $point['lat'] }},{{ $point['lng'] }}" target="_blank" rel="noopener" class="btn btn-outline py-2 px-3 text-xs flex items-center gap-1.5 shrink-0 shadow-3xs hover:bg-brand-primary/5 hover:text-brand-primary hover:ring-brand-primary/20 transition">
+                                <svg class="size-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                                 </svg>
@@ -179,7 +187,7 @@
                                         @php
                                             $amenityType = strtolower($amenity->type ?? '');
                                             $iconPath = '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />'; // map-pin
-                                            $iconColor = 'text-indigo-500 bg-indigo-50';
+                                            $iconColor = 'text-brand-primary bg-brand-primary/8';
 
                                             if (str_contains($amenityType, 'sekolah') || str_contains($amenityType, 'universitas') || str_contains($amenityType, 'pendidikan') || str_contains($amenityType, 'education')) {
                                                 $iconPath = '<path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.57 50.57 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.902 59.902 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 7.74-3.342M12 21v-8.25" />';
@@ -207,7 +215,7 @@
                                                     <div class="truncate text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ $amenity->type }}</div>
                                                 </div>
                                             </div>
-                                            <div class="shrink-0 text-xs font-extrabold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-md">
+                                            <div class="shrink-0 text-xs font-extrabold text-brand-primary bg-brand-primary/8 px-2 py-0.5 rounded-md">
                                                 {{ number_format(((float) $amenity->distance_m) / 1000, 1) }} km
                                             </div>
                                         </div>
@@ -221,7 +229,7 @@
 
             <section class="mt-8 card p-6">
                 <div class="text-base font-extrabold text-slate-900 border-b border-slate-100 pb-3 flex items-center gap-2">
-                    <svg class="size-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <svg class="size-5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
                     </svg>
                     <span>Deskripsi Properti</span>
@@ -235,7 +243,7 @@
         <aside class="lg:sticky lg:top-24 lg:self-start">
             <div class="card p-6 shadow-sm">
                 <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Harga Penawaran</div>
-                <div class="text-2xl font-black text-indigo-700 mt-1">Rp {{ number_format((float) $property->price, 0, ',', '.') }}</div>
+                <div class="text-2xl font-black text-brand-accent mt-1">Rp {{ number_format((float) $property->price, 0, ',', '.') }}</div>
 
                 @if (($property->status ?? 'Tersedia') === 'Terjual')
                     <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-extrabold text-slate-600 ring-1 ring-slate-200">
@@ -254,7 +262,7 @@
                         @php
                             $waNumber = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $property->user->phone));
                         @endphp
-                        <a href="https://wa.me/{{ $waNumber }}?text={{ rawurlencode('Halo, saya tertarik dengan properti: '.$property->title) }}" target="_blank" rel="noopener" class="btn bg-[#25D366] text-white hover:bg-[#20ba5a] w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition shadow-xs hover:shadow-md">
+                        <a id="whatsappBtn" href="https://wa.me/{{ $waNumber }}?text={{ rawurlencode('Halo, saya tertarik dengan properti: '.$property->title) }}" target="_blank" rel="noopener" class="btn bg-[#25D366] text-white hover:bg-[#20ba5a] w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold transition shadow-xs hover:shadow-md">
                             <svg class="size-5" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                             </svg>
@@ -269,7 +277,7 @@
                 <div class="mt-6 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/50 shadow-2xs">
                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">Kontak Pengiklan</div>
                     <div class="flex items-center gap-3">
-                        <div class="grid size-11 shrink-0 place-items-center rounded-2xl bg-indigo-600 font-extrabold text-white shadow-xs">
+                        <div class="grid size-11 shrink-0 place-items-center rounded-2xl bg-brand-primary font-extrabold text-white shadow-xs">
                             {{ strtoupper(substr($property->user?->name ?? 'A', 0, 1)) }}
                         </div>
                         <div class="min-w-0">
@@ -282,7 +290,7 @@
 
             <div class="mt-4 card p-6 shadow-sm">
                 <div class="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-2.5 flex items-center gap-2">
-                    <svg class="size-4.5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                    <svg class="size-4.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
                     </svg>
                     <span>Simulasi KPR</span>
@@ -291,23 +299,23 @@
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="text-xs font-semibold text-slate-600">Uang Muka (DP)</label>
-                            <span id="dpPercentLabel" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">20%</span>
+                            <span id="dpPercentLabel" class="text-xs font-bold text-brand-primary bg-brand-primary/8 px-1.5 py-0.5 rounded">20%</span>
                         </div>
                         <input id="dpInputDisplay" type="text" class="input" placeholder="100.000.000" />
                         <input id="dpInput" type="hidden" value="0" />
-                        <input id="dpSlider" type="range" min="10" max="90" step="5" value="20" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer mt-2.5" />
+                        <input id="dpSlider" type="range" min="10" max="90" step="5" value="20" class="w-full accent-brand-primary h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer mt-2.5" />
                     </div>
                     <div>
                         <div class="flex items-center justify-between mb-1.5">
                             <label class="text-xs font-semibold text-slate-600">Jangka Waktu (Tenor)</label>
-                            <span id="termLabel" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded">15 Tahun</span>
+                            <span id="termLabel" class="text-xs font-bold text-brand-primary bg-brand-primary/8 px-1.5 py-0.5 rounded">15 Tahun</span>
                         </div>
-                        <input id="termSlider" type="range" min="1" max="30" step="1" value="15" class="w-full accent-indigo-600 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer mt-1" />
+                        <input id="termSlider" type="range" min="1" max="30" step="1" value="15" class="w-full accent-brand-primary h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer mt-1" />
                         <input id="termInput" type="hidden" value="15" />
                     </div>
-                    <div class="rounded-2xl bg-indigo-50/50 p-4 ring-1 ring-indigo-500/10 shadow-3xs">
-                        <div class="text-[10px] font-bold text-indigo-950 uppercase tracking-wider">Estimasi Cicilan / Bulan</div>
-                        <div id="installment" class="mt-1 text-xl font-black text-indigo-700">-</div>
+                    <div class="rounded-2xl bg-brand-primary/5 p-4 ring-1 ring-brand-primary/10 shadow-3xs">
+                        <div class="text-[10px] font-bold text-brand-primary uppercase tracking-wider">Estimasi Cicilan / Bulan</div>
+                        <div id="installment" class="mt-1 text-xl font-black text-brand-accent">-</div>
                         <div class="mt-1.5 text-[10px] font-bold text-slate-400">Asumsi bunga tetap KPR 8% per tahun</div>
                     </div>
                 </div>
@@ -321,7 +329,14 @@
             const point = @json($point);
             const miniMap = L.map('miniMap', { zoomControl: false, attributionControl: false }).setView([point.lat, point.lng], 15);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 }).addTo(miniMap);
-            L.marker([point.lat, point.lng]).addTo(miniMap);
+
+            const markerIcon = L.divIcon({
+                className: '',
+                html: '<div style="width:16px;height:16px;border-radius:9999px;background:#E36414;border:3.5px solid #ffffff;box-shadow:0 4px 10px rgba(15,23,42,.35)"></div>',
+                iconSize: [16, 16],
+                iconAnchor: [8, 8]
+            });
+            L.marker([point.lat, point.lng], { icon: markerIcon }).addTo(miniMap);
 
             // Force correct size: immediately + after layout settles
             miniMap.invalidateSize({ animate: false });
@@ -418,6 +433,16 @@
             }
 
             calc();
+
+            document.getElementById('whatsappBtn')?.addEventListener('click', function() {
+                fetch('/properties/{{ $property->id }}/whatsapp-click', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    }
+                }).catch(err => console.error(err));
+            });
         </script>
     @endpush
 </x-layouts.app>

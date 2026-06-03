@@ -2,12 +2,17 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
         <title>{{ config('app.name', 'Samarinda Properti GIS') }}</title>
 
         @fonts
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+        <style>[x-cloak]{display:none!important}</style>
 
         <style>
             /* Modal overlay — reliable centering via flexbox */
@@ -84,7 +89,7 @@
         <div class="min-h-dvh">
             <x-navbar />
 
-            <main class="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+            <main class="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8" style="padding-bottom: max(2rem, env(safe-area-inset-bottom))">
                 {{ $slot }}
             </main>
         </div>
@@ -106,6 +111,7 @@
                 }
             });
         </script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     </body>
 </html>
 

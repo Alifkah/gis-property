@@ -45,7 +45,7 @@
                 {{-- Panduan --}}
                 <div class="rounded-2xl bg-slate-50 p-4 border border-slate-100">
                     <div class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                        <svg class="size-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <svg class="size-4 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                         <span>Panduan Menggambar Polygon</span>
@@ -106,7 +106,7 @@
             const drawControl = new L.Control.Draw({
                 edit: { featureGroup: drawnItems },
                 draw: {
-                    polygon: { shapeOptions: { color: '#f43f5e', fillOpacity: 0.2 } },
+                    polygon: { shapeOptions: { color: '#9A031E', fillOpacity: 0.2 } },
                     polyline: false,
                     rectangle: false,
                     circle: false,

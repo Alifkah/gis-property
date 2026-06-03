@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Amenity;
+use App\Models\MarketDemand;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -77,6 +78,13 @@ class ExploreApiController extends Controller
         $page = max((int) $request->integer('page', 1), 1);
         $radius = $this->parseRadiusMeters($request);
         $center = $this->parseCenter($request);
+
+        if ($center !== null) {
+            MarketDemand::query()->create([
+                'latitude' => (float) $center['lat'],
+                'longitude' => (float) $center['lng'],
+            ]);
+        }
         $amenityRadius = $this->parseRadiusMetersFromKey($request, 'amenity_radius_m');
         $amenityType = $request->filled('amenity_type') ? $request->string('amenity_type')->toString() : null;
         $amenityId = $request->filled('amenity_id') ? (int) $request->input('amenity_id') : null;

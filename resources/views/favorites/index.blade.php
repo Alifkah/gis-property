@@ -18,7 +18,7 @@
                 <h3 class="text-base font-extrabold text-slate-900">Belum ada properti tersimpan</h3>
                 <p class="mt-2 text-sm font-medium text-slate-500 leading-relaxed">Simpan properti impian Anda dengan menekan tombol ❤️ saat menjelajah.</p>
             </div>
-            <a href="{{ route('properties.index') }}" class="btn btn-primary px-6 py-2.5 shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 transition">Jelajahi Properti Sekarang</a>
+            <a href="{{ route('properties.index') }}" class="btn btn-primary px-6 py-2.5 shadow-md shadow-brand-primary/10 hover:shadow-brand-primary/20 transition">Jelajahi Properti Sekarang</a>
         </div>
     @else
         <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

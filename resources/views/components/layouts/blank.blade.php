@@ -12,6 +12,11 @@
             @vite(['resources/css/app.css', 'resources/js/app.js'])
         @endif
 
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
+        <style>
+            [x-cloak] { display: none !important; }
+        </style>
+
         @stack('styles')
     </head>
     <body class="overflow-hidden">

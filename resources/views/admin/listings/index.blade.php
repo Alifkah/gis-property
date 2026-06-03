@@ -66,13 +66,13 @@
                                             class="size-14 object-cover flex-shrink-0 rounded-xl ring-1 ring-slate-200/50"
                                         />
                                     @else
-                                        <div class="size-14 flex-shrink-0 grid place-items-center rounded-xl bg-indigo-50 border border-indigo-100/40 text-xs font-extrabold text-indigo-700">
+                                        <div class="size-14 flex-shrink-0 grid place-items-center rounded-xl bg-brand-primary/5 border border-brand-primary/10 text-xs font-extrabold text-brand-primary">
                                             {{ strtoupper(substr($property->type, 0, 1)) }}
                                         </div>
                                     @endif
                                     <div class="min-w-0">
                                         <a href="{{ route('properties.show', $property->id) }}" target="_blank"
-                                           class="block font-bold text-slate-900 hover:text-indigo-600 hover:underline truncate text-sm">
+                                           class="block font-bold text-slate-900 hover:text-brand-primary hover:underline truncate text-sm">
                                             {{ $property->title }}
                                         </a>
                                         <div class="mt-0.5 text-xs text-slate-400 font-medium flex items-center gap-1.5">
@@ -87,7 +87,7 @@
                                 <div class="text-xs font-bold text-slate-700">{{ $property->user?->name ?? '-' }}</div>
                                 <div class="text-[11px] text-slate-400 font-medium mt-0.5">{{ $property->user?->email ?? '' }}</div>
                             </td>
-                            <td class="px-6 py-4 font-bold text-indigo-600 text-xs whitespace-nowrap">
+                            <td class="px-6 py-4 font-bold text-brand-primary text-xs whitespace-nowrap">
                                 Rp {{ number_format((float) $property->price, 0, ',', '.') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">

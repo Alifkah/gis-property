@@ -88,7 +88,7 @@
                 <div class="mt-1 truncate text-xs font-semibold text-slate-500">{{ $property->district_name ?? 'Kota Samarinda' }}</div>
             </div>
             <div class="shrink-0 text-right">
-                <div class="text-sm font-extrabold {{ $isSold ? 'text-slate-400' : 'text-indigo-700' }}">Rp {{ number_format((float) $property->price, 0, ',', '.') }}</div>
+                <div class="text-sm font-extrabold {{ $isSold ? 'text-slate-400' : 'text-brand-accent' }}">Rp {{ number_format((float) $property->price, 0, ',', '.') }}</div>
             </div>
         </div>
 

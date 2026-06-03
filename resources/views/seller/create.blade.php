@@ -1,14 +1,4 @@
-<x-layouts.app>
-    <div class="grid gap-6 lg:grid-cols-[260px_minmax(0,1fr)]">
-        <aside class="card p-4">
-            <div class="px-2 pt-2 text-sm font-extrabold text-slate-900">Dashboard Penjual</div>
-            <nav class="mt-3 grid gap-1">
-                <a href="{{ route('seller.listings.index') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Listing Saya</a>
-                <a href="{{ route('seller.listings.create') }}" class="rounded-xl bg-indigo-50 px-3 py-2 text-sm font-extrabold text-indigo-700 ring-1 ring-indigo-100">Tambah Baru</a>
-                <a href="{{ route('seller.competitor-analysis.index') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Analisis Kompetitor</a>
-                <a href="{{ route('seller.profile.edit') }}" class="rounded-xl px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-50">Pengaturan</a>
-            </nav>
-        </aside>
+<x-layouts.seller>
 
         <section class="card p-6">
             <div class="flex flex-wrap items-center justify-between gap-4">
@@ -17,7 +7,7 @@
                     <div class="mt-1 text-sm text-slate-600">Lengkapi data properti sebelum menentukan lokasi spasial.</div>
                 </div>
                 <div class="flex items-center gap-2 text-xs font-extrabold">
-                    <span class="grid size-8 place-items-center rounded-full bg-indigo-600 text-white">1</span>
+                    <span class="grid size-8 place-items-center rounded-full bg-brand-primary text-white">1</span>
                     <span class="text-slate-600">Data Properti</span>
                     <span class="h-0.5 w-8 rounded bg-slate-200"></span>
                     <span class="grid size-8 place-items-center rounded-full bg-slate-200 text-slate-600">2</span>
@@ -97,7 +87,7 @@
 
                 <div>
                     <label class="text-xs font-semibold text-slate-600">Foto Properti <span class="font-normal text-slate-400">(maks. 5 foto, JPG/PNG/WebP, maks. 3 MB per foto)</span></label>
-                    <div id="imageDropzone" class="mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-indigo-400 hover:bg-indigo-50/40">
+                    <div id="imageDropzone" class="mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-brand-primary/40 hover:bg-brand-primary/5">
                         <svg class="size-8 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" stroke-linecap="round" stroke-linejoin="round" />
                         </svg>
@@ -118,7 +108,6 @@
                 </div>
             </form>
         </section>
-    </div>
 
     @push('scripts')
         <script>
@@ -130,16 +119,16 @@
 
             dropzone.addEventListener('dragover', (e) => {
                 e.preventDefault();
-                dropzone.classList.add('border-indigo-400', 'bg-indigo-50/40');
+                dropzone.classList.add('border-brand-primary/40', 'bg-brand-primary/5');
             });
 
             dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('border-indigo-400', 'bg-indigo-50/40');
+                dropzone.classList.remove('border-brand-primary/40', 'bg-brand-primary/5');
             });
 
             dropzone.addEventListener('drop', (e) => {
                 e.preventDefault();
-                dropzone.classList.remove('border-indigo-400', 'bg-indigo-50/40');
+                dropzone.classList.remove('border-brand-primary/40', 'bg-brand-primary/5');
                 const dt = new DataTransfer();
                 Array.from(e.dataTransfer.files).forEach((f) => dt.items.add(f));
                 input.files = dt.files;
@@ -193,4 +182,4 @@
             }
         </script>
     @endpush
-</x-layouts.app>
+</x-layouts.seller>

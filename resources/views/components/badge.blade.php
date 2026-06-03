@@ -4,7 +4,7 @@
 
 @php
     $classes = match ($variant) {
-        'new' => 'bg-indigo-600 text-white',
+        'new' => 'bg-brand-primary text-white',
         'safe' => 'bg-emerald-500 text-white',
         default => 'bg-slate-900 text-white',
     };

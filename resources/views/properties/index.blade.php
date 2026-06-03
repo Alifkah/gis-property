@@ -81,6 +81,17 @@
                         <a href="{{ route('properties.index') }}" class="btn btn-outline">Reset</a>
                     @endif
                 </div>
+
+                @auth
+                    <div class="border-t border-slate-100 pt-3">
+                        <button type="button" onclick="activateSearchAlert()" class="btn btn-outline text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10 border-brand-primary/20 w-full flex items-center justify-center gap-2 py-2.5 text-xs font-bold cursor-pointer">
+                            <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <span>Aktifkan Alarm Properti Baru</span>
+                        </button>
+                    </div>
+                @endauth
             </form>
         </aside>
 
@@ -105,4 +116,50 @@
             @endif
         </div>
     </div>
+
+    @auth
+    @push('scripts')
+        <script>
+            function activateSearchAlert() {
+                const type = document.querySelector('select[name="type"]').value;
+                const district = document.querySelector('select[name="district"]').value;
+                const priceRange = document.querySelector('select[name="price"]').value;
+                
+                let min_price = null;
+                let max_price = null;
+                if (priceRange) {
+                    const parts = priceRange.split('-');
+                    min_price = parts[0];
+                    max_price = parts[1];
+                }
+
+                fetch('{{ route('property-alerts.store') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({
+                        type: type || null,
+                        min_price: min_price || null,
+                        max_price: max_price || null,
+                        district_name: district || null
+                    })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                    } else {
+                        alert('Gagal mengaktifkan alarm.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Terjadi kesalahan koneksi.');
+                });
+            }
+        </script>
+    @endpush
+    @endauth
 </x-layouts.app>

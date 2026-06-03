@@ -5,11 +5,16 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\FloodZoneController as AdminFloodZoneController;
 use App\Http\Controllers\Admin\ListingController as AdminListingController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\Buyer\AlertController;
 use App\Http\Controllers\ExploreApiController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PropertyController;
 use App\Http\Controllers\Seller\CompetitorAnalysisController;
+use App\Http\Controllers\Seller\EstimationController;
+use App\Http\Controllers\Seller\ImportController;
 use App\Http\Controllers\Seller\ListingController;
+use App\Http\Controllers\Seller\MarketDemandController;
 use App\Http\Controllers\Seller\ProfileController;
 use App\Models\Amenity;
 use App\Models\District;
@@ -152,10 +157,20 @@ Route::prefix('api/explore')->group(function () {
 Route::get('/properties', [PropertyController::class, 'browse'])->name('properties.index');
 Route::get('/properties/geojson', [PropertyController::class, 'index'])->name('properties.geojson');
 Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
+Route::post('/properties/{property}/whatsapp-click', [PropertyController::class, 'trackWhatsappClick'])->name('properties.whatsapp-click');
+Route::get('/sellers/{user}', [ProfileController::class, 'showPublic'])->name('sellers.show');
 
 Route::middleware('auth')->group(function () {
     Route::post('/favorites/{property}', [FavoriteController::class, 'toggle'])->name('favorites.toggle');
     Route::get('/favorites', [FavoriteController::class, 'index'])->name('favorites.index');
+
+    // Property Alerts & Notifications
+    Route::post('/property-alerts', [AlertController::class, 'store'])->name('property-alerts.store');
+    Route::delete('/property-alerts/{alert}', [AlertController::class, 'destroy'])->name('property-alerts.destroy');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
+    // Market Demand JSON API
+    Route::get('/api/seller/market-demands', [MarketDemandController::class, 'index'])->name('api.seller.market-demands');
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -179,9 +194,18 @@ Route::middleware('auth')->prefix('seller')->name('seller.')->group(function () 
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password', [ProfileController::class, 'updatePassword'])->name('profile.password');
 
+    Route::get('/listings/import', [ImportController::class, 'show'])->name('listings.import.show');
+    Route::post('/listings/import', [ImportController::class, 'store'])->name('listings.import.store');
+    Route::get('/listings/import/template', [ImportController::class, 'downloadTemplate'])->name('listings.import.template');
+
+    Route::post('/estimate-price', [EstimationController::class, 'estimate'])->name('estimate-price');
+
     Route::get('/competitor-analysis/export/{property}', [CompetitorAnalysisController::class, 'exportCsv'])->name('competitor-analysis.export');
     Route::get('/competitor-analysis', [CompetitorAnalysisController::class, 'index'])->name('competitor-analysis.index');
     Route::get('/competitor-analysis/{property}', [CompetitorAnalysisController::class, 'analyze'])->name('competitor-analysis.analyze');
+
+    // Market Demand Heatmap Page
+    Route::get('/market-demands/heatmap', [MarketDemandController::class, 'heatmap'])->name('market-demands.heatmap');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

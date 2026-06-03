@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\District;
 use App\Models\Property;
+use App\Models\PropertyAlert;
 use App\Models\PropertyImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -132,6 +133,10 @@ class ListingController extends Controller
                 ->get();
         }
 
+        $totalViews = $properties->sum('views_count');
+        $totalClicks = $properties->sum('whatsapp_clicks_count');
+        $topProperties = $properties->sortByDesc('views_count')->take(5);
+
         return view('seller.index', [
             'properties' => $properties,
             'propertiesPerDistrict' => $propertiesPerDistrict,
@@ -139,6 +144,9 @@ class ListingController extends Controller
             'floodRiskCount' => $floodRiskCount,
             'sellerPriceTrend' => $sellerPriceTrend,
             'marketPriceTrend' => $marketPriceTrend,
+            'totalViews' => $totalViews,
+            'totalClicks' => $totalClicks,
+            'topProperties' => $topProperties,
         ]);
     }
 
@@ -312,7 +320,9 @@ class ListingController extends Controller
             $lat = (float) ($point->lat ?? self::DEFAULT_LAT);
             $lng = (float) ($point->lng ?? self::DEFAULT_LNG);
         } else {
-            [$lat, $lng] = $this->extractPoint($property->geom);
+            $coords = $this->extractPoint($property->geom);
+            $lat = $coords['lat'];
+            $lng = $coords['lng'];
         }
 
         return view('seller.location', [
@@ -345,6 +355,9 @@ class ListingController extends Controller
                 'geom' => 'POINT('.(float) $data['lng'].' '.(float) $data['lat'].')',
             ]);
         }
+
+        $property->refresh();
+        PropertyAlert::checkAndNotify($property);
 
         return redirect()->route('properties.show', [
             'property' => $property->id,
@@ -448,13 +461,13 @@ class ListingController extends Controller
     private function extractPoint(?string $wkt): array
     {
         if (! is_string($wkt)) {
-            return [self::DEFAULT_LAT, self::DEFAULT_LNG];
+            return ['lat' => self::DEFAULT_LAT, 'lng' => self::DEFAULT_LNG];
         }
 
         if (preg_match('/POINT\\(([-0-9.]+) ([-0-9.]+)\\)/', $wkt, $matches) !== 1) {
-            return [self::DEFAULT_LAT, self::DEFAULT_LNG];
+            return ['lat' => self::DEFAULT_LAT, 'lng' => self::DEFAULT_LNG];
         }
 
-        return [(float) $matches[2], (float) $matches[1]];
+        return ['lat' => (float) $matches[2], 'lng' => (float) $matches[1]];
     }
 }
