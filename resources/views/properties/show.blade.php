@@ -3,6 +3,27 @@
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     @endpush
 
+    @php
+        $firstImage = $property->images->first();
+        $imageUrl = $firstImage ? Storage::url($firstImage->path) : null;
+        if (!$imageUrl) {
+            $placeholderSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" fill="none">'
+                . '<rect width="400" height="250" fill="url(#g)"/>'
+                . '<defs>'
+                . '<linearGradient id="g" x1="0" y1="0" x2="1" y2="1">'
+                . '<stop offset="0%" stop-color="#4f46e5" stop-opacity="0.12"/>'
+                . '<stop offset="100%" stop-color="#6366f1" stop-opacity="0.04"/>'
+                . '</linearGradient>'
+                . '</defs>'
+                . '<path d="M170 140 l30-25 30 25 M180 132 v18 h40 v-18" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.4"/>'
+                . '<text x="50%" y="185" dominant-baseline="middle" text-anchor="middle" fill="#4338ca" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="12" letter-spacing="1" opacity="0.5">'
+                . strtoupper($property->type)
+                . '</text>'
+                . '</svg>';
+            $imageUrl = 'data:image/svg+xml;base64,' . base64_encode($placeholderSvg);
+        }
+    @endphp
+
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
         <div>
             {{-- Galeri foto --}}
@@ -320,6 +341,47 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Bagikan Properti Card --}}
+            <div class="mt-4 card p-6 shadow-sm">
+                <div class="text-sm font-extrabold text-slate-900 border-b border-slate-100 pb-2.5 flex items-center gap-2">
+                    <svg class="size-4.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z" />
+                    </svg>
+                    <span>Bagikan Properti</span>
+                </div>
+                <div class="mt-4 grid grid-cols-3 gap-2">
+                    {{-- WhatsApp --}}
+                    @php
+                        $shareText = rawurlencode($property->title . ' - Temukan properti menarik ini di Samarinda: ' . request()->url());
+                    @endphp
+                    <a href="https://api.whatsapp.com/send?text={{ $shareText }}" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-100 bg-[#25D366]/5 hover:bg-[#25D366]/10 text-[#25D366] transition group shadow-3xs cursor-pointer">
+                        <svg class="size-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
+                        </svg>
+                        <span class="text-[10px] font-bold">WhatsApp</span>
+                    </a>
+
+                    {{-- Facebook --}}
+                    @php
+                        $shareUrl = rawurlencode(request()->url());
+                    @endphp
+                    <a href="https://www.facebook.com/sharer/sharer.php?u={{ $shareUrl }}" target="_blank" rel="noopener" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-100 bg-[#1877F2]/5 hover:bg-[#1877F2]/10 text-[#1877F2] transition group shadow-3xs cursor-pointer">
+                        <svg class="size-6 mb-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c4.56-.93 8-4.96 8-9.75z" />
+                        </svg>
+                        <span class="text-[10px] font-bold">Facebook</span>
+                    </a>
+
+                    {{-- Copy Link --}}
+                    <button onclick="copyToClipboard()" class="flex flex-col items-center justify-center p-2.5 rounded-xl border border-slate-100 bg-brand-primary/5 hover:bg-brand-primary/10 text-brand-primary transition group shadow-3xs cursor-pointer">
+                        <svg id="copyIcon" class="size-6 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                        <span id="copyText" class="text-[10px] font-bold">Salin Link</span>
+                    </button>
+                </div>
+            </div>
         </aside>
     </div>
 
@@ -443,6 +505,53 @@
                     }
                 }).catch(err => console.error(err));
             });
+
+            // Copy Link Functionality
+            function copyToClipboard() {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url).then(() => {
+                    const copyText = document.getElementById('copyText');
+                    const copyIcon = document.getElementById('copyIcon');
+                    if (copyText) copyText.textContent = 'Tersalin!';
+                    if (copyIcon) {
+                        copyIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />';
+                        copyIcon.classList.add('text-emerald-500');
+                    }
+                    setTimeout(() => {
+                        if (copyText) copyText.textContent = 'Salin Link';
+                        if (copyIcon) {
+                            copyIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />';
+                            copyIcon.classList.remove('text-emerald-500');
+                        }
+                    }, 2000);
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+
+            // Save to recently viewed
+            try {
+                const propertyData = {
+                    id: {{ $property->id }},
+                    title: {!! json_encode($property->title) !!},
+                    price: "Rp {{ number_format((float) $property->price, 0, ',', '.') }}",
+                    type: "{{ $property->type }}",
+                    imageUrl: "{{ $imageUrl }}",
+                    districtName: "{{ $districtName ?? 'Samarinda' }}",
+                    url: "{{ route('properties.show', $property->id) }}",
+                    bedroom: {{ (int) $property->bedroom }},
+                    bathroom: {{ (int) $property->bathroom }},
+                    landArea: {{ (int) $property->land_area }}
+                };
+
+                let list = JSON.parse(localStorage.getItem('recentlyViewedProperties') || '[]');
+                list = list.filter(item => item.id !== propertyData.id);
+                list.unshift(propertyData);
+                list = list.slice(0, 8);
+                localStorage.setItem('recentlyViewedProperties', JSON.stringify(list));
+            } catch (e) {
+                console.error('Error saving recently viewed property', e);
+            }
         </script>
     @endpush
 </x-layouts.app>

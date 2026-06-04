@@ -127,6 +127,79 @@
         </div>
     </section>
 
+    {{-- Recently Viewed Properties --}}
+    <section x-data="{ recentlyViewed: [] }" x-init="recentlyViewed = JSON.parse(localStorage.getItem('recentlyViewedProperties') || '[]');" x-show="recentlyViewed.length > 0" class="mt-14" x-cloak>
+        <div class="flex items-end justify-between gap-4 border-b border-slate-200/50 pb-4">
+            <div>
+                <div class="text-lg font-extrabold text-slate-900 tracking-tight flex items-center gap-2 font-display">
+                    <span class="size-2 rounded-full bg-brand-accent"></span>
+                    <span>Terakhir Anda Lihat</span>
+                </div>
+                <div class="mt-1 text-xs font-semibold text-slate-500">Daftar properti yang baru saja Anda kunjungi di aplikasi ini.</div>
+            </div>
+            <button @click="localStorage.removeItem('recentlyViewedProperties'); recentlyViewed = [];" class="btn btn-outline py-1.5 px-3 text-xs flex items-center gap-1.5 border-rose-200 text-rose-600 hover:bg-rose-50 hover:text-rose-700 cursor-pointer">
+                <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                <span>Bersihkan Riwayat</span>
+            </button>
+        </div>
+
+        <div class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <template x-for="item in recentlyViewed" :key="item.id">
+                <div class="group card overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md relative">
+                    <a :href="item.url" class="block">
+                        <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
+                            <img :src="item.imageUrl" :alt="item.title" class="h-full w-full object-cover transition duration-300 group-hover:scale-105" loading="lazy" />
+                            <div class="absolute left-3 top-3 flex flex-wrap gap-2">
+                                <span class="inline-flex items-center rounded-md bg-white/95 px-2 py-0.5 text-[10px] font-bold text-slate-700 uppercase tracking-wider ring-1 ring-slate-200" x-text="item.type"></span>
+                            </div>
+                        </div>
+                    </a>
+
+                    <a :href="item.url" class="block p-4">
+                        <div class="flex items-start justify-between gap-3">
+                            <div class="min-w-0">
+                                <div class="truncate text-sm font-bold text-slate-900" x-text="item.title"></div>
+                                <div class="mt-1 truncate text-xs font-semibold text-slate-500" x-text="item.districtName"></div>
+                            </div>
+                            <div class="shrink-0 text-right">
+                                <div class="text-sm font-extrabold text-brand-accent" x-text="item.price"></div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 grid grid-cols-3 gap-2 text-xs font-semibold text-slate-600">
+                            <div class="flex items-center gap-1.5 rounded-xl bg-slate-50 px-2 py-2 ring-1 ring-slate-200/60" title="Kamar Tidur">
+                                <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M2 4v16" />
+                                    <path d="M2 17h20" />
+                                    <path d="M22 8v12" />
+                                    <path d="M2 8h20" />
+                                    <path d="M6 12h4a2 2 0 0 0 2-2V8H4v2a2 2 0 0 0 2 2Z" />
+                                </svg>
+                                <span x-text="item.bedroom"></span>
+                            </div>
+                            <div class="flex items-center gap-1.5 rounded-xl bg-slate-50 px-2 py-2 ring-1 ring-slate-200/60" title="Kamar Mandi">
+                                <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M9 6 6.5 3.5a1.5 1.5 0 0 0-1-1C4.3 2.5 3 4.3 3.5 5.5l2 2" />
+                                    <path d="M3 11h18a2 2 0 0 1 2 2v2a6 6 0 0 1-6 6H7a6 6 0 0 1-6-6v-2a2 2 0 0 1-2-2Z" />
+                                    <path d="M7 21v2M17 21v2" />
+                                </svg>
+                                <span x-text="item.bathroom"></span>
+                            </div>
+                            <div class="flex items-center gap-1.5 rounded-xl bg-slate-50 px-2 py-2 ring-1 ring-slate-200/60" title="Luas Tanah">
+                                <svg class="size-4 text-slate-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M4 4h7v7H4z" /><path d="M13 13h7v7h-7z" /><path d="M13 4h7v7h-7z" /><path d="M4 13h7v7H4z" />
+                                </svg>
+                                <span x-text="item.landArea + ' m²'"></span>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </template>
+        </div>
+    </section>
+
     {{-- Listing Terbaru --}}
     <section class="mt-14">
         <div class="flex items-end justify-between gap-4 border-b border-slate-200/50 pb-4">

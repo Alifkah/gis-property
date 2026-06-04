@@ -18,8 +18,23 @@
     <div class="grid gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
         {{-- Sidebar Filter --}}
         <aside>
-            <form method="GET" action="{{ route('properties.index') }}" class="card p-5 grid gap-4 lg:sticky lg:top-24">
+            <form method="GET" action="{{ route('properties.index') }}" class="card p-5 grid gap-4 lg:sticky lg:top-24" x-data="searchHistoryData()" x-init="initHistory()">
                 <div class="text-xs font-extrabold uppercase tracking-widest text-slate-400">Filter</div>
+
+                {{-- Riwayat Pencarian --}}
+                <div x-show="searches.length > 0" class="border-b border-slate-100 pb-3" x-cloak>
+                    <div class="flex items-center justify-between">
+                        <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Pencarian Terakhir</label>
+                        <button type="button" @click="clearSearches()" class="text-[10px] font-bold text-rose-500 hover:text-rose-700 cursor-pointer">Hapus</button>
+                    </div>
+                    <div class="mt-2 flex flex-wrap gap-1.5">
+                        <template x-for="(s, idx) in searches" :key="idx">
+                            <a :href="s.url" class="inline-flex items-center gap-1 rounded-lg bg-slate-50 border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-600 hover:bg-brand-primary/5 hover:text-brand-primary hover:border-brand-primary/20 transition truncate max-w-full" :title="s.title">
+                                <span class="truncate" x-text="s.label"></span>
+                            </a>
+                        </template>
+                    </div>
+                </div>
 
                 <div>
                     <label class="text-xs font-semibold text-slate-600">Kata Kunci</label>
@@ -162,4 +177,54 @@
         </script>
     @endpush
     @endauth
+
+    @push('scripts')
+        <script>
+            function searchHistoryData() {
+                return {
+                    searches: [],
+                    initHistory() {
+                        this.searches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+                        
+                        // Parse current URL params
+                        const params = new URLSearchParams(window.location.search);
+                        const q = params.get('q');
+                        const type = params.get('type');
+                        const district = params.get('district');
+                        const price = params.get('price');
+                        const status = params.get('status');
+
+                        if (q || type || district || price || status) {
+                            let labels = [];
+                            if (q) labels.push(`"${q}"`);
+                            if (type) labels.push(type);
+                            if (district) labels.push(district);
+                            if (price) {
+                                if (price === '0-250000000') labels.push('0-250 jt');
+                                else if (price === '250000000-750000000') labels.push('250-750 jt');
+                                else if (price === '750000000-2000000000') labels.push('750 jt-2 M');
+                                else if (price === '2000000000-999999999999') labels.push('> 2 M');
+                            }
+                            if (status) labels.push(status);
+
+                            const label = labels.join(' • ');
+                            const url = window.location.search;
+
+                            // Save if not already exists
+                            let currentSearches = JSON.parse(localStorage.getItem('recentSearches') || '[]');
+                            currentSearches = currentSearches.filter(item => item.url !== url);
+                            currentSearches.unshift({ label: label, url: window.location.pathname + url, title: label });
+                            currentSearches = currentSearches.slice(0, 5); // Keep last 5 searches
+                            localStorage.setItem('recentSearches', JSON.stringify(currentSearches));
+                            this.searches = currentSearches;
+                        }
+                    },
+                    clearSearches() {
+                        localStorage.removeItem('recentSearches');
+                        this.searches = [];
+                    }
+                }
+            }
+        </script>
+    @endpush
 </x-layouts.app>
