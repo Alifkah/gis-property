@@ -17,8 +17,8 @@
                 <span class="text-sm font-bold tracking-wider">SP</span>
             </div>
             <div class="leading-tight">
-                <div class="text-sm font-black text-slate-900 tracking-tight transition-colors group-hover:text-brand-primary">Samarinda Properti GIS</div>
-                <div class="text-[10px] font-bold text-slate-500 tracking-wider">Web-GIS Marketplace</div>
+                <div class="text-sm font-black text-slate-900 tracking-tight transition-colors group-hover:text-brand-primary">Samarinda Properti</div>
+                <div class="text-[10px] font-bold text-slate-500 tracking-wider">Web-Property Marketplace</div>
             </div>
         </a>
 
