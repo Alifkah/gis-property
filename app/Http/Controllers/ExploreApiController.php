@@ -74,6 +74,7 @@ class ExploreApiController extends Controller
     public function properties(Request $request): JsonResponse
     {
         $isPgsql = DB::getDriverName() === 'pgsql';
+        $isLocalDisk = config('filesystems.disks.public.driver') === 'local';
         $perPage = min(max((int) $request->integer('per_page', self::PER_PAGE), 1), self::MAX_PER_PAGE);
         $page = max((int) $request->integer('page', 1), 1);
         $radius = $this->parseRadiusMeters($request);
@@ -139,7 +140,7 @@ class ExploreApiController extends Controller
                 ->forPage($page, $perPage)
                 ->get();
 
-            $items = $rows->map(function ($property) {
+            $items = $rows->map(function ($property) use ($isLocalDisk) {
                 return [
                     'id' => (int) $property->id,
                     'type' => $property->type,
@@ -155,7 +156,7 @@ class ExploreApiController extends Controller
                     'is_new' => (bool) $property->is_new,
                     'is_flood_safe' => (bool) $property->is_flood_safe,
                     'amenity_distance_m' => isset($property->amenity_distance_m) ? (float) $property->amenity_distance_m : null,
-                    'image_url' => ($property->first_image_path && Storage::disk('public')->exists($property->first_image_path)) ? Storage::url($property->first_image_path) : null,
+                    'image_url' => ($property->first_image_path && (! $isLocalDisk || Storage::disk('public')->exists($property->first_image_path))) ? Storage::url($property->first_image_path) : null,
                 ];
             })->values();
         } else {
@@ -169,7 +170,7 @@ class ExploreApiController extends Controller
             // Eager load first image to avoid N+1
             $rows->load('images');
 
-            $rows = $rows->map(function (Property $property) {
+            $rows = $rows->map(function (Property $property) use ($isLocalDisk) {
                 $point = $this->extractPoint($property->geom);
                 $firstImage = $property->images->first();
 
@@ -188,7 +189,7 @@ class ExploreApiController extends Controller
                     'is_new' => false,
                     'is_flood_safe' => true,
                     'amenity_distance_m' => null,
-                    'image_url' => ($firstImage && Storage::disk('public')->exists($firstImage->path)) ? Storage::url($firstImage->path) : null,
+                    'image_url' => ($firstImage && (! $isLocalDisk || Storage::disk('public')->exists($firstImage->path))) ? Storage::url($firstImage->path) : null,
                 ];
             })
                 ->values();

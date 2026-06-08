@@ -11,8 +11,9 @@
     @endpush
 
     @php
-        $existingImages = $property->images->filter(function ($img) {
-            return Storage::disk('public')->exists($img->path);
+        $isLocalDisk = config('filesystems.disks.public.driver') === 'local';
+        $existingImages = $property->images->filter(function ($img) use ($isLocalDisk) {
+            return !$isLocalDisk || Storage::disk('public')->exists($img->path);
         });
         $firstImage = $existingImages->first();
         $imageUrl = $firstImage ? Storage::url($firstImage->path) : null;

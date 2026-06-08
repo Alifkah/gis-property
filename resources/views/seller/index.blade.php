@@ -71,7 +71,10 @@
                                     <tr class="hover:bg-slate-50/30 transition-colors">
                                         <td class="px-4 sm:px-6 py-3">
                                             <div class="flex items-center gap-3">
-                                                @if ($p->images->isNotEmpty() && Storage::disk('public')->exists($p->images->first()->path))
+                                                @php
+                                                    $isLocalDisk = config('filesystems.disks.public.driver') === 'local';
+                                                @endphp
+                                                @if ($p->images->isNotEmpty() && (!$isLocalDisk || Storage::disk('public')->exists($p->images->first()->path)))
                                                     <img src="{{ Storage::url($p->images->first()->path) }}" alt="{{ $p->title }}" class="size-9 sm:size-10 object-cover rounded-lg ring-1 ring-slate-200/50 shrink-0" />
                                                 @else
                                                     <div class="size-9 sm:size-10 grid place-items-center rounded-lg bg-brand-primary/8 border border-brand-primary/10 text-[10px] font-extrabold text-brand-primary shrink-0">

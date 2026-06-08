@@ -98,7 +98,10 @@
                                 <label class="group relative cursor-pointer">
                                     <input type="checkbox" name="delete_images[]" value="{{ $image->id }}" class="peer hidden" />
                                     <div class="relative aspect-square overflow-hidden rounded-xl bg-slate-100 ring-2 ring-transparent transition peer-checked:ring-rose-500">
-                                        @if (Storage::disk('public')->exists($image->path))
+                                        @php
+                                            $isLocalDisk = config('filesystems.disks.public.driver') === 'local';
+                                        @endphp
+                                        @if (!$isLocalDisk || Storage::disk('public')->exists($image->path))
                                             <img src="{{ Storage::url($image->path) }}" alt="Foto properti" class="h-full w-full object-cover" />
                                         @else
                                             <div class="h-full w-full flex flex-col items-center justify-center bg-slate-50 text-slate-400 p-2">
