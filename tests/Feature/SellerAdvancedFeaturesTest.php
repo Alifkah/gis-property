@@ -92,15 +92,16 @@ it('can update seller branded public profile details and logo', function () {
         'logo' => $logo,
     ]);
 
+    $response->dump();
     $response->assertRedirect(route('seller.profile.edit'));
 
     $user->refresh();
-    expect($user->name)->toBe('John Doe Updated')
-        ->and($user->company_name)->toBe('Super Property Developer')
-        ->and($user->description)->toBe('We build the best modern homes in East Kalimantan.')
-        ->and($user->logo_path)->not->toBeNull();
+    $this->assertEquals('John Doe Updated', $user->name);
+    $this->assertEquals('Super Property Developer', $user->company_name);
+    $this->assertEquals('We build the best modern homes in East Kalimantan.', $user->description);
+    $this->assertNotNull($user->logo_path);
 
-    Storage::disk('public')->assertExists($user->logo_path);
+    $this->assertTrue(Storage::disk('public')->exists($user->logo_path));
 });
 
 it('displays the branded public profile page', function () {

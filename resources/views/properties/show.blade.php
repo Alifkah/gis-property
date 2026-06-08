@@ -1,10 +1,20 @@
 <x-layouts.app>
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        <style>
+            @keyframes pulse-marker {
+                0% { transform: scale(0.8); opacity: 0.5; }
+                70% { transform: scale(1.5); opacity: 0; }
+                100% { transform: scale(0.8); opacity: 0; }
+            }
+        </style>
     @endpush
 
     @php
-        $firstImage = $property->images->first();
+        $existingImages = $property->images->filter(function ($img) {
+            return Storage::disk('public')->exists($img->path);
+        });
+        $firstImage = $existingImages->first();
         $imageUrl = $firstImage ? Storage::url($firstImage->path) : null;
         if (!$imageUrl) {
             $placeholderSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" fill="none">'
@@ -28,14 +38,14 @@
         <div>
             {{-- Galeri foto --}}
             <div class="relative">
-                @if ($property->images->isNotEmpty())
+                @if ($existingImages->isNotEmpty())
                     <section class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_280px]">
                         <div class="group overflow-hidden rounded-2xl bg-slate-100 aspect-[16/10] sm:aspect-auto sm:h-[350px] shadow-xs hover:shadow-md transition duration-300">
-                            <img src="{{ Storage::url($property->images->first()->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                            <img src="{{ Storage::url($existingImages->first()->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                         </div>
-                        @if ($property->images->count() > 1)
+                        @if ($existingImages->count() > 1)
                             <div class="grid grid-cols-2 gap-3 lg:grid-cols-1">
-                                @foreach ($property->images->skip(1)->take(2) as $image)
+                                @foreach ($existingImages->skip(1)->take(2) as $image)
                                     <div class="group overflow-hidden rounded-2xl bg-slate-100 aspect-[16/10] lg:aspect-auto lg:h-[168px] shadow-xs hover:shadow-md transition duration-300">
                                         <img src="{{ Storage::url($image->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                                     </div>
@@ -47,7 +57,7 @@
                         <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
                         </svg>
-                        <span>{{ $property->images->count() }} Foto</span>
+                        <span>{{ $existingImages->count() }} Foto</span>
                     </div>
                 @else
                     @php
@@ -152,8 +162,15 @@
                 </div>
                 <div class="mt-4 grid gap-5 lg:grid-cols-[minmax(0,1fr)_340px]">
                     <div class="flex flex-col">
-                        <div class="rounded-2xl overflow-hidden shadow-xs ring-1 ring-slate-200/50" style="height:320px;min-height:320px">
+                        <div class="rounded-2xl overflow-hidden shadow-xs ring-1 ring-slate-200/50 relative" style="height:320px;min-height:320px">
                             <div id="miniMap" class="relative z-0" style="height:320px;width:100%"></div>
+                            
+                            {{-- MiniMap Route Overlay Info Panel --}}
+                            <div id="miniRoutePanel" style="display:none;" class="absolute top-3 right-3 z-[400] w-[200px] bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-slate-200/60 transition">
+                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="miniRouteLabel">Petunjuk Rute</div>
+                                <div class="mt-1 text-xs font-black text-slate-800" id="miniRouteDist">-</div>
+                                <div class="mt-1 text-[10px] font-bold text-brand-primary bg-brand-primary/5 px-1.5 py-0.5 rounded inline-block" id="miniRouteTime">-</div>
+                            </div>
                         </div>
                         <div class="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-slate-50/80 p-4 ring-1 ring-slate-200/50 shadow-2xs">
                             <div class="min-w-0">
@@ -162,13 +179,13 @@
                                     {{ number_format((float) $point['lat'], 6) }}, {{ number_format((float) $point['lng'], 6) }}
                                 </div>
                             </div>
-                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ $point['lat'] }},{{ $point['lng'] }}" target="_blank" rel="noopener" class="btn btn-outline py-2 px-3 text-xs flex items-center gap-1.5 shrink-0 shadow-3xs hover:bg-brand-primary/5 hover:text-brand-primary hover:ring-brand-primary/20 transition">
+                            <button type="button" id="directionsBtn" onclick="toggleDirections()" class="btn btn-outline py-2 px-3 text-xs flex items-center gap-1.5 shrink-0 shadow-3xs hover:bg-brand-primary/5 hover:text-brand-primary hover:ring-brand-primary/20 transition cursor-pointer">
                                 <svg class="size-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
                                 </svg>
-                                <span>Petunjuk Arah</span>
-                            </a>
+                                <span id="directionsBtnText">Petunjuk Arah</span>
+                            </button>
                         </div>
                     </div>
                     <div class="flex flex-col gap-4 min-w-0">
@@ -224,7 +241,7 @@
                                                 $iconColor = 'text-teal-600 bg-teal-50';
                                             }
                                         @endphp
-                                        <div class="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1 ring-slate-200/50 shadow-2xs hover:ring-slate-300/60 transition min-w-0">
+                                        <div onclick="showAmenityRoute({{ $loop->index }}, {{ $amenity->lat ?? 0 }}, {{ $amenity->lng ?? 0 }}, '{{ addslashes($amenity->name) }}', '{{ $amenity->type }}')" class="flex items-center justify-between gap-4 rounded-xl bg-white px-3 py-2 ring-1 ring-slate-200/50 shadow-2xs hover:ring-slate-400/40 hover:bg-slate-50/50 transition min-w-0 cursor-pointer" title="Klik untuk lihat rute jalan di peta">
                                             <div class="flex items-center gap-2.5 min-w-0">
                                                 <span class="grid size-8 shrink-0 place-items-center rounded-lg {{ $iconColor }}">
                                                     <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -236,8 +253,11 @@
                                                     <div class="truncate text-[10px] font-bold text-slate-400 uppercase tracking-wider">{{ $amenity->type }}</div>
                                                 </div>
                                             </div>
-                                            <div class="shrink-0 text-xs font-extrabold text-brand-primary bg-brand-primary/8 px-2 py-0.5 rounded-md">
-                                                {{ number_format(((float) $amenity->distance_m) / 1000, 1) }} km
+                                            <div class="shrink-0 text-right">
+                                                <div class="text-xs font-extrabold text-brand-primary bg-brand-primary/8 px-2 py-0.5 rounded-md inline-block">
+                                                    {{ number_format(((float) $amenity->distance_m) / 1000, 1) }} km
+                                                </div>
+                                                <div id="amenity-time-{{ $loop->index }}" class="text-[9px] font-bold text-emerald-600 mt-1 hidden text-right leading-none"></div>
                                             </div>
                                         </div>
                                     @endforeach
@@ -405,6 +425,220 @@
             setTimeout(() => miniMap.invalidateSize({ animate: false }), 200);
             setTimeout(() => miniMap.invalidateSize({ animate: false }), 600);
             window.addEventListener('load', () => miniMap.invalidateSize({ animate: false }));
+
+            // GPS and Routing Variables
+            window.userLocation = null;
+            let userMarker = null;
+            let userAccuracyCircle = null;
+            let routeLines = [];
+
+            async function getRoute(fromLat, fromLng, toLat, toLng) {
+                const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error("Gagal memuat rute jalan.");
+                }
+                const data = await response.json();
+                if (!data.routes || data.routes.length === 0) {
+                    throw new Error("Rute tidak ditemukan.");
+                }
+                return data.routes[0];
+            }
+
+            function clearRoutes() {
+                routeLines.forEach(line => miniMap.removeLayer(line));
+                routeLines = [];
+                document.getElementById('miniRoutePanel').style.display = 'none';
+            }
+
+            window.toggleDirections = function() {
+                if (!navigator.geolocation) {
+                    alert("Geolokasi tidak didukung oleh browser Anda.");
+                    return;
+                }
+
+                const btn = document.getElementById('directionsBtn');
+                const btnText = document.getElementById('directionsBtnText');
+
+                btn.disabled = true;
+                btnText.textContent = "Mencari Lokasi...";
+
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        window.userLocation = { lat, lng };
+
+                        // Draw user marker
+                        if (userMarker) {
+                            userMarker.setLatLng([lat, lng]);
+                        } else {
+                            const userIcon = L.divIcon({
+                                className: '',
+                                html: `<div style="position:relative;width:20px;height:20px;">
+                                         <div style="position:absolute;width:20px;height:20px;background:#0F4C5C;border:3px solid #ffffff;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:2"></div>
+                                         <div style="position:absolute;width:30px;height:30px;background:#0F4C5C;border-radius:50%;opacity:0.3;top:-5px;left:-5px;animation:pulse-marker 2s infinite;z-index:1"></div>
+                                       </div>`,
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
+                            });
+                            userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(miniMap);
+                        }
+
+                        if (userAccuracyCircle) {
+                            userAccuracyCircle.setLatLng([lat, lng]).setRadius(position.coords.accuracy);
+                        } else {
+                            userAccuracyCircle = L.circle([lat, lng], {
+                                radius: position.coords.accuracy,
+                                color: '#0F4C5C',
+                                fillColor: '#0F4C5C',
+                                fillOpacity: 0.05,
+                                weight: 1
+                            }).addTo(miniMap);
+                        }
+
+                        // Clear old route lines
+                        clearRoutes();
+
+                        try {
+                            const route = await getRoute(lat, lng, point.lat, point.lng);
+                            const polyline = L.geoJSON(route.geometry, {
+                                style: {
+                                    color: '#E36414',
+                                    weight: 5,
+                                    opacity: 0.8
+                                }
+                            }).addTo(miniMap);
+                            routeLines.push(polyline);
+
+                            const distKm = (route.distance / 1000).toFixed(1);
+                            const driveTime = Math.round(route.duration / 60);
+                            const walkTime = Math.round((route.distance / 1.39) / 60);
+
+                            document.getElementById('miniRouteLabel').textContent = "Rute Anda ke Properti";
+                            document.getElementById('miniRouteDist').textContent = `${distKm} km`;
+                            document.getElementById('miniRouteTime').textContent = `${driveTime} mnt berkendara / ${walkTime} mnt jalan kaki`;
+                            document.getElementById('miniRoutePanel').style.display = 'block';
+
+                            miniMap.fitBounds(polyline.getBounds(), { padding: [40, 40] });
+
+                            btnText.textContent = "Petunjuk Arah Aktif";
+                        } catch (err) {
+                            console.error("Routing error:", err);
+                            // Fallback straight line
+                            const fallbackLine = L.polyline([[lat, lng], [point.lat, point.lng]], {
+                                color: '#E36414',
+                                dashArray: '5, 10',
+                                weight: 4
+                            }).addTo(miniMap);
+                            routeLines.push(fallbackLine);
+
+                            // Distance calculation
+                            const R = 6371e3;
+                            const dLat = (point.lat - lat) * Math.PI / 180;
+                            const dLng = (point.lng - lng) * Math.PI / 180;
+                            const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(lat*Math.PI/180)*Math.cos(point.lat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+                            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                            const dist = R * c;
+
+                            document.getElementById('miniRouteLabel').textContent = "Jarak Garis Lurus";
+                            document.getElementById('miniRouteDist').textContent = `${(dist/1000).toFixed(1)} km`;
+                            document.getElementById('miniRouteTime').textContent = "Rute jalan gagal dimuat";
+                            document.getElementById('miniRoutePanel').style.display = 'block';
+
+                            miniMap.fitBounds(fallbackLine.getBounds(), { padding: [40, 40] });
+                            btnText.textContent = "Jarak Garis Lurus";
+                        }
+
+                        btn.disabled = false;
+                    },
+                    (error) => {
+                        console.warn(error);
+                        alert("Gagal mendeteksi lokasi GPS Anda. Pastikan layanan lokasi di perangkat Anda aktif.");
+                        btn.disabled = false;
+                        btnText.textContent = "Petunjuk Arah";
+                    },
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                );
+            };
+
+            window.showAmenityRoute = async function(index, destLat, destLng, name, type) {
+                if (destLat === 0 || destLng === 0) return;
+
+                // Clear previous routing lines
+                clearRoutes();
+
+                // Clear styling active on other items
+                const timeElements = document.querySelectorAll('[id^="amenity-time-"]');
+                timeElements.forEach(el => {
+                    el.style.display = 'none';
+                    el.textContent = '';
+                });
+
+                const timeEl = document.getElementById(`amenity-time-${index}`);
+                if (timeEl) {
+                    timeEl.style.display = 'block';
+                    timeEl.textContent = 'Memuat rute...';
+                }
+
+                try {
+                    const route = await getRoute(point.lat, point.lng, destLat, destLng);
+                    const polyline = L.geoJSON(route.geometry, {
+                        style: {
+                            color: '#10B981', // Emerald green
+                            weight: 5,
+                            opacity: 0.8
+                        }
+                    }).addTo(miniMap);
+                    routeLines.push(polyline);
+
+                    const distKm = (route.distance / 1000).toFixed(1);
+                    const driveTime = Math.round(route.duration / 60);
+                    const walkTime = Math.round((route.distance / 1.39) / 60);
+
+                    document.getElementById('miniRouteLabel').textContent = `Ke: ${name}`;
+                    document.getElementById('miniRouteDist').textContent = `${distKm} km`;
+                    document.getElementById('miniRouteTime').textContent = `${driveTime} mnt berkendara / ${walkTime} mnt jalan kaki`;
+                    document.getElementById('miniRoutePanel').style.display = 'block';
+
+                    if (timeEl) {
+                        timeEl.textContent = `${driveTime} mnt (mobil) / ${walkTime} mnt (jalan)`;
+                    }
+
+                    miniMap.fitBounds(polyline.getBounds(), { padding: [40, 40] });
+                } catch (err) {
+                    console.error("OSRM routing to facility failed:", err);
+                    // Draw direct straight line fallback
+                    const fallbackLine = L.polyline([[point.lat, point.lng], [destLat, destLng]], {
+                        color: '#10B981',
+                        dashArray: '5, 10',
+                        weight: 4
+                    }).addTo(miniMap);
+                    routeLines.push(fallbackLine);
+
+                    // Estimate direct time
+                    const R = 6371e3;
+                    const dLat = (destLat - point.lat) * Math.PI / 180;
+                    const dLng = (destLng - point.lng) * Math.PI / 180;
+                    const a = Math.sin(dLat/2)*Math.sin(dLat/2) + Math.cos(point.lat*Math.PI/180)*Math.cos(destLat*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
+                    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                    const dist = R * c;
+                    
+                    const distKm = (dist / 1000).toFixed(1);
+                    const walkTime = Math.round((dist / 1.39) / 60);
+
+                    document.getElementById('miniRouteLabel').textContent = `Ke: ${name}`;
+                    document.getElementById('miniRouteDist').textContent = `${distKm} km (garis lurus)`;
+                    document.getElementById('miniRouteTime').textContent = `~${walkTime} mnt jalan kaki`;
+                    document.getElementById('miniRoutePanel').style.display = 'block';
+
+                    if (timeEl) {
+                        timeEl.textContent = `~${walkTime} mnt jalan`;
+                    }
+
+                    miniMap.fitBounds(fallbackLine.getBounds(), { padding: [40, 40] });
+                }
+            };
 
             const price = {{ (float) $property->price }};
             const dpInput = document.getElementById('dpInput');

@@ -97,6 +97,58 @@
         <main class="relative flex-1">
             <div id="map" class="h-full w-full z-0"></div>
 
+            {{-- GPS Alert Banner --}}
+            <div id="gpsAlert" style="display:none;" class="absolute top-4 left-1/2 -translate-x-1/2 z-[900] w-[90%] max-w-md bg-rose-50 border border-rose-200 rounded-2xl p-3 shadow-xl flex items-center justify-between gap-3 animate-fade-in">
+                <div class="flex items-center gap-2.5 min-w-0">
+                    <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-rose-500 text-white shadow-xs animate-pulse">
+                        <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                        </svg>
+                    </span>
+                    <div class="min-w-0">
+                        <div class="text-xs font-black text-rose-950">GPS Tidak Aktif</div>
+                        <div class="text-[10px] font-semibold text-rose-700 leading-tight">Aktifkan GPS Anda untuk melihat petunjuk arah rute jalan langsung dari lokasi Anda.</div>
+                    </div>
+                </div>
+                <button type="button" onclick="trackUserLocation(true)" class="btn bg-rose-600 text-white hover:bg-rose-700 py-1.5 px-3 text-[10px] font-bold rounded-xl shrink-0 shadow-xs cursor-pointer">Aktifkan</button>
+            </div>
+
+            {{-- Floating Route Panel --}}
+            <div id="routePanel" style="display:none;" class="absolute top-4 right-4 z-[900] w-[280px] bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-slate-200/60 transition duration-300">
+                <div class="text-xs font-black text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between">
+                    <div class="flex items-center gap-1.5">
+                        <svg class="size-4.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.89-2.201a.75.75 0 00.407-.672V5.25a.75.75 0 00-1.077-.671L15 6.75l-6-2.25-4.89 2.201A.75.75 0 003.75 5.375v12.235a.75.75 0 001.077.671L9 15.75l6 2.25z" />
+                        </svg>
+                        <span>Informasi Rute Jalan</span>
+                    </div>
+                    <button type="button" onclick="clearRoutes()" class="size-6 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex items-center justify-center transition cursor-pointer">
+                        <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="mt-3.5 space-y-3">
+                    {{-- User -> Property --}}
+                    <div id="userRouteInfo" style="display:none;">
+                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Rute Anda ke Properti</div>
+                        <div class="mt-1 flex items-center justify-between text-xs font-extrabold text-slate-800">
+                            <span id="userRouteDist">-</span>
+                            <span id="userRouteTime" class="text-brand-primary bg-brand-primary/5 px-1.5 py-0.5 rounded text-[10px]">-</span>
+                        </div>
+                    </div>
+                    {{-- Property -> Facility --}}
+                    <div>
+                        <div class="text-[9px] font-bold text-slate-400 uppercase tracking-wider" id="facilityRouteLabel">Fasilitas Terdekat</div>
+                        <div class="mt-1 flex items-center justify-between text-xs font-extrabold text-slate-800">
+                            <span id="facilityRouteDist">-</span>
+                            <span id="facilityRouteTime" class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px]">-</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             {{-- Mobile FAB Bar --}}
             <div class="absolute bottom-5 left-0 right-0 flex justify-center gap-2 z-[930] md:hidden px-4">
                 <button @click="showResults = !showResults; showFilters = false"
@@ -435,6 +487,251 @@
             let centerCircle = null;
             let markerMap = new Map();
 
+            // GPS and Routing Variables
+            window.userLocation = null;
+            let userMarker = null;
+            let userAccuracyCircle = null;
+            let routeLines = [];
+            window.allAmenities = [];
+
+            // Add custom Locate control button
+            var LocateControl = L.Control.extend({
+                options: { position: 'bottomleft' },
+                onAdd: function() {
+                    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    var button = L.DomUtil.create('a', 'leaflet-bar-part', container);
+                    button.innerHTML = `<svg class="size-5 text-slate-700" style="margin: 5px auto;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>`;
+                    button.title = "Cari Lokasi Saya";
+                    button.style.backgroundColor = '#ffffff';
+                    button.style.cursor = 'pointer';
+                    button.style.display = 'flex';
+                    button.style.alignItems = 'center';
+                    button.style.justifyContent = 'center';
+
+                    L.DomEvent.on(button, 'click', function(e) {
+                        L.DomEvent.stopPropagation(e);
+                        trackUserLocation(true);
+                    });
+                    return container;
+                }
+            });
+            new LocateControl().addTo(map);
+
+            window.trackUserLocation = function(panTo = false) {
+                if (!navigator.geolocation) {
+                    alert("Geolokasi tidak didukung oleh browser Anda.");
+                    return;
+                }
+
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        window.userLocation = { lat, lng };
+
+                        // Draw user marker
+                        if (userMarker) {
+                            userMarker.setLatLng([lat, lng]);
+                        } else {
+                            const userIcon = L.divIcon({
+                                className: '',
+                                html: `<div style="position:relative;width:20px;height:20px;">
+                                         <div style="position:absolute;width:20px;height:20px;background:#0F4C5C;border:3px solid #ffffff;border-radius:50%;box-shadow:0 0 8px rgba(0,0,0,0.3);z-index:2"></div>
+                                         <div style="position:absolute;width:30px;height:30px;background:#0F4C5C;border-radius:50%;opacity:0.3;top:-5px;left:-5px;animation:pulse-marker 2s infinite;z-index:1"></div>
+                                       </div>`,
+                                iconSize: [30, 30],
+                                iconAnchor: [15, 15]
+                            });
+                            userMarker = L.marker([lat, lng], { icon: userIcon }).addTo(map);
+                        }
+
+                        if (userAccuracyCircle) {
+                            userAccuracyCircle.setLatLng([lat, lng]).setRadius(position.coords.accuracy);
+                        } else {
+                            userAccuracyCircle = L.circle([lat, lng], {
+                                radius: position.coords.accuracy,
+                                color: '#0F4C5C',
+                                fillColor: '#0F4C5C',
+                                fillOpacity: 0.05,
+                                weight: 1
+                            }).addTo(map);
+                        }
+
+                        if (panTo) {
+                            map.setView([lat, lng], 15, { animate: true });
+                        }
+
+                        // Hide GPS warning if it is visible
+                        const gpsAlert = document.getElementById('gpsAlert');
+                        if (gpsAlert) gpsAlert.style.display = 'none';
+                    },
+                    (error) => {
+                        console.warn("GPS tracking error:", error);
+                        // Show GPS alert banner
+                        const gpsAlert = document.getElementById('gpsAlert');
+                        if (gpsAlert) gpsAlert.style.display = 'flex';
+                    },
+                    { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+                );
+            };
+
+            function distanceMeters(lat1, lng1, lat2, lng2) {
+                const earthRadius = 6371000.0;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLng = (lng2 - lng1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                          Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                          Math.sin(dLng / 2) * Math.sin(dLng / 2);
+                return earthRadius * 2 * Math.asin(Math.min(1.0, Math.sqrt(a)));
+            }
+
+            function findNearestAmenity(propertyLat, propertyLng) {
+                if (!window.allAmenities || window.allAmenities.length === 0) return null;
+                let nearest = null;
+                let minDistance = Infinity;
+
+                window.allAmenities.forEach(amenity => {
+                    const d = distanceMeters(propertyLat, propertyLng, amenity.lat, amenity.lng);
+                    if (d < minDistance) {
+                        minDistance = d;
+                        nearest = amenity;
+                    }
+                });
+
+                if (nearest) {
+                    nearest.distance_m = minDistance;
+                }
+                return nearest;
+            }
+
+            async function getRoute(fromLat, fromLng, toLat, toLng) {
+                const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error("Gagal memuat rute jalan.");
+                }
+                const data = await response.json();
+                if (!data.routes || data.routes.length === 0) {
+                    throw new Error("Rute tidak ditemukan.");
+                }
+                return data.routes[0];
+            }
+
+            window.clearRoutes = function() {
+                routeLines.forEach(line => map.removeLayer(line));
+                routeLines = [];
+                document.getElementById('routePanel').style.display = 'none';
+            };
+
+            window.showPropertyRoute = async function(propId) {
+                const prop = properties.find(p => p.id === propId);
+                if (!prop) return;
+
+                // Clear old routes
+                window.clearRoutes();
+
+                let drawnBounds = L.latLngBounds();
+
+                // 1. Rute dari Properti ke Fasilitas Terdekat
+                const nearestAmenity = findNearestAmenity(prop.lat, prop.lng);
+                if (nearestAmenity) {
+                    try {
+                        const route = await getRoute(prop.lat, prop.lng, nearestAmenity.lat, nearestAmenity.lng);
+                        const polyline = L.geoJSON(route.geometry, {
+                            style: {
+                                color: '#10B981', // Emerald green
+                                weight: 5,
+                                opacity: 0.8
+                            }
+                        }).addTo(map);
+                        routeLines.push(polyline);
+                        drawnBounds.extend(polyline.getBounds());
+
+                        const distKm = (route.distance / 1000).toFixed(1);
+                        const driveTime = Math.round(route.duration / 60);
+                        const walkTime = Math.round((route.distance / 1.39) / 60);
+
+                        document.getElementById('facilityRouteLabel').textContent = `Fasilitas Terdekat: ${nearestAmenity.name} (${nearestAmenity.type})`;
+                        document.getElementById('facilityRouteDist').textContent = `${distKm} km`;
+                        document.getElementById('facilityRouteTime').textContent = `${driveTime} mnt berkendara / ${walkTime} mnt jalan kaki`;
+                    } catch (err) {
+                        console.error("Error routing to amenity:", err);
+                        // Fallback straight line
+                        const fallbackLine = L.polyline([[prop.lat, prop.lng], [nearestAmenity.lat, nearestAmenity.lng]], {
+                            color: '#10B981',
+                            dashArray: '5, 10',
+                            weight: 4
+                        }).addTo(map);
+                        routeLines.push(fallbackLine);
+                        drawnBounds.extend(fallbackLine.getBounds());
+                        
+                        const distKm = (nearestAmenity.distance_m / 1000).toFixed(1);
+                        const walkTime = Math.round((nearestAmenity.distance_m / 1.39) / 60);
+                        document.getElementById('facilityRouteLabel').textContent = `Fasilitas Terdekat: ${nearestAmenity.name} (${nearestAmenity.type})`;
+                        document.getElementById('facilityRouteDist').textContent = `${distKm} km (garis lurus)`;
+                        document.getElementById('facilityRouteTime').textContent = `~${walkTime} mnt jalan kaki`;
+                    }
+                }
+
+                // 2. Rute dari User ke Properti
+                let hasUserRoute = false;
+                const startPoint = window.userLocation || (center ? { lat: center.lat, lng: center.lng } : null);
+                
+                if (startPoint) {
+                    try {
+                        const route = await getRoute(startPoint.lat, startPoint.lng, prop.lat, prop.lng);
+                        const polyline = L.geoJSON(route.geometry, {
+                            style: {
+                                color: '#E36414', // Orange/Brand-accent
+                                weight: 5,
+                                opacity: 0.8
+                            }
+                        }).addTo(map);
+                        routeLines.push(polyline);
+                        drawnBounds.extend(polyline.getBounds());
+
+                        const distKm = (route.distance / 1000).toFixed(1);
+                        const driveTime = Math.round(route.duration / 60);
+                        const walkTime = Math.round((route.distance / 1.39) / 60);
+
+                        document.getElementById('userRouteInfo').style.display = 'block';
+                        document.getElementById('userRouteDist').textContent = `${distKm} km`;
+                        document.getElementById('userRouteTime').textContent = `${driveTime} mnt berkendara / ${walkTime} mnt jalan kaki`;
+                        hasUserRoute = true;
+                    } catch (err) {
+                        console.error("Error routing from start to property:", err);
+                        // Fallback straight line
+                        const fallbackLine = L.polyline([[startPoint.lat, startPoint.lng], [prop.lat, prop.lng]], {
+                            color: '#E36414',
+                            dashArray: '5, 10',
+                            weight: 4
+                        }).addTo(map);
+                        routeLines.push(fallbackLine);
+                        drawnBounds.extend(fallbackLine.getBounds());
+
+                        const straightDist = distanceMeters(startPoint.lat, startPoint.lng, prop.lat, prop.lng);
+                        const distKm = (straightDist / 1000).toFixed(1);
+                        document.getElementById('userRouteInfo').style.display = 'block';
+                        document.getElementById('userRouteDist').textContent = `${distKm} km (garis lurus)`;
+                        document.getElementById('userRouteTime').textContent = `Rute jalan gagal dimuat`;
+                        hasUserRoute = true;
+                    }
+                } else {
+                    document.getElementById('userRouteInfo').style.display = 'none';
+                }
+
+                // Show the panel
+                document.getElementById('routePanel').style.display = 'block';
+
+                // Fit map bounds to show the routes
+                if (routeLines.length > 0) {
+                    map.fitBounds(drawnBounds, { padding: [50, 50] });
+                }
+            };
+
             function formatCurrency(value) {
                 return new Intl.NumberFormat('id-ID').format(value);
             }
@@ -509,6 +806,7 @@
                             if (marker) {
                                 marker.openPopup();
                             }
+                            window.showPropertyRoute(id);
                         });
                     });
                 });
@@ -591,6 +889,10 @@
 
                     const marker = L.marker([lat, lng], { icon: markerIcon }).addTo(markerLayer);
                     marker.bindPopup(popupHtml, { closeButton: true, className: 'rounded-xl' });
+
+                    marker.on('click', () => {
+                        window.showPropertyRoute(Number(p.id));
+                    });
 
                     if (Number.isFinite(Number(p.id))) {
                         markerMap.set(Number(p.id), marker);
@@ -914,6 +1216,14 @@
                 });
             });
             @endauth
+
+            // Jalankan pelacakan GPS awal & preload semua data fasilitas untuk rute jalan
+            trackUserLocation(false);
+            fetchAmenities().then((data) => {
+                window.allAmenities = data;
+            }).catch((err) => {
+                console.error("Gagal memuat fasilitas untuk rute:", err);
+            });
         </script>
         <style>
             .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:12px; padding:7px 11px; font-size:11px; font-weight:800; background:#f8fafc; color:#475569; border:1px solid #e2e8f0; transition:all .2s; cursor:pointer; }
@@ -937,6 +1247,12 @@
                 color: #64748b !important;
                 font-size: 16px !important;
                 font-weight: bold !important;
+            }
+
+            @keyframes pulse-marker {
+                0% { transform: scale(0.8); opacity: 0.5; }
+                70% { transform: scale(1.5); opacity: 0; }
+                100% { transform: scale(0.8); opacity: 0; }
             }
         </style>
     @endpush

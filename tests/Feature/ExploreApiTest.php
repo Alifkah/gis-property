@@ -71,8 +71,8 @@ it('can filter explore properties by radius', function () {
     $response->assertOk();
 
     $ids = collect($response->json('data'))->pluck('id')->all();
-    expect($ids)->toContain($near->id);
-    expect($ids)->not->toContain($far->id);
+    $this->assertContains($near->id, $ids);
+    $this->assertNotContains($far->id, $ids);
 });
 
 it('can filter explore properties by amenity type within radius', function () {
@@ -97,6 +97,6 @@ it('can filter explore properties by amenity type within radius', function () {
     $response->assertOk();
 
     $ids = collect($response->json('data'))->pluck('id')->all();
-    expect($ids)->toContain($near->id);
-    expect($ids)->not->toContain($far->id);
+    $this->assertContains($near->id, $ids);
+    $this->assertNotContains($far->id, $ids);
 });

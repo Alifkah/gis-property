@@ -76,8 +76,14 @@ class AmenitySeeder extends Seeder
             $seenNamesNear[$nameNearKey] = true;
 
             // Tentukan tipe fasilitas berdasarkan tag asli OSM dan sesuaikan dengan kategori aplikasi
-            $typeRaw = $properties['amenity'] ?? $properties['shop'] ?? 'Lainnya';
-            $type = $this->normalizeType($typeRaw);
+            $typeRaw = $properties['amenity']
+                ?? $properties['shop']
+                ?? $properties['leisure']
+                ?? $properties['highway']
+                ?? $properties['office']
+                ?? $properties['aeroway']
+                ?? (isset($properties['harbour']) ? 'harbour' : null)
+                ?? 'Lainnya';
 
             // Batasi panjang karakter nama agar sesuai dengan kolom tabel database (max 150)
             $name = substr($name, 0, 150);
@@ -85,13 +91,13 @@ class AmenitySeeder extends Seeder
             if ($driver === 'pgsql') {
                 $records[] = [
                     'name' => $name,
-                    'type' => $type,
+                    'type' => $this->normalizeType($typeRaw),
                     'geom' => DB::raw("ST_GeomFromText('POINT({$longitude} {$latitude})', 4326)"),
                 ];
             } else {
                 $records[] = [
                     'name' => $name,
-                    'type' => $type,
+                    'type' => $this->normalizeType($typeRaw),
                     'geom' => "POINT({$longitude} {$latitude})",
                 ];
             }
@@ -138,7 +144,7 @@ class AmenitySeeder extends Seeder
         if (in_array($rawType, [
             'supermarket', 'mall', 'marketplace', 'convenience', 'shop',
             'bakery', 'restaurant', 'cafe', 'fast_food', 'food_court',
-            'pub', 'bar', 'coffee', 'marketplace',
+            'pub', 'bar', 'coffee', 'department_store',
         ])) {
             return 'Perdagangan';
         }
@@ -149,11 +155,14 @@ class AmenitySeeder extends Seeder
         }
 
         // 6. Transportasi
-        if (in_array($rawType, ['fuel', 'bus_station', 'taxi', 'parking'])) {
+        if (in_array($rawType, [
+            'fuel', 'bus_station', 'taxi', 'parking', 'bus_stop',
+            'aerodrome', 'ferry_terminal', 'harbour',
+        ])) {
             return 'Transportasi';
         }
 
-        // 7. Fallback ke Fasilitas Umum
+        // 7. Fallback ke Fasilitas Umum (seperti bank, atm, government, townhall, park, stadium, dll.)
         return 'Fasilitas Umum';
     }
 }

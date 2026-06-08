@@ -59,7 +59,7 @@
                         <tr class="group hover:bg-slate-50/50 transition-colors">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3.5">
-                                    @if ($property->images->isNotEmpty())
+                                    @if ($property->images->isNotEmpty() && Storage::disk('public')->exists($property->images->first()->path))
                                         <img
                                             src="{{ Storage::url($property->images->first()->path) }}"
                                             alt="{{ $property->title }}"

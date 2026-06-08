@@ -165,6 +165,7 @@ class PropertyController extends Controller
 
             $nearestAmenities = DB::table('amenities')
                 ->select('id', 'name', 'type')
+                ->selectRaw('ST_X(geom::geometry) as lng, ST_Y(geom::geometry) as lat')
                 ->selectRaw('ST_Distance(amenities.geom::geography, ((select geom from properties where id = ?))::geography) as distance_m', [
                     $property->id,
                 ])
@@ -228,6 +229,8 @@ class PropertyController extends Controller
             ->map(function (Amenity $amenity) use ($lat, $lng) {
                 $point = $this->extractPoint($amenity->geom);
                 $amenity->distance_m = $this->distanceMeters($lat, $lng, (float) $point['lat'], (float) $point['lng']);
+                $amenity->lat = (float) $point['lat'];
+                $amenity->lng = (float) $point['lng'];
 
                 return $amenity;
             })
