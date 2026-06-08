@@ -156,7 +156,7 @@ class ExploreApiController extends Controller
                     'is_new' => (bool) $property->is_new,
                     'is_flood_safe' => (bool) $property->is_flood_safe,
                     'amenity_distance_m' => isset($property->amenity_distance_m) ? (float) $property->amenity_distance_m : null,
-                    'image_url' => ($property->first_image_path && (! $isLocalDisk || Storage::disk('public')->exists($property->first_image_path))) ? Storage::url($property->first_image_path) : null,
+                    'image_url' => ($property->first_image_path && (! $isLocalDisk || Storage::disk('public')->exists($property->first_image_path))) ? Storage::disk('public')->url($property->first_image_path) : null,
                 ];
             })->values();
         } else {
@@ -189,7 +189,7 @@ class ExploreApiController extends Controller
                     'is_new' => false,
                     'is_flood_safe' => true,
                     'amenity_distance_m' => null,
-                    'image_url' => ($firstImage && (! $isLocalDisk || Storage::disk('public')->exists($firstImage->path))) ? Storage::url($firstImage->path) : null,
+                    'image_url' => ($firstImage && (! $isLocalDisk || Storage::disk('public')->exists($firstImage->path))) ? Storage::disk('public')->url($firstImage->path) : null,
                 ];
             })
                 ->values();

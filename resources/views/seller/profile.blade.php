@@ -70,7 +70,7 @@
                         <label class="text-xs font-bold text-slate-700">Logo Agensi / Foto Profil</label>
                         <div class="mt-2.5 flex items-center gap-4">
                             @if ($user->logo_path)
-                                <img src="{{ Storage::url($user->logo_path) }}" alt="Logo" class="size-16 object-cover rounded-2xl ring-1 ring-slate-200/50" />
+                                <img src="{{ Storage::disk('public')->url($user->logo_path) }}" alt="Logo" class="size-16 object-cover rounded-2xl ring-1 ring-slate-200/50" />
                             @else
                                 <div class="size-16 grid place-items-center rounded-2xl bg-brand-primary/8 border border-brand-primary/10 text-brand-primary text-lg font-black uppercase">
                                     {{ substr($user->company_name ?? $user->name, 0, 1) }}

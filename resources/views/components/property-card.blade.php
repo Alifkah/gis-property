@@ -8,7 +8,7 @@
     $firstImage = $property->relationLoaded('images') ? $property->images->first() : null;
     $isLocalDisk = config('filesystems.disks.public.driver') === 'local';
     if ($firstImage && (!$isLocalDisk || Storage::disk('public')->exists($firstImage->path))) {
-        $imageUrl = Storage::url($firstImage->path);
+        $imageUrl = Storage::disk('public')->url($firstImage->path);
     } else {
         $placeholderSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" fill="none">'
             . '<rect width="400" height="250" fill="url(#g)"/>'

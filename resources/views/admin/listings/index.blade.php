@@ -64,7 +64,7 @@
                                     @endphp
                                     @if ($property->images->isNotEmpty() && (!$isLocalDisk || Storage::disk('public')->exists($property->images->first()->path)))
                                         <img
-                                            src="{{ Storage::url($property->images->first()->path) }}"
+                                            src="{{ Storage::disk('public')->url($property->images->first()->path) }}"
                                             alt="{{ $property->title }}"
                                             class="size-14 object-cover flex-shrink-0 rounded-xl ring-1 ring-slate-200/50"
                                         />

@@ -218,14 +218,3 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/listings', [AdminListingController::class, 'index'])->name('listings.index');
     Route::delete('/listings/{property}', [AdminListingController::class, 'destroy'])->name('listings.destroy');
 });
-
-Route::get('/debug-storage', function () {
-    return [
-        'disk_public_driver' => config('filesystems.disks.public.driver'),
-        'disk_public_url' => config('filesystems.disks.public.url'),
-        'env_filesystem_disk_public' => env('FILESYSTEM_DISK_PUBLIC'),
-        'env_aws_url' => env('AWS_URL'),
-        'env_aws_endpoint' => env('AWS_ENDPOINT'),
-        'storage_url_test' => Storage::disk('public')->url('test.jpg'),
-    ];
-});

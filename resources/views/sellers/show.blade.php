@@ -7,7 +7,7 @@
         {{-- Seller Info Profile Card --}}
         <aside class="card p-6 h-fit flex flex-col items-center text-center">
             @if ($seller->logo_path)
-                <img src="{{ Storage::url($seller->logo_path) }}" alt="{{ $seller->company_name ?? $seller->name }}" class="size-24 object-cover rounded-3xl ring-2 ring-slate-200/50 shadow-sm" />
+                <img src="{{ Storage::disk('public')->url($seller->logo_path) }}" alt="{{ $seller->company_name ?? $seller->name }}" class="size-24 object-cover rounded-3xl ring-2 ring-slate-200/50 shadow-sm" />
             @else
                 <div class="size-24 grid place-items-center rounded-3xl bg-brand-primary/5 border border-brand-primary/10 text-brand-primary text-3xl font-black uppercase">
                     {{ substr($seller->company_name ?? $seller->name, 0, 1) }}

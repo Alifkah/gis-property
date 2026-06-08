@@ -16,7 +16,7 @@
             return !$isLocalDisk || Storage::disk('public')->exists($img->path);
         });
         $firstImage = $existingImages->first();
-        $imageUrl = $firstImage ? Storage::url($firstImage->path) : null;
+        $imageUrl = $firstImage ? Storage::disk('public')->url($firstImage->path) : null;
         if (!$imageUrl) {
             $placeholderSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" fill="none">'
                 . '<rect width="400" height="250" fill="url(#g)"/>'
@@ -42,13 +42,13 @@
                 @if ($existingImages->isNotEmpty())
                     <section class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_280px]">
                         <div class="group overflow-hidden rounded-2xl bg-slate-100 aspect-[16/10] sm:aspect-auto sm:h-[350px] shadow-xs hover:shadow-md transition duration-300">
-                            <img src="{{ Storage::url($existingImages->first()->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                            <img src="{{ Storage::disk('public')->url($existingImages->first()->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                         </div>
                         @if ($existingImages->count() > 1)
                             <div class="grid grid-cols-2 gap-3 lg:grid-cols-1">
                                 @foreach ($existingImages->skip(1)->take(2) as $image)
                                     <div class="group overflow-hidden rounded-2xl bg-slate-100 aspect-[16/10] lg:aspect-auto lg:h-[168px] shadow-xs hover:shadow-md transition duration-300">
-                                        <img src="{{ Storage::url($image->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                                        <img src="{{ Storage::disk('public')->url($image->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
                                     </div>
                                 @endforeach
                             </div>
