@@ -101,3 +101,52 @@
         padding-bottom: env(safe-area-inset-bottom, 0px);
     }
 }
+
+/* Custom premium shadows and animations */
+@utility shadow-premium {
+    box-shadow: 0 10px 30px -10px rgba(15, 76, 92, 0.08), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+@utility shadow-premium-accent {
+    box-shadow: 0 10px 30px -10px rgba(227, 100, 20, 0.12), 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+@utility hover-premium {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@utility hover-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px -15px rgba(15, 76, 92, 0.12);
+}
+
+/* Animations */
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { opacity: 0.25; }
+    50% { opacity: 0.5; }
+}
+
+@keyframes draw-lines {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.animate-float {
+    animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.gis-contour-path {
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: draw-lines 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

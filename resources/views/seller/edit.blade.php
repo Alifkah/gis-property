@@ -125,7 +125,7 @@
 
                 {{-- Upload foto baru --}}
                 <div>
-                    <label class="text-xs font-semibold text-slate-600">Tambah Foto Baru <span class="font-normal text-slate-400">(maks. 5 foto, JPG/PNG/WebP, maks. 3 MB per foto)</span></label>
+                    <label class="text-xs font-semibold text-slate-600">Tambah Foto Baru <span class="font-normal text-slate-400">(maks. 15 foto, JPG/PNG/WebP, maks. 3 MB per foto)</span></label>
                     <div id="imageDropzone" class="mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-brand-primary/40 hover:bg-brand-primary/5">
                         <svg class="size-8 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" stroke-linecap="round" stroke-linejoin="round" />
@@ -179,7 +179,7 @@
 
             function renderPreviews(files) {
                 preview.innerHTML = '';
-                Array.from(files).slice(0, 5).forEach((file) => {
+                Array.from(files).slice(0, 15).forEach((file) => {
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const div = document.createElement('div');

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Seller;
 use App\Http\Controllers\Controller;
 use App\Models\Property;
 use App\Models\PropertyAlert;
+use App\Services\SimpleXlsxReader;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -40,107 +41,198 @@ class ImportController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
-            'csv_file' => ['required', 'file', 'mimes:csv,txt', 'max:2048'],
+            'csv_file' => ['required', 'file', 'max:5120'],
         ]);
 
         $file = $request->file('csv_file');
-        $path = $file->getRealPath();
+        $extension = strtolower($file->getClientOriginalExtension());
+        if (! in_array($extension, ['csv', 'txt', 'xlsx', 'xls'], true)) {
+            return redirect()->back()->withErrors(['csv_file' => 'Format file harus berupa CSV atau Excel (.xlsx).']);
+        }
 
         $rows = [];
-        if (($handle = fopen($path, 'r')) !== false) {
-            // Read UTF-8 BOM if present
-            $bom = fread($handle, 3);
-            if ($bom !== chr(0xEF).chr(0xBB).chr(0xBF)) {
-                rewind($handle);
-            }
+        $errors = [];
 
-            // Parse headers
-            $headers = fgetcsv($handle, 1000, ',');
-            if (! $headers) {
-                fclose($handle);
-
-                return redirect()->back()->withErrors(['csv_file' => 'File CSV kosong atau tidak memiliki header.']);
-            }
-
-            // Normalize header names to lowercase and trim spaces
-            $headers = array_map(function ($h) {
-                return strtolower(trim($h));
-            }, $headers);
-
-            // Required headers verification
-            $required = ['judul', 'tipe', 'harga', 'luas_tanah', 'latitude', 'longitude'];
-            $missing = [];
-            foreach ($required as $req) {
-                if (! in_array($req, $headers, true)) {
-                    $missing[] = $req;
-                }
-            }
-
-            if (! empty($missing)) {
-                fclose($handle);
-
-                return redirect()->back()->withErrors([
-                    'csv_file' => 'Kolom wajib berikut tidak ditemukan di CSV: '.implode(', ', $missing),
-                ]);
-            }
-
-            $lineNum = 1;
-            $errors = [];
-            $isPgsql = DB::getDriverName() === 'pgsql';
-
-            while (($data = fgetcsv($handle, 1000, ',')) !== false) {
-                $lineNum++;
-
-                // Skip empty lines
-                if (count($data) === 1 && empty($data[0])) {
-                    continue;
+        if ($extension === 'xlsx') {
+            try {
+                $rawRows = SimpleXlsxReader::parse($file->getRealPath());
+                if (empty($rawRows)) {
+                    return redirect()->back()->withErrors(['csv_file' => 'File Excel kosong atau tidak valid.']);
                 }
 
-                // If column count doesn't match header count
-                if (count($data) !== count($headers)) {
-                    $errors[] = "Baris {$lineNum}: Jumlah kolom tidak cocok dengan header (Header: ".count($headers).', Baris: '.count($data).').';
+                // First row is headers
+                $rawHeaders = array_shift($rawRows);
+                $headers = array_map(function ($h) {
+                    return strtolower(trim((string) $h));
+                }, $rawHeaders);
 
-                    continue;
+                // Required headers verification
+                $required = ['judul', 'tipe', 'harga', 'luas_tanah', 'latitude', 'longitude'];
+                $missing = [];
+                foreach ($required as $req) {
+                    if (! in_array($req, $headers, true)) {
+                        $missing[] = $req;
+                    }
                 }
 
-                // Combine row values with headers
-                $row = array_combine($headers, $data);
-                $row = array_map('trim', $row);
+                if (! empty($missing)) {
+                    return redirect()->back()->withErrors([
+                        'csv_file' => 'Kolom wajib berikut tidak ditemukan di Excel: '.implode(', ', $missing),
+                    ]);
+                }
 
-                // Validation rules for this specific row
-                $validator = Validator::make($row, [
-                    'judul' => ['required', 'string', 'max:150'],
-                    'tipe' => ['required', 'string', 'in:Rumah,Tanah'],
-                    'deskripsi' => ['nullable', 'string', 'max:2000'],
-                    'harga' => ['required', 'numeric', 'min:0'],
-                    'luas_tanah' => ['required', 'integer', 'min:1'],
-                    'luas_bangunan' => ['nullable', 'integer', 'min:0'],
-                    'kamar_tidur' => ['nullable', 'integer', 'min:0'],
-                    'kamar_mandi' => ['nullable', 'integer', 'min:0'],
-                    'latitude' => ['required', 'numeric', 'between:-90,90'],
-                    'longitude' => ['required', 'numeric', 'between:-180,180'],
-                ]);
+                $lineNum = 1;
+                foreach ($rawRows as $data) {
+                    $lineNum++;
 
-                if ($validator->fails()) {
-                    foreach ($validator->errors()->all() as $msg) {
-                        $errors[] = "Baris {$lineNum}: {$msg}";
+                    // Skip empty rows
+                    if (empty(array_filter($data, fn ($v) => trim((string) $v) !== ''))) {
+                        continue;
                     }
 
-                    continue;
+                    // Pad or slice data to match headers length
+                    if (count($data) < count($headers)) {
+                        $data = array_pad($data, count($headers), '');
+                    } elseif (count($data) > count($headers)) {
+                        $data = array_slice($data, 0, count($headers));
+                    }
+
+                    // Combine row values with headers
+                    $row = array_combine($headers, $data);
+                    $row = array_map('trim', $row);
+
+                    // Validation rules for this specific row
+                    $validator = Validator::make($row, [
+                        'judul' => ['required', 'string', 'max:150'],
+                        'tipe' => ['required', 'string', 'in:Rumah,Tanah,Ruko,Apartemen'],
+                        'deskripsi' => ['nullable', 'string', 'max:2000'],
+                        'harga' => ['required', 'numeric', 'min:0'],
+                        'luas_tanah' => ['required', 'integer', 'min:1'],
+                        'luas_bangunan' => ['nullable', 'integer', 'min:0'],
+                        'kamar_tidur' => ['nullable', 'integer', 'min:0'],
+                        'kamar_mandi' => ['nullable', 'integer', 'min:0'],
+                        'latitude' => ['required', 'numeric', 'between:-90,90'],
+                        'longitude' => ['required', 'numeric', 'between:-180,180'],
+                    ]);
+
+                    if ($validator->fails()) {
+                        foreach ($validator->errors()->all() as $msg) {
+                            $errors[] = "Baris {$lineNum}: {$msg}";
+                        }
+
+                        continue;
+                    }
+
+                    $rows[] = $row;
                 }
-
-                $rows[] = $row;
-            }
-
-            fclose($handle);
-
-            if (! empty($errors)) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['csv_errors' => $errors]);
+            } catch (\Exception $e) {
+                return redirect()->back()->withErrors(['csv_file' => 'Gagal membaca file Excel: '.$e->getMessage()]);
             }
         } else {
-            return redirect()->back()->withErrors(['csv_file' => 'Gagal membuka file CSV.']);
+            // CSV parser
+            $path = $file->getRealPath();
+            if (($handle = fopen($path, 'r')) !== false) {
+                // Read UTF-8 BOM if present
+                $bom = fread($handle, 3);
+                if ($bom !== chr(0xEF).chr(0xBB).chr(0xBF)) {
+                    rewind($handle);
+                }
+
+                // Detect delimiter dynamically (comma vs semicolon)
+                $firstLine = fgets($handle);
+                $commaCount = substr_count($firstLine, ',');
+                $semicolonCount = substr_count($firstLine, ';');
+                $delimiter = $commaCount >= $semicolonCount ? ',' : ';';
+
+                rewind($handle);
+                if ($bom === chr(0xEF).chr(0xBB).chr(0xBF)) {
+                    fread($handle, 3); // skip BOM again
+                }
+
+                $headers = fgetcsv($handle, 1000, $delimiter);
+                if (! $headers) {
+                    fclose($handle);
+
+                    return redirect()->back()->withErrors(['csv_file' => 'File CSV kosong atau tidak memiliki header.']);
+                }
+
+                // Normalize header names to lowercase and trim spaces
+                $headers = array_map(function ($h) {
+                    return strtolower(trim($h));
+                }, $headers);
+
+                // Required headers verification
+                $required = ['judul', 'tipe', 'harga', 'luas_tanah', 'latitude', 'longitude'];
+                $missing = [];
+                foreach ($required as $req) {
+                    if (! in_array($req, $headers, true)) {
+                        $missing[] = $req;
+                    }
+                }
+
+                if (! empty($missing)) {
+                    fclose($handle);
+
+                    return redirect()->back()->withErrors([
+                        'csv_file' => 'Kolom wajib berikut tidak ditemukan di CSV: '.implode(', ', $missing),
+                    ]);
+                }
+
+                $lineNum = 1;
+                while (($data = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                    $lineNum++;
+
+                    // Skip empty lines
+                    if (count($data) === 1 && empty($data[0])) {
+                        continue;
+                    }
+
+                    // Pad or slice data to match headers length
+                    if (count($data) < count($headers)) {
+                        $data = array_pad($data, count($headers), '');
+                    } elseif (count($data) > count($headers)) {
+                        $data = array_slice($data, 0, count($headers));
+                    }
+
+                    // Combine row values with headers
+                    $row = array_combine($headers, $data);
+                    $row = array_map('trim', $row);
+
+                    // Validation rules for this specific row
+                    $validator = Validator::make($row, [
+                        'judul' => ['required', 'string', 'max:150'],
+                        'tipe' => ['required', 'string', 'in:Rumah,Tanah,Ruko,Apartemen'],
+                        'deskripsi' => ['nullable', 'string', 'max:2000'],
+                        'harga' => ['required', 'numeric', 'min:0'],
+                        'luas_tanah' => ['required', 'integer', 'min:1'],
+                        'luas_bangunan' => ['nullable', 'integer', 'min:0'],
+                        'kamar_tidur' => ['nullable', 'integer', 'min:0'],
+                        'kamar_mandi' => ['nullable', 'integer', 'min:0'],
+                        'latitude' => ['required', 'numeric', 'between:-90,90'],
+                        'longitude' => ['required', 'numeric', 'between:-180,180'],
+                    ]);
+
+                    if ($validator->fails()) {
+                        foreach ($validator->errors()->all() as $msg) {
+                            $errors[] = "Baris {$lineNum}: {$msg}";
+                        }
+
+                        continue;
+                    }
+
+                    $rows[] = $row;
+                }
+
+                fclose($handle);
+            } else {
+                return redirect()->back()->withErrors(['csv_file' => 'Gagal membuka file CSV.']);
+            }
+        }
+
+        if (! empty($errors)) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['csv_errors' => $errors]);
         }
 
         if (empty($rows)) {

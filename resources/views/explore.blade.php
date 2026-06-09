@@ -146,6 +146,10 @@
                             <span id="facilityRouteTime" class="text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded text-[10px]">-</span>
                         </div>
                     </div>
+                    <div class="border-t border-slate-100 pt-2 flex items-center justify-between text-[10px] text-slate-500 font-semibold">
+                        <span>Lalu Lintas Samarinda:</span>
+                        <span id="trafficStatusBadge" class="font-black px-1.5 py-0.5 rounded text-[8px]"></span>
+                    </div>
                 </div>
             </div>
 
@@ -573,6 +577,19 @@
                         // Show GPS alert banner
                         const gpsAlert = document.getElementById('gpsAlert');
                         if (gpsAlert) gpsAlert.style.display = 'flex';
+
+                        // Hanya tampilkan alert jika diaktifkan atas aksi eksplisit user (panTo === true)
+                        if (panTo) {
+                            let msg = "Gagal mendeteksi lokasi GPS Anda.";
+                            if (error.code === error.PERMISSION_DENIED) {
+                                msg = "Akses lokasi ditolak browser. Mohon izinkan akses lokasi untuk situs ini di pengaturan browser Anda (biasanya di ikon gembok sebelah alamat web), lalu coba lagi.";
+                            } else if (error.code === error.POSITION_UNAVAILABLE) {
+                                msg = "Lokasi GPS tidak tersedia. Pastikan GPS perangkat Anda aktif.";
+                            } else if (error.code === error.TIMEOUT) {
+                                msg = "Waktu pencarian lokasi habis. Silakan coba lagi.";
+                            }
+                            alert(msg);
+                        }
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
@@ -605,6 +622,57 @@
                     nearest.distance_m = minDistance;
                 }
                 return nearest;
+            }
+
+            // Real-time Traffic Calculation Helper functions
+            function getSamarindaTimeDecimal() {
+                try {
+                    const options = { 
+                        timeZone: 'Asia/Makassar', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: false 
+                    };
+                    const formatter = new Intl.DateTimeFormat('en-US', options);
+                    const parts = formatter.formatToParts(new Date());
+                    let hour = 0;
+                    let minute = 0;
+                    for (const part of parts) {
+                        if (part.type === 'hour') hour = parseInt(part.value, 10);
+                        if (part.type === 'minute') minute = parseInt(part.value, 10);
+                    }
+                    return hour + (minute / 60);
+                } catch (e) {
+                    const now = new Date();
+                    return now.getHours() + (now.getMinutes() / 60);
+                }
+            }
+
+            function getTrafficData() {
+                const time = getSamarindaTimeDecimal();
+                let multiplier = 1.0;
+                let status = "Lancar";
+                let statusClass = "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30";
+
+                if ((time >= 7.0 && time < 9.0) || (time >= 16.5 && time < 19.0)) {
+                    multiplier = 2.3;
+                    status = "Padat (Jam Sibuk)";
+                    statusClass = "text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-950/30";
+                } else if (time >= 9.0 && time < 16.5) {
+                    multiplier = 1.4;
+                    status = "Sedang (Jam Kerja)";
+                    statusClass = "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/30";
+                } else {
+                    multiplier = 1.0;
+                    status = "Lancar";
+                    statusClass = "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30";
+                }
+
+                const hours = Math.floor(time);
+                const minutes = Math.floor((time - hours) * 60);
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+                return { multiplier, status, statusClass, timeStr };
             }
 
             async function getRoute(fromLat, fromLng, toLat, toLng) {
@@ -651,7 +719,8 @@
                         drawnBounds.extend(polyline.getBounds());
 
                         const distKm = (route.distance / 1000).toFixed(1);
-                        const driveTime = Math.round(route.duration / 60);
+                        const traffic = getTrafficData();
+                        const driveTime = Math.round((route.duration * traffic.multiplier) / 60);
                         const walkTime = Math.round((route.distance / 1.39) / 60);
 
                         document.getElementById('facilityRouteLabel').textContent = `Fasilitas Terdekat: ${nearestAmenity.name} (${nearestAmenity.type})`;
@@ -694,7 +763,8 @@
                         drawnBounds.extend(polyline.getBounds());
 
                         const distKm = (route.distance / 1000).toFixed(1);
-                        const driveTime = Math.round(route.duration / 60);
+                        const traffic = getTrafficData();
+                        const driveTime = Math.round((route.duration * traffic.multiplier) / 60);
                         const walkTime = Math.round((route.distance / 1.39) / 60);
 
                         document.getElementById('userRouteInfo').style.display = 'block';
@@ -724,6 +794,12 @@
                 }
 
                 // Show the panel
+                const traffic = getTrafficData();
+                const badge = document.getElementById('trafficStatusBadge');
+                if (badge) {
+                    badge.textContent = traffic.status;
+                    badge.className = `font-black px-1.5 py-0.5 rounded text-[8px] ${traffic.statusClass}`;
+                }
                 document.getElementById('routePanel').style.display = 'block';
 
                 // Fit map bounds to show the routes

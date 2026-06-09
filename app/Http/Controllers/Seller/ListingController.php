@@ -276,7 +276,7 @@ class ListingController extends Controller
             'building_area' => ['nullable', 'integer', 'min:0'],
             'bedroom' => ['nullable', 'integer', 'min:0'],
             'bathroom' => ['nullable', 'integer', 'min:0'],
-            'images' => ['nullable', 'array', 'max:5'],
+            'images' => ['nullable', 'array', 'max:15'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
         ]);
 
@@ -389,7 +389,7 @@ class ListingController extends Controller
             'bedroom' => ['nullable', 'integer', 'min:0'],
             'bathroom' => ['nullable', 'integer', 'min:0'],
             'status' => ['nullable', 'string', 'max:20'],
-            'images' => ['nullable', 'array', 'max:5'],
+            'images' => ['nullable', 'array', 'max:15'],
             'images.*' => ['image', 'mimes:jpg,jpeg,png,webp', 'max:3072'],
             'delete_images' => ['nullable', 'array'],
             'delete_images.*' => ['integer'],

@@ -239,39 +239,75 @@
             document.addEventListener("DOMContentLoaded", function() {
                 const defaultFont = "'Instrument Sans', 'Inter', system-ui, sans-serif";
 
-                // 1. District Bar Chart
+                // 1. District Donut Chart
                 const districtData = @json($propertiesPerDistrict);
                 const districtLabels = districtData.map(d => d.name);
                 const districtTotals = districtData.map(d => d.total);
 
                 const districtOptions = {
-                    series: [{
-                        name: 'Properti Saya',
-                        data: districtTotals
-                    }],
+                    series: districtTotals,
+                    labels: districtLabels,
                     chart: {
-                        type: 'bar',
+                        type: 'donut',
                         height: 240,
                         toolbar: { show: false },
                         fontFamily: defaultFont
                     },
-                    plotOptions: {
-                        bar: {
-                            borderRadius: 4,
-                            horizontal: true,
-                            barHeight: '50%'
+                    colors: ['#0F4C5C', '#E36414', '#FB8B24', '#5F0F40', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#14B8A6', '#F59E0B'],
+                    legend: {
+                        position: 'bottom',
+                        fontSize: '11px',
+                        fontFamily: defaultFont,
+                        fontWeight: 600,
+                        labels: { colors: '#64748B' }
+                    },
+                    dataLabels: {
+                        enabled: true,
+                        style: {
+                            fontSize: '10px',
+                            fontWeight: 'bold',
+                            fontFamily: defaultFont
+                        },
+                        formatter: function (val, opts) {
+                            return opts.w.config.series[opts.seriesIndex] + " unit";
                         }
                     },
-                    colors: ['#0F4C5C'],
-                    dataLabels: { enabled: false },
-                    xaxis: {
-                        categories: districtLabels,
-                        labels: { style: { colors: '#64748b', fontWeight: 500, fontSize: '11px' } }
-                    },
-                    yaxis: {
-                        labels: { style: { colors: '#64748b', fontWeight: 500, fontSize: '11px' } }
-                    },
-                    grid: { borderColor: '#f1f5f9', strokeDashArray: 3 }
+                    plotOptions: {
+                        pie: {
+                            donut: {
+                                size: '60%',
+                                labels: {
+                                    show: true,
+                                    name: {
+                                        show: true,
+                                        fontSize: '11px',
+                                        fontWeight: 'bold',
+                                        fontFamily: defaultFont,
+                                        color: '#64748b'
+                                    },
+                                    value: {
+                                        show: true,
+                                        fontSize: '14px',
+                                        fontWeight: 'extrabold',
+                                        fontFamily: defaultFont,
+                                        color: '#0f172a',
+                                        formatter: function (val) {
+                                            return val + " unit";
+                                        }
+                                    },
+                                    total: {
+                                        show: true,
+                                        label: 'Total Properti',
+                                        fontFamily: defaultFont,
+                                        color: '#64748b',
+                                        formatter: function (w) {
+                                            return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + " unit";
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 };
                 new ApexCharts(document.querySelector("#districtChart"), districtOptions).render();
 

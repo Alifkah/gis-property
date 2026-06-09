@@ -23,11 +23,11 @@
     {{-- Stat Cards --}}
     <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {{-- Card 1: Total Listing --}}
-        <div class="card bg-linear-to-br from-brand-primary/5 via-white to-white p-5 border-l-4 border-l-brand-primary transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-brand-primary/5 via-white to-white p-5 border-l-4 border-l-brand-primary hover:shadow-xl hover:shadow-brand-primary/10 hover:-translate-y-0.5 duration-300 transition">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Listing</div>
                 <div class="grid size-9 place-items-center rounded-xl bg-brand-primary/5 text-brand-primary ring-1 ring-brand-primary/10">
-                    <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="size-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                 </div>
@@ -41,7 +41,7 @@
         </div>
 
         {{-- Card 2: Total Penjual --}}
-        <div class="card bg-linear-to-br from-brand-accent/5 via-white to-white p-5 border-l-4 border-l-brand-accent transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-brand-accent/5 via-white to-white p-5 border-l-4 border-l-brand-accent hover:shadow-xl hover:shadow-brand-accent/15 hover:-translate-y-0.5 duration-300 transition">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Penjual</div>
                 <div class="grid size-9 place-items-center rounded-xl bg-brand-accent/5 text-brand-accent ring-1 ring-brand-accent/10">
@@ -57,7 +57,7 @@
         </div>
 
         {{-- Card 3: Fasilitas POI --}}
-        <div class="card bg-linear-to-br from-amber-500/5 via-white to-white p-5 border-l-4 border-l-amber-500 transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-amber-500/5 via-white to-white p-5 border-l-4 border-l-amber-500 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5 duration-300 transition">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Fasilitas (POI)</div>
                 <div class="grid size-9 place-items-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100/50">
@@ -74,7 +74,7 @@
         </div>
 
         {{-- Card 4: Zona Banjir --}}
-        <div class="card bg-linear-to-br from-brand-warning/5 via-white to-white p-5 border-l-4 border-l-brand-warning transition hover:shadow-md">
+        <div class="card bg-linear-to-br from-brand-warning/5 via-white to-white p-5 border-l-4 border-l-brand-warning hover:shadow-xl hover:shadow-brand-warning/10 hover:-translate-y-0.5 duration-300 transition">
             <div class="flex items-center justify-between">
                 <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Zona Banjir</div>
                 <div class="grid size-9 place-items-center rounded-xl bg-brand-warning/5 text-brand-warning ring-1 ring-brand-warning/10">
@@ -215,45 +215,74 @@
         document.addEventListener("DOMContentLoaded", function() {
             const defaultFont = "'Instrument Sans', 'Inter', system-ui, sans-serif";
 
-            // 1. District Bar Chart
+            // 1. District Donut Chart
             const districtData = @json($propertiesPerDistrict);
             const districtLabels = districtData.map(d => d.name);
             const districtTotals = districtData.map(d => d.total);
 
             const districtOptions = {
-                series: [{
-                    name: 'Jumlah Properti',
-                    data: districtTotals
-                }],
+                series: districtTotals,
+                labels: districtLabels,
                 chart: {
-                    type: 'bar',
+                    type: 'donut',
                     height: 280,
                     toolbar: { show: false },
                     fontFamily: defaultFont
                 },
+                colors: ['#0F4C5C', '#E36414', '#FB8B24', '#5F0F40', '#10B981', '#3B82F6', '#8B5CF6', '#EC4899', '#14B8A6', '#F59E0B'],
+                legend: {
+                    position: 'bottom',
+                    fontSize: '11px',
+                    fontFamily: defaultFont,
+                    fontWeight: 600,
+                    labels: { colors: '#64748B' }
+                },
+                dataLabels: {
+                    enabled: true,
+                    style: {
+                        fontSize: '10px',
+                        fontWeight: 'bold',
+                        fontFamily: defaultFont
+                    },
+                    formatter: function (val, opts) {
+                        return opts.w.config.series[opts.seriesIndex] + " unit";
+                    }
+                },
                 plotOptions: {
-                    bar: {
-                        borderRadius: 5,
-                        horizontal: true,
-                        barHeight: '55%'
+                    pie: {
+                        donut: {
+                            size: '65%',
+                            labels: {
+                                show: true,
+                                name: {
+                                    show: true,
+                                    fontSize: '12px',
+                                    fontWeight: 'bold',
+                                    fontFamily: defaultFont,
+                                    color: '#64748b'
+                                },
+                                value: {
+                                    show: true,
+                                    fontSize: '16px',
+                                    fontWeight: 'extrabold',
+                                    fontFamily: defaultFont,
+                                    color: '#0f172a',
+                                    formatter: function (val) {
+                                        return val + " unit";
+                                    }
+                                },
+                                total: {
+                                    show: true,
+                                    label: 'Total Properti',
+                                    fontFamily: defaultFont,
+                                    color: '#64748b',
+                                    formatter: function (w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0) + " unit";
+                                    }
+                                }
+                            }
+                        }
                     }
-                },
-                colors: ['#0F4C5C'],
-                dataLabels: { enabled: false },
-                xaxis: {
-                    categories: districtLabels,
-                    labels: {
-                        style: { colors: '#64748b', fontWeight: 500, fontSize: '11px' }
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        style: { colors: '#64748b', fontWeight: 500, fontSize: '11px' }
-                    }
-                },
-                grid: {
-                    borderColor: '#f1f5f9',
-                    strokeDashArray: 3
                 }
             };
             new ApexCharts(document.querySelector("#districtChart"), districtOptions).render();

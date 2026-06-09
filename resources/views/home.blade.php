@@ -6,13 +6,13 @@
             <svg class="h-full w-full" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" preserveAspectRatio="none">
                 <g fill="none" stroke="currentColor" stroke-width="1.5">
                     <!-- Contour lines -->
-                    <path d="M-100,100 C200,50 300,250 500,150 C700,50 800,200 1100,100" />
-                    <path d="M-100,150 C200,100 300,300 500,200 C700,100 800,250 1100,150" />
-                    <path d="M-100,200 C200,150 300,350 500,250 C700,150 800,300 1100,200" />
-                    <path d="M-100,250 C200,200 300,400 500,300 C700,200 800,350 1100,250" />
-                    <path d="M-100,300 C200,250 300,450 500,350 C700,250 800,400 1100,300" />
-                    <path d="M-100,350 C200,300 300,500 500,400 C700,300 800,450 1100,350" />
-                    <path d="M-100,400 C200,350 300,550 500,450 C700,350 800,500 1100,400" />
+                    <path class="gis-contour-path" style="animation-delay: 0.1s;" d="M-100,100 C200,50 300,250 500,150 C700,50 800,200 1100,100" />
+                    <path class="gis-contour-path" style="animation-delay: 0.3s;" d="M-100,150 C200,100 300,300 500,200 C700,100 800,250 1100,150" />
+                    <path class="gis-contour-path" style="animation-delay: 0.5s;" d="M-100,200 C200,150 300,350 500,250 C700,150 800,300 1100,200" />
+                    <path class="gis-contour-path" style="animation-delay: 0.7s;" d="M-100,250 C200,200 300,400 500,300 C700,200 800,350 1100,250" />
+                    <path class="gis-contour-path" style="animation-delay: 0.9s;" d="M-100,300 C200,250 300,450 500,350 C700,250 800,400 1100,300" />
+                    <path class="gis-contour-path" style="animation-delay: 1.1s;" d="M-100,350 C200,300 300,500 500,400 C700,300 800,450 1100,350" />
+                    <path class="gis-contour-path" style="animation-delay: 1.3s;" d="M-100,400 C200,350 300,550 500,450 C700,350 800,500 1100,400" />
                     <!-- Grid coordinates indicators -->
                     <line x1="100" y1="0" x2="100" y2="500" stroke-opacity="0.2" stroke-dasharray="5 5" />
                     <line x1="300" y1="0" x2="300" y2="500" stroke-opacity="0.2" stroke-dasharray="5 5" />
@@ -97,7 +97,7 @@
 
     {{-- Fitur Utama --}}
     <section class="mt-6 sm:mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        <div class="group card p-6 hover:-translate-y-1 hover:shadow-md hover:border-brand-primary/20 transition duration-300">
+        <div class="group card shadow-premium hover-premium p-6 border-slate-200/50">
             <span class="grid size-12 place-items-center rounded-2xl bg-brand-primary/5 text-brand-primary transition group-hover:scale-105 duration-300">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.89-1.63a1.875 1.875 0 001.108-1.723V1.35c0-.847-.788-1.54-1.618-1.328l-4.708 1.205M9.623 3.328L3.3 5.4a1.875 1.875 0 00-1.29 1.783v12.285c0 .762.583 1.417 1.34 1.328l6.233-1.205m0-14.542L15.5 1.3M9 6.75L15.5 4.5m-.5 10.5L9 15" />
@@ -106,7 +106,7 @@
             <div class="text-sm font-extrabold text-slate-900 mt-4 font-display">Eksplorasi Spasial Interaktif</div>
             <div class="mt-2 text-xs font-semibold leading-relaxed text-slate-500">Cari dan jelajahi berbagai listing properti berbasis peta interaktif dengan filter pencarian spasial yang dinamis dan super cepat.</div>
         </div>
-        <div class="group card p-6 hover:-translate-y-1 hover:shadow-md hover:border-brand-primary/20 transition duration-300">
+        <div class="group card shadow-premium hover-premium p-6 border-slate-200/50">
             <span class="grid size-12 place-items-center rounded-2xl bg-brand-primary/5 text-brand-primary transition group-hover:scale-105 duration-300">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -116,7 +116,7 @@
             <div class="text-sm font-extrabold text-slate-900 mt-4 font-display">Smart Proximity Analytics</div>
             <div class="mt-2 text-xs font-semibold leading-relaxed text-slate-500">Ketahui fasilitas penting terdekat seperti sekolah, rumah sakit, dan pasar, lengkap dengan kalkulasi jarak tempuh presisi.</div>
         </div>
-        <div class="group card p-6 hover:-translate-y-1 hover:shadow-md hover:border-brand-primary/20 transition duration-300">
+        <div class="group card shadow-premium hover-premium p-6 border-slate-200/50">
             <span class="grid size-12 place-items-center rounded-2xl bg-brand-primary/5 text-brand-primary transition group-hover:scale-105 duration-300">
                 <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15a4.5 4.5 0 0 0-4.5 4.5V21h9v-1.5A4.5 4.5 0 0 0 2.25 15ZM12 18.75V21M12 3a9 9 0 0 0-9 9m9-9a9 9 0 0 1 9 9m-9-9v2.25m9 6.75H21M3 12h2.25m11.364-5.636-1.591 1.591M6.393 17.607l1.591-1.591m8.25-8.25-1.591 1.591M7.984 6.393l1.591 1.591" />

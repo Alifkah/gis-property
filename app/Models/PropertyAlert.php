@@ -79,11 +79,29 @@ class PropertyAlert extends Model
             ->where('user_id', '!=', $property->user_id)
             ->get();
 
+        $notifiedUserIds = [];
+
         foreach ($matchingAlerts as $alert) {
             Notification::query()->create([
                 'user_id' => $alert->user_id,
                 'title' => 'Properti Baru yang Cocok!',
                 'message' => 'Properti baru "'.$property->title.'" di '.$districtName.' tersedia dengan harga Rp '.number_format($property->price, 0, ',', '.').'.',
+                'url' => route('properties.show', $property->id),
+                'is_read' => false,
+            ]);
+            $notifiedUserIds[] = $alert->user_id;
+        }
+
+        // Send global new listing notification to all other registered users (except owner & already notified)
+        $otherUsers = User::where('id', '!=', $property->user_id)
+            ->whereNotIn('id', $notifiedUserIds)
+            ->get();
+
+        foreach ($otherUsers as $user) {
+            Notification::query()->create([
+                'user_id' => $user->id,
+                'title' => 'Listing Baru Terbit!',
+                'message' => 'Sebuah properti baru "'.$property->title.'" di '.$districtName.' telah diterbitkan dengan harga Rp '.number_format($property->price, 0, ',', '.').'.',
                 'url' => route('properties.show', $property->id),
                 'is_read' => false,
             ]);

@@ -67,10 +67,33 @@
                             <div class="text-xs font-semibold text-rose-600">Harga per m²</div>
                             <div id="statPricePerSqm" class="mt-2 text-2xl font-extrabold text-rose-900">-</div>
                         </div>
-                        <div class="rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-100">
-                            <div class="text-xs font-semibold text-amber-600">Posisi Harga Anda</div>
+                        <div class="rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-100 transition-all duration-300" id="pricePositionCard">
+                            <div class="text-xs font-semibold text-amber-600" id="pricePositionLabel">Posisi Harga Anda</div>
                             <div id="statPosition" class="mt-2 text-lg font-extrabold text-amber-900">-</div>
                         </div>
+                    </div>
+
+                    <!-- Price Position Visual Meter -->
+                    <div class="mt-6 border-t border-slate-100 pt-5">
+                        <div class="text-xs font-extrabold text-slate-900 mb-3 flex items-center gap-1.5">
+                            <svg class="size-4 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 1 0 7.5 7.5h-7.5V6Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0 0 13.5 3v7.5Z" />
+                            </svg>
+                            <span>Garis Ukur Perbandingan Harga</span>
+                        </div>
+                        <div class="flex items-center justify-between text-[10px] font-bold text-slate-500 mb-2">
+                            <span>Terendah: <span id="meterMin" class="text-slate-800 font-extrabold">-</span></span>
+                            <span>Rata-rata: <span id="meterAvg" class="text-slate-800 font-extrabold">-</span></span>
+                            <span>Tertinggi: <span id="meterMax" class="text-slate-800 font-extrabold">-</span></span>
+                        </div>
+                        <div class="relative w-full h-3.5 bg-slate-200/80 rounded-full ring-1 ring-slate-300/30 overflow-visible">
+                            <!-- Average Line Marker -->
+                            <div id="meterAvgLine" class="absolute top-0 bottom-0 w-0.5 bg-slate-400/80 z-10" style="left: 50%;"></div>
+                            <!-- User Price Marker -->
+                            <div id="meterUserMarker" class="absolute -top-0.5 w-4.5 h-4.5 rounded-full border-3 border-white shadow-md z-20 transition-all duration-500" style="left: 0%; background-color: #3b82f6;"></div>
+                        </div>
+                        <div class="mt-2.5 text-center text-xs font-semibold text-slate-500 leading-relaxed" id="meterLabel"></div>
                     </div>
 
                     <div class="mt-6 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70">
@@ -79,18 +102,31 @@
                     </div>
                 </div>
 
-                <div class="card p-6">
-                    <div class="flex items-center justify-between gap-4">
-                        <div>
-                            <div class="text-sm font-extrabold text-slate-900">Peta Buffer Zone</div>
-                            <div class="mt-1 text-sm text-slate-600">Visualisasi properti kompetitor dalam radius yang dipilih.</div>
+                <!-- Split Map & Scatter Plot Layout -->
+                <div class="grid gap-6 lg:grid-cols-2">
+                    {{-- Map Card --}}
+                    <div class="card p-6 flex flex-col justify-between">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <div class="text-sm font-extrabold text-slate-900">Peta Buffer Zone</div>
+                                <div class="mt-1 text-sm text-slate-600">Visualisasi properti kompetitor dalam radius yang dipilih.</div>
+                            </div>
+                            <label class="flex items-center gap-2 print:hidden cursor-pointer select-none">
+                                <input id="toggleDarkMode" type="checkbox" class="size-4 accent-brand-primary rounded" />
+                                <span class="text-xs font-bold text-slate-700">Mode Gelap</span>
+                            </label>
                         </div>
-                        <label class="flex items-center gap-2 print:hidden cursor-pointer select-none">
-                            <input id="toggleDarkMode" type="checkbox" class="size-4 accent-brand-primary rounded" />
-                            <span class="text-xs font-bold text-slate-700">Mode Gelap Peta</span>
-                        </label>
+                        <div id="map" class="relative z-0 mt-4 h-[380px] w-full rounded-2xl overflow-hidden ring-1 ring-slate-200"></div>
                     </div>
-                    <div id="map" class="relative z-0 mt-4 h-[500px] w-full rounded-2xl overflow-hidden ring-1 ring-slate-200"></div>
+
+                    {{-- Scatter Plot Card --}}
+                    <div class="card p-6 flex flex-col justify-between">
+                        <div>
+                            <div class="text-sm font-extrabold text-slate-900">Grafik Harga vs Jarak</div>
+                            <div class="mt-1 text-sm text-slate-600">Perbandingan harga properti kompetitor terhadap jaraknya dari properti Anda.</div>
+                        </div>
+                        <div id="scatterChart" class="mt-4" style="min-height: 380px; width: 100%;"></div>
+                    </div>
                 </div>
 
                 <div class="card p-6">
@@ -120,6 +156,7 @@
 
     @push('scripts')
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script>
             const propertySelect = document.getElementById('propertySelect');
             const radiusSelect = document.getElementById('radiusSelect');
@@ -136,6 +173,7 @@
             let markerLayer = null;
             let bufferCircle = null;
             let myMarker = null;
+            let scatterChart = null;
 
             // Auto-select property from URL query parameter
             const urlParams = new URLSearchParams(window.location.search);
@@ -206,7 +244,76 @@
                 statPricePerSqm.textContent = data.statistics.avg_price_per_sqm 
                     ? `Rp ${Math.round(data.statistics.avg_price_per_sqm).toLocaleString('id-ID')}/m²`
                     : '-';
-                statPosition.textContent = data.statistics.price_position;
+
+                // Price position gauge and card styling
+                const pricePositionCard = document.getElementById('pricePositionCard');
+                const pricePositionLabel = document.getElementById('pricePositionLabel');
+                const meterMin = document.getElementById('meterMin');
+                const meterAvg = document.getElementById('meterAvg');
+                const meterMax = document.getElementById('meterMax');
+                const meterAvgLine = document.getElementById('meterAvgLine');
+                const meterUserMarker = document.getElementById('meterUserMarker');
+                const meterLabel = document.getElementById('meterLabel');
+
+                const pos = data.statistics.price_position;
+                let cardBg = 'bg-blue-50 ring-blue-100';
+                let labelColor = 'text-blue-600';
+                let valueColor = 'text-blue-900';
+                let markerColor = '#3b82f6';
+                let labelText = 'Harga Anda kompetitif dan berada dalam kisaran rata-rata pasar.';
+
+                if (pos === 'di bawah rata-rata') {
+                    cardBg = 'bg-emerald-50 ring-emerald-100';
+                    labelColor = 'text-emerald-600';
+                    valueColor = 'text-emerald-900';
+                    markerColor = '#10b981';
+                    labelText = 'Harga Anda di bawah rata-rata pasar (potensi laku lebih cepat).';
+                } else if (pos === 'di atas rata-rata') {
+                    cardBg = 'bg-rose-50 ring-rose-100';
+                    labelColor = 'text-rose-600';
+                    valueColor = 'text-rose-900';
+                    markerColor = '#f43f5e';
+                    labelText = 'Harga Anda di atas rata-rata pasar (disarankan optimasi harga).';
+                }
+
+                if (pricePositionCard) {
+                    pricePositionCard.className = `rounded-2xl p-4 ring-1 transition-all duration-300 ${cardBg}`;
+                }
+                if (pricePositionLabel) {
+                    pricePositionLabel.className = `text-xs font-semibold ${labelColor}`;
+                }
+                if (statPosition) {
+                    statPosition.className = `mt-2 text-lg font-extrabold ${valueColor}`;
+                    statPosition.textContent = pos.toUpperCase();
+                }
+
+                const myPrice = prop.price;
+                const minPrice = data.statistics.min_price || 0;
+                const avgPrice = data.statistics.avg_price || 0;
+                const maxPrice = data.statistics.max_price || 0;
+
+                const minVal = Math.min(minPrice, myPrice);
+                const maxVal = Math.max(maxPrice, myPrice);
+                const range = maxVal - minVal;
+
+                let userPercent = 50;
+                let avgPercent = 50;
+
+                if (range > 0) {
+                    userPercent = ((myPrice - minVal) / range) * 100;
+                    avgPercent = ((avgPrice - minVal) / range) * 100;
+                }
+
+                if (meterMin) meterMin.textContent = formatCurrency(minVal);
+                if (meterMax) meterMax.textContent = formatCurrency(maxVal);
+                if (meterAvg) meterAvg.textContent = formatCurrency(avgPrice);
+
+                if (meterAvgLine) meterAvgLine.style.left = `${avgPercent}%`;
+                if (meterUserMarker) {
+                    meterUserMarker.style.left = `${userPercent}%`;
+                    meterUserMarker.style.backgroundColor = markerColor;
+                }
+                if (meterLabel) meterLabel.textContent = labelText;
 
                 // My property info
                 myPropertyInfo.innerHTML = `
@@ -221,11 +328,165 @@
                 // Map
                 initMap(data);
 
+                // Scatter Plot
+                renderScatterPlot(prop, data.competitors);
+
                 // Table
                 renderTable(data.competitors);
 
                 // Scroll to results
                 resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            function renderScatterPlot(myProperty, competitors) {
+                if (scatterChart) {
+                    scatterChart.destroy();
+                }
+
+                // Format competitor data points: [distance_km, price]
+                const competitorPoints = competitors.map(c => [
+                    parseFloat((c.distance_m / 1000).toFixed(2)),
+                    c.price
+                ]);
+
+                // Format user property point: [0, price]
+                const myPoint = [0, myProperty.price];
+
+                const options = {
+                    series: [
+                        {
+                            name: 'Kompetitor',
+                            data: competitorPoints
+                        },
+                        {
+                            name: 'Properti Anda',
+                            data: [myPoint]
+                        }
+                    ],
+                    chart: {
+                        type: 'scatter',
+                        height: 380,
+                        toolbar: {
+                            show: false
+                        },
+                        zoom: {
+                            enabled: true,
+                            type: 'xy'
+                        }
+                    },
+                    colors: ['#3b82f6', '#ef4444'], // Blue for competitors, Red for user's property
+                    xaxis: {
+                        tickAmount: 5,
+                        labels: {
+                            formatter: function (val) {
+                                return parseFloat(val).toFixed(2) + ' km';
+                            },
+                            style: {
+                                colors: '#64748b',
+                                fontSize: '11px',
+                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontWeight: 500
+                            }
+                        },
+                        title: {
+                            text: 'Jarak (km)',
+                            style: {
+                                color: '#0f172a',
+                                fontSize: '12px',
+                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontWeight: 700
+                            }
+                        }
+                    },
+                    yaxis: {
+                        tickAmount: 5,
+                        labels: {
+                            formatter: function (val) {
+                                return formatCurrency(val);
+                            },
+                            style: {
+                                colors: '#64748b',
+                                fontSize: '11px',
+                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontWeight: 500
+                            }
+                        },
+                        title: {
+                            text: 'Harga',
+                            style: {
+                                color: '#0f172a',
+                                fontSize: '12px',
+                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontWeight: 700
+                            }
+                        }
+                    },
+                    grid: {
+                        borderColor: '#e2e8f0',
+                        strokeDashArray: 4,
+                        xaxis: {
+                            lines: {
+                                show: true
+                            }
+                        },
+                        yaxis: {
+                            lines: {
+                                show: true
+                            }
+                        }
+                    },
+                    legend: {
+                        position: 'top',
+                        horizontalAlign: 'right',
+                        fontSize: '12px',
+                        fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                        fontWeight: 600,
+                        labels: {
+                            colors: '#334155'
+                        },
+                        markers: {
+                            radius: 12
+                        }
+                    },
+                    markers: {
+                        size: [6, 10], // size for competitor vs my property
+                        strokeWidth: 2,
+                        strokeColors: '#ffffff',
+                        hover: {
+                            sizeOffset: 3
+                        }
+                    },
+                    tooltip: {
+                        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                            const data = w.config.series[seriesIndex].data[dataPointIndex];
+                            const distance = data[0];
+                            const price = data[1];
+                            
+                            if (seriesIndex === 1) { // Properti Anda
+                                return `
+                                    <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-md font-sans">
+                                        <div class="font-extrabold text-rose-600 mb-1">Properti Anda</div>
+                                        <div class="text-xs font-semibold text-slate-800">Harga: ${formatCurrency(price)}</div>
+                                        <div class="text-xs font-semibold text-slate-500">Jarak: ${distance} km</div>
+                                    </div>
+                                `;
+                            } else { // Kompetitor
+                                const comp = competitors[dataPointIndex];
+                                return `
+                                    <div class="p-3 bg-white border border-slate-200 rounded-xl shadow-md font-sans">
+                                        <div class="font-extrabold text-blue-600 mb-1">${comp.title}</div>
+                                        <div class="text-xs font-semibold text-slate-800">Harga: ${formatCurrency(price)}</div>
+                                        <div class="text-xs font-semibold text-slate-500">Jarak: ${distance} km</div>
+                                        <div class="text-xs text-slate-500 mt-1">Luas Tanah: ${comp.land_area} m²</div>
+                                    </div>
+                                `;
+                            }
+                        }
+                    }
+                };
+
+                scatterChart = new ApexCharts(document.querySelector("#scatterChart"), options);
+                scatterChart.render();
             }
 
             function initMap(data) {

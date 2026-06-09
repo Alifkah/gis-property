@@ -40,26 +40,49 @@
             {{-- Galeri foto --}}
             <div class="relative">
                 @if ($existingImages->isNotEmpty())
-                    <section class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_280px]">
-                        <div class="group overflow-hidden rounded-2xl bg-slate-100 aspect-[16/10] sm:aspect-auto sm:h-[350px] shadow-xs hover:shadow-md transition duration-300">
-                            <img src="{{ Storage::disk('public')->url($existingImages->first()->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                    <div class="relative group overflow-hidden rounded-2xl bg-slate-900 shadow-xs aspect-[16/10] sm:h-[400px]">
+                        {{-- Slider Viewport --}}
+                        <div id="gallerySlider" class="flex h-full w-full transition-transform duration-500 ease-out">
+                            @foreach ($existingImages as $image)
+                                <div class="w-full h-full shrink-0 cursor-pointer overflow-hidden flex items-center justify-center bg-slate-950" onclick="openLightbox({{ $loop->index }})">
+                                    <img src="{{ Storage::disk('public')->url($image->path) }}" alt="{{ $property->title }} - Foto {{ $loop->iteration }}" class="h-full w-full object-cover transition duration-500 hover:scale-[1.02]" />
+                                </div>
+                            @endforeach
                         </div>
+
+                        {{-- Navigation Arrows --}}
                         @if ($existingImages->count() > 1)
-                            <div class="grid grid-cols-2 gap-3 lg:grid-cols-1">
-                                @foreach ($existingImages->skip(1)->take(2) as $image)
-                                    <div class="group overflow-hidden rounded-2xl bg-slate-100 aspect-[16/10] lg:aspect-auto lg:h-[168px] shadow-xs hover:shadow-md transition duration-300">
-                                        <img src="{{ Storage::disk('public')->url($image->path) }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
-                                    </div>
-                                @endforeach
-                            </div>
+                            <button type="button" onclick="prevSlide(event)" class="absolute left-4 top-1/2 -translate-y-1/2 z-10 size-10 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm cursor-pointer border-0">
+                                <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                                </svg>
+                            </button>
+                            <button type="button" onclick="nextSlide(event)" class="absolute right-4 top-1/2 -translate-y-1/2 z-10 size-10 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm cursor-pointer border-0">
+                                <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                                </svg>
+                            </button>
                         @endif
-                    </section>
-                    <div class="absolute bottom-4 right-4 z-10 rounded-xl bg-slate-900/80 backdrop-blur-xs px-3 py-1.5 text-xs font-bold text-white shadow-xs flex items-center gap-1.5">
-                        <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-                        </svg>
-                        <span>{{ $existingImages->count() }} Foto</span>
+
+                        {{-- Photo Badge Counter --}}
+                        <div class="absolute bottom-4 right-4 z-10 rounded-xl bg-slate-900/80 backdrop-blur-xs px-3 py-1.5 text-xs font-bold text-white shadow-xs flex items-center gap-1.5 pointer-events-none">
+                            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                            </svg>
+                            <span id="sliderCounter">1 / {{ $existingImages->count() }} Foto</span>
+                        </div>
                     </div>
+
+                    {{-- Thumbnails Scroll Strip --}}
+                    @if ($existingImages->count() > 1)
+                        <div class="mt-3 flex gap-2 overflow-x-auto pb-2 scrollbar-thin max-w-full">
+                            @foreach ($existingImages as $image)
+                                <button type="button" onclick="goToSlide({{ $loop->index }})" class="thumbnail-btn relative shrink-0 aspect-[16/10] w-[70px] sm:w-[90px] rounded-xl overflow-hidden bg-slate-100 ring-2 ring-transparent transition hover:ring-brand-primary/40 cursor-pointer border-0 p-0">
+                                    <img src="{{ Storage::disk('public')->url($image->path) }}" alt="Miniatur {{ $loop->iteration }}" class="h-full w-full object-cover" />
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
                 @else
                     @php
                         $svg1 = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 400" fill="none"><rect width="600" height="400" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f46e5" stop-opacity="0.15"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.05"/></linearGradient></defs><path d="M220 240 l80-60 80 60 M240 220 v60h120v-60 M280 280 v-30h40v30" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.5"/><text x="50%" y="330" dominant-baseline="middle" text-anchor="middle" fill="#4338ca" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="14" letter-spacing="2" opacity="0.6">EKSTERIOR</text></svg>';
@@ -167,10 +190,14 @@
                             <div id="miniMap" class="relative z-0" style="height:320px;width:100%"></div>
                             
                             {{-- MiniMap Route Overlay Info Panel --}}
-                            <div id="miniRoutePanel" style="display:none;" class="absolute top-3 right-3 z-[400] w-[200px] bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-slate-200/60 transition">
+                            <div id="miniRoutePanel" style="display:none;" class="absolute top-3 right-3 z-[400] w-[210px] bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-md border border-slate-200/60 transition">
                                 <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider" id="miniRouteLabel">Petunjuk Rute</div>
                                 <div class="mt-1 text-xs font-black text-slate-800" id="miniRouteDist">-</div>
                                 <div class="mt-1 text-[10px] font-bold text-brand-primary bg-brand-primary/5 px-1.5 py-0.5 rounded inline-block" id="miniRouteTime">-</div>
+                                <div class="mt-1.5 text-[9px] font-semibold text-slate-500 flex items-center justify-between">
+                                    <span>Lalu Lintas:</span>
+                                    <span id="miniTrafficStatus" class="font-black px-1.5 py-0.5 rounded"></span>
+                                </div>
                             </div>
                         </div>
                         <div class="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-slate-50/80 p-4 ring-1 ring-slate-200/50 shadow-2xs">
@@ -406,6 +433,49 @@
         </aside>
     </div>
 
+    {{-- Lightbox Modal --}}
+    @if ($existingImages->isNotEmpty())
+        <div id="lightboxModal" style="display:none;" class="fixed inset-0 z-[1000] bg-black/95 flex flex-col justify-between p-4 transition-all duration-300">
+            {{-- Header --}}
+            <div class="flex items-center justify-between text-white pb-2">
+                <span id="lightboxCounter" class="text-xs font-bold pointer-events-none">1 / 1</span>
+                <button type="button" onclick="closeLightbox()" class="size-10 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition cursor-pointer bg-transparent border-0">
+                    <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            {{-- Main Viewport --}}
+            <div class="flex-1 relative flex items-center justify-center overflow-hidden">
+                <div id="lightboxSlider" class="flex h-full w-full transition-transform duration-300 ease-out">
+                    @foreach ($existingImages as $image)
+                        <div class="w-full h-full shrink-0 flex items-center justify-center bg-transparent select-none">
+                            <img src="{{ Storage::disk('public')->url($image->path) }}" alt="{{ $property->title }} - Zoom {{ $loop->iteration }}" class="max-h-full max-w-full object-contain pointer-events-none" />
+                        </div>
+                    @endforeach
+                </div>
+
+                @if ($existingImages->count() > 1)
+                    {{-- Arrow controls --}}
+                    <button type="button" onclick="prevLightbox(event)" class="absolute left-2 top-1/2 -translate-y-1/2 size-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shadow-lg cursor-pointer border-0">
+                        <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                        </svg>
+                    </button>
+                    <button type="button" onclick="nextLightbox(event)" class="absolute right-2 top-1/2 -translate-y-1/2 size-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shadow-lg cursor-pointer border-0">
+                        <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                    </button>
+                @endif
+            </div>
+
+            {{-- Bottom spacer --}}
+            <div class="h-6"></div>
+        </div>
+    @endif
+
     @push('scripts')
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
         <script>
@@ -432,6 +502,57 @@
             let userMarker = null;
             let userAccuracyCircle = null;
             let routeLines = [];
+
+            // Real-time Traffic Calculation Helper functions
+            function getSamarindaTimeDecimal() {
+                try {
+                    const options = { 
+                        timeZone: 'Asia/Makassar', 
+                        hour: '2-digit', 
+                        minute: '2-digit', 
+                        hour12: false 
+                    };
+                    const formatter = new Intl.DateTimeFormat('en-US', options);
+                    const parts = formatter.formatToParts(new Date());
+                    let hour = 0;
+                    let minute = 0;
+                    for (const part of parts) {
+                        if (part.type === 'hour') hour = parseInt(part.value, 10);
+                        if (part.type === 'minute') minute = parseInt(part.value, 10);
+                    }
+                    return hour + (minute / 60);
+                } catch (e) {
+                    const now = new Date();
+                    return now.getHours() + (now.getMinutes() / 60);
+                }
+            }
+
+            function getTrafficData() {
+                const time = getSamarindaTimeDecimal();
+                let multiplier = 1.0;
+                let status = "Lancar";
+                let statusClass = "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30";
+
+                if ((time >= 7.0 && time < 9.0) || (time >= 16.5 && time < 19.0)) {
+                    multiplier = 2.3;
+                    status = "Padat (Jam Sibuk)";
+                    statusClass = "text-rose-600 bg-rose-50 dark:text-rose-400 dark:bg-rose-950/30";
+                } else if (time >= 9.0 && time < 16.5) {
+                    multiplier = 1.4;
+                    status = "Sedang (Jam Kerja)";
+                    statusClass = "text-amber-600 bg-amber-50 dark:text-amber-400 dark:bg-amber-950/30";
+                } else {
+                    multiplier = 1.0;
+                    status = "Lancar";
+                    statusClass = "text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/30";
+                }
+
+                const hours = Math.floor(time);
+                const minutes = Math.floor((time - hours) * 60);
+                const timeStr = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+                return { multiplier, status, statusClass, timeStr };
+            }
 
             async function getRoute(fromLat, fromLng, toLat, toLng) {
                 const url = `https://router.project-osrm.org/route/v1/driving/${fromLng},${fromLat};${toLng},${toLat}?overview=full&geometries=geojson`;
@@ -513,12 +634,20 @@
                             routeLines.push(polyline);
 
                             const distKm = (route.distance / 1000).toFixed(1);
-                            const driveTime = Math.round(route.duration / 60);
+                            const traffic = getTrafficData();
+                            const driveTime = Math.round((route.duration * traffic.multiplier) / 60);
                             const walkTime = Math.round((route.distance / 1.39) / 60);
 
                             document.getElementById('miniRouteLabel').textContent = "Rute Anda ke Properti";
                             document.getElementById('miniRouteDist').textContent = `${distKm} km`;
                             document.getElementById('miniRouteTime').textContent = `${driveTime} mnt berkendara / ${walkTime} mnt jalan kaki`;
+                            
+                            const trafficStatusEl = document.getElementById('miniTrafficStatus');
+                            if (trafficStatusEl) {
+                                trafficStatusEl.textContent = traffic.status;
+                                trafficStatusEl.className = `font-black px-1.5 py-0.5 rounded text-[8px] ${traffic.statusClass}`;
+                            }
+                            
                             document.getElementById('miniRoutePanel').style.display = 'block';
 
                             miniMap.fitBounds(polyline.getBounds(), { padding: [40, 40] });
@@ -555,7 +684,15 @@
                     },
                     (error) => {
                         console.warn(error);
-                        alert("Gagal mendeteksi lokasi GPS Anda. Pastikan layanan lokasi di perangkat Anda aktif.");
+                        let msg = "Gagal mendeteksi lokasi GPS Anda.";
+                        if (error.code === error.PERMISSION_DENIED) {
+                            msg = "Akses lokasi ditolak browser. Mohon izinkan akses lokasi untuk situs ini di pengaturan browser Anda (biasanya di ikon gembok sebelah alamat web), lalu coba lagi.";
+                        } else if (error.code === error.POSITION_UNAVAILABLE) {
+                            msg = "Lokasi GPS tidak tersedia. Pastikan GPS perangkat Anda aktif.";
+                        } else if (error.code === error.TIMEOUT) {
+                            msg = "Waktu pencarian lokasi habis. Silakan coba lagi.";
+                        }
+                        alert(msg);
                         btn.disabled = false;
                         btnText.textContent = "Petunjuk Arah";
                     },
@@ -594,12 +731,20 @@
                     routeLines.push(polyline);
 
                     const distKm = (route.distance / 1000).toFixed(1);
-                    const driveTime = Math.round(route.duration / 60);
+                    const traffic = getTrafficData();
+                    const driveTime = Math.round((route.duration * traffic.multiplier) / 60);
                     const walkTime = Math.round((route.distance / 1.39) / 60);
 
                     document.getElementById('miniRouteLabel').textContent = `Ke: ${name}`;
                     document.getElementById('miniRouteDist').textContent = `${distKm} km`;
                     document.getElementById('miniRouteTime').textContent = `${driveTime} mnt berkendara / ${walkTime} mnt jalan kaki`;
+                    
+                    const trafficStatusEl = document.getElementById('miniTrafficStatus');
+                    if (trafficStatusEl) {
+                        trafficStatusEl.textContent = traffic.status;
+                        trafficStatusEl.className = `font-black px-1.5 py-0.5 rounded text-[8px] ${traffic.statusClass}`;
+                    }
+
                     document.getElementById('miniRoutePanel').style.display = 'block';
 
                     if (timeEl) {
@@ -787,6 +932,134 @@
             } catch (e) {
                 console.error('Error saving recently viewed property', e);
             }
+
+            // Slider and Lightbox State Logic
+            (function() {
+                let currentSlideIndex = 0;
+                const totalSlides = {{ $existingImages->count() }};
+                if (totalSlides === 0) return;
+
+                const slider = document.getElementById('gallerySlider');
+                const lightboxSlider = document.getElementById('lightboxSlider');
+                const lightboxModal = document.getElementById('lightboxModal');
+                const sliderCounter = document.getElementById('sliderCounter');
+                const lightboxCounter = document.getElementById('lightboxCounter');
+                const thumbs = document.querySelectorAll('.thumbnail-btn');
+
+                window.goToSlide = function(index) {
+                    if (index < 0 || index >= totalSlides) return;
+                    currentSlideIndex = index;
+                    if (slider) {
+                        slider.style.transform = `translateX(-${index * 100}%)`;
+                    }
+                    if (sliderCounter) {
+                        sliderCounter.textContent = `${index + 1} / ${totalSlides} Foto`;
+                    }
+                    thumbs.forEach((t, idx) => {
+                        if (idx === index) {
+                            t.classList.add('ring-brand-primary', 'active-thumb');
+                        } else {
+                            t.classList.remove('ring-brand-primary', 'active-thumb');
+                        }
+                    });
+                };
+
+                window.nextSlide = function(e) {
+                    if (e) e.stopPropagation();
+                    let nextIdx = (currentSlideIndex + 1) % totalSlides;
+                    goToSlide(nextIdx);
+                };
+
+                window.prevSlide = function(e) {
+                    if (e) e.stopPropagation();
+                    let prevIdx = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+                    goToSlide(prevIdx);
+                };
+
+                // Touch support for main slider
+                if (slider) {
+                    let startX = 0;
+                    let endX = 0;
+                    slider.addEventListener('touchstart', (e) => {
+                        startX = e.touches[0].clientX;
+                    }, { passive: true });
+                    slider.addEventListener('touchend', (e) => {
+                        endX = e.changedTouches[0].clientX;
+                        let diffX = startX - endX;
+                        if (Math.abs(diffX) > 50) {
+                            if (diffX > 0) {
+                                nextSlide();
+                            } else {
+                                prevSlide();
+                            }
+                        }
+                    }, { passive: true });
+                }
+
+                // Lightbox functions
+                let currentLightboxIndex = 0;
+
+                window.openLightbox = function(index) {
+                    if (!lightboxModal) return;
+                    currentLightboxIndex = index;
+                    lightboxModal.style.display = 'flex';
+                    updateLightboxSlide();
+                };
+
+                window.closeLightbox = function() {
+                    if (lightboxModal) lightboxModal.style.display = 'none';
+                };
+
+                window.nextLightbox = function(e) {
+                    if (e) e.stopPropagation();
+                    currentLightboxIndex = (currentLightboxIndex + 1) % totalSlides;
+                    updateLightboxSlide();
+                };
+
+                window.prevLightbox = function(e) {
+                    if (e) e.stopPropagation();
+                    currentLightboxIndex = (currentLightboxIndex - 1 + totalSlides) % totalSlides;
+                    updateLightboxSlide();
+                };
+
+                function updateLightboxSlide() {
+                    if (lightboxSlider) {
+                        lightboxSlider.style.transform = `translateX(-${currentLightboxIndex * 100}%)`;
+                    }
+                    if (lightboxCounter) {
+                        lightboxCounter.textContent = `${currentLightboxIndex + 1} / ${totalSlides} Foto`;
+                    }
+                }
+
+                // Touch support for Lightbox
+                if (lightboxSlider) {
+                    let startX = 0;
+                    let endX = 0;
+                    lightboxSlider.addEventListener('touchstart', (e) => {
+                        startX = e.touches[0].clientX;
+                    }, { passive: true });
+                    lightboxSlider.addEventListener('touchend', (e) => {
+                        endX = e.changedTouches[0].clientX;
+                        let diffX = startX - endX;
+                        if (Math.abs(diffX) > 50) {
+                            if (diffX > 0) {
+                                nextLightbox();
+                            } else {
+                                prevLightbox();
+                            }
+                        }
+                    }, { passive: true });
+                }
+
+                // Keyboard navigation for lightbox
+                document.addEventListener('keydown', (e) => {
+                    if (lightboxModal && lightboxModal.style.display === 'flex') {
+                        if (e.key === 'ArrowRight') nextLightbox();
+                        else if (e.key === 'ArrowLeft') prevLightbox();
+                        else if (e.key === 'Escape') closeLightbox();
+                    }
+                });
+            })();
         </script>
     @endpush
 </x-layouts.app>
