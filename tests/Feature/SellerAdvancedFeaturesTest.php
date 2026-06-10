@@ -166,7 +166,7 @@ it('can successfully bulk import properties via CSV', function () {
     ]);
 });
 
-it('rejects bulk import CSV with validation errors', function () {
+it('rejects bulk import CSV with validation errors and renders errors on view', function () {
     $user = User::factory()->create();
     $this->actingAs($user);
 
@@ -177,10 +177,45 @@ it('rejects bulk import CSV with validation errors', function () {
 
     $file = UploadedFile::fake()->createWithContent('impor_salah.csv', $csvContent);
 
+    $response = $this->from(route('seller.listings.import.show'))
+        ->followingRedirects()
+        ->post(route('seller.listings.import.store'), [
+            'csv_file' => $file,
+        ]);
+
+    $response->assertStatus(200);
+    $response->assertSee('Ditemukan kesalahan pada file Anda. Impor dibatalkan:');
+    $response->assertSee('Baris 2:');
+    expect(Property::count())->toBe(0); // Nothing should be imported because of rollback
+});
+
+it('can successfully bulk import properties via CSV with comma coordinates', function () {
+    $user = User::factory()->create();
+    $this->actingAs($user);
+
+    $csvContent = "judul;tipe;deskripsi;harga;luas_tanah;luas_bangunan;kamar_tidur;kamar_mandi;latitude;longitude\n".
+        "Rumah Baru Keren;Rumah;Dekat Mall Mulia;650000000;100;80;3;2;-0,49523;117,15120\n".
+        'Tanah Kebun Murah;Tanah;Kondisi subur rata;120000000;300;0;0;0;-0,51012;117,19853';
+
+    $file = UploadedFile::fake()->createWithContent('impor_koma.csv', $csvContent);
+
     $response = $this->post(route('seller.listings.import.store'), [
         'csv_file' => $file,
     ]);
 
-    $response->assertSessionHasErrors(['csv_errors']);
-    expect(Property::count())->toBe(0); // Nothing should be imported because of rollback
+    $response->assertRedirect(route('seller.listings.index'));
+
+    $this->assertDatabaseHas('properties', [
+        'user_id' => $user->id,
+        'title' => 'Rumah Baru Keren',
+        'type' => 'Rumah',
+        'price' => 650000000,
+    ]);
+
+    $this->assertDatabaseHas('properties', [
+        'user_id' => $user->id,
+        'title' => 'Tanah Kebun Murah',
+        'type' => 'Tanah',
+        'price' => 120000000,
+    ]);
 });

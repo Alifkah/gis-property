@@ -143,6 +143,7 @@ class ExploreApiController extends Controller
             $items = $rows->map(function ($property) use ($isLocalDisk) {
                 return [
                     'id' => (int) $property->id,
+                    'slug' => $property->slug,
                     'type' => $property->type,
                     'title' => $property->title,
                     'price' => (float) $property->price,
@@ -164,7 +165,7 @@ class ExploreApiController extends Controller
             $total = (clone $query)->count();
 
             $rows = $query
-                ->select('id', 'type', 'title', 'price', 'land_area', 'bedroom', 'bathroom', 'status', 'geom')
+                ->select('id', 'slug', 'type', 'title', 'price', 'land_area', 'bedroom', 'bathroom', 'status', 'geom')
                 ->get();
 
             // Eager load first image to avoid N+1
@@ -176,6 +177,7 @@ class ExploreApiController extends Controller
 
                 return [
                     'id' => (int) $property->id,
+                    'slug' => $property->slug,
                     'type' => $property->type,
                     'title' => $property->title,
                     'price' => (float) $property->price,
@@ -283,7 +285,7 @@ class ExploreApiController extends Controller
             }
 
             $rows = $query
-                ->select('properties.id', 'properties.type', 'properties.title', 'properties.price')
+                ->select('properties.id', 'properties.slug', 'properties.type', 'properties.title', 'properties.price')
                 ->addSelect(DB::raw('ST_AsGeoJSON(properties.geom) as geojson'))
                 ->forPage($page, $perPage)
                 ->get();
@@ -295,6 +297,7 @@ class ExploreApiController extends Controller
                         'type' => 'Feature',
                         'properties' => [
                             'id' => (int) $property->id,
+                            'slug' => $property->slug,
                             'type' => $property->type,
                             'title' => $property->title,
                             'price' => (float) $property->price,
@@ -306,7 +309,7 @@ class ExploreApiController extends Controller
         }
 
         $query = $this->baseSqliteQuery($request)
-            ->select('id', 'type', 'title', 'price', 'geom');
+            ->select('id', 'slug', 'type', 'title', 'price', 'geom');
 
         $rows = $query->get();
 
@@ -349,6 +352,7 @@ class ExploreApiController extends Controller
                     'type' => 'Feature',
                     'properties' => [
                         'id' => (int) $property->id,
+                        'slug' => $property->slug,
                         'type' => $property->type,
                         'title' => $property->title,
                         'price' => (float) $property->price,

@@ -10,16 +10,10 @@
 <header x-data="{ mobileMenuOpen: false }"
     class="sticky top-0 z-[1050] border-b border-slate-200/50 bg-white/80 backdrop-blur-lg"
     @keydown.escape.window="mobileMenuOpen = false">
-    <div class="mx-auto flex h-14 w-full max-w-7xl items-center justify-between gap-3 px-4 sm:h-16 sm:px-6 lg:px-8">
+    <div class="flex h-16 w-full items-center justify-between gap-3 px-6 sm:h-20 sm:px-10 lg:px-16 xl:px-24">
         {{-- Logo --}}
-        <a href="{{ route('home') }}" class="flex items-center gap-2.5 shrink-0 group">
-            <div class="grid size-9 place-items-center rounded-xl bg-brand-primary text-white shadow-sm shadow-brand-primary/20 transition-transform duration-300 group-hover:scale-105">
-                <span class="text-sm font-bold tracking-wider">SP</span>
-            </div>
-            <div class="leading-tight">
-                <div class="text-sm font-black text-slate-900 tracking-tight transition-colors group-hover:text-brand-primary">Samarinda Properti</div>
-                <div class="text-[10px] font-bold text-slate-500 tracking-wider">Web-Property Marketplace</div>
-            </div>
+        <a href="{{ route('home') }}" class="flex items-center shrink-0 group">
+            <img src="{{ asset('images/logo.png') }}" alt="Samarinda Properti Logo" class="h-13 sm:h-17 w-auto transition-transform duration-300 group-hover:scale-105" />
         </a>
 
         {{-- Desktop Nav --}}
@@ -184,7 +178,7 @@
         x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0"
         x-transition:leave-end="opacity-0 -translate-y-2" @click.outside="mobileMenuOpen = false"
         class="lg:hidden border-t border-slate-100 bg-white shadow-lg">
-        <div class="mx-auto max-w-7xl px-4 py-3 sm:px-6">
+        <div class="w-full px-6 py-3 sm:px-10">
             {{-- Nav Links --}}
             <nav class="grid gap-0.5">
                 @foreach ($items as $item)

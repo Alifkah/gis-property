@@ -26,12 +26,19 @@
         overflow-x: hidden;
     }
 
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         @apply font-display text-slate-900 font-extrabold tracking-tight;
     }
 
     /* Improve tap target size on mobile */
-    button, a, [role="button"] {
+    button,
+    a,
+    [role="button"] {
         -webkit-tap-highlight-color: transparent;
     }
 
@@ -40,13 +47,16 @@
         width: 6px;
         height: 6px;
     }
+
     ::-webkit-scrollbar-track {
         background: transparent;
     }
+
     ::-webkit-scrollbar-thumb {
         background: theme('colors.slate.200');
         border-radius: 99px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
         background: theme('colors.slate.300');
     }
@@ -82,12 +92,14 @@
     .input {
         @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-xs outline-none transition-all duration-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10;
         /* Better mobile input */
-        font-size: 16px; /* Prevent iOS auto-zoom */
+        font-size: 16px;
+        /* Prevent iOS auto-zoom */
     }
 
     .select {
         @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm text-slate-800 shadow-xs outline-none transition-all duration-200 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10;
-        font-size: 16px; /* Prevent iOS auto-zoom */
+        font-size: 16px;
+        /* Prevent iOS auto-zoom */
     }
 
     /* Mobile-friendly table wrapper */
@@ -113,22 +125,36 @@
 
 @utility hover-premium {
     transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
 
-@utility hover-premium:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 20px 40px -15px rgba(15, 76, 92, 0.12);
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 20px 40px -15px rgba(15, 76, 92, 0.12);
+    }
 }
 
 /* Animations */
 @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-4px); }
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-4px);
+    }
 }
 
 @keyframes pulse-glow {
-    0%, 100% { opacity: 0.25; }
-    50% { opacity: 0.5; }
+
+    0%,
+    100% {
+        opacity: 0.25;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
 }
 
 @keyframes draw-lines {
@@ -149,4 +175,19 @@
     stroke-dasharray: 1000;
     stroke-dashoffset: 1000;
     animation: draw-lines 4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Progress bar and smooth scroll styles */
+@keyframes loading-bar {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(-10%); }
+    100% { transform: translateX(100%); }
+}
+
+.animate-loading-bar {
+    animation: loading-bar 1.5s infinite ease-in-out;
+}
+
+html {
+    scroll-behavior: smooth;
 }

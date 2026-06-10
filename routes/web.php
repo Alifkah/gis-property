@@ -20,6 +20,7 @@ use App\Models\Amenity;
 use App\Models\District;
 use App\Models\FloodZone;
 use App\Models\Property;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -218,3 +219,16 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/listings', [AdminListingController::class, 'index'])->name('listings.index');
     Route::delete('/listings/{property}', [AdminListingController::class, 'destroy'])->name('listings.destroy');
 });
+
+Route::get('/sitemap.xml', function () {
+    $properties = Property::where('status', 'Tersedia')->orderBy('updated_at', 'desc')->get();
+    $sellers = User::whereHas('properties')->get();
+
+    $content = view('sitemap', [
+        'properties' => $properties,
+        'sellers' => $sellers,
+    ])->render();
+
+    return response($content, 200)
+        ->header('Content-Type', 'text/xml');
+})->name('sitemap');

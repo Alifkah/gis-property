@@ -113,14 +113,19 @@ class ProfileController extends Controller
         $geojson = [
             'type' => 'FeatureCollection',
             'features' => $properties->map(function ($p) {
+                $firstImage = $p->images->first();
+                $imageUrl = $firstImage ? Storage::disk('public')->url($firstImage->path) : null;
+
                 return [
                     'type' => 'Feature',
                     'properties' => [
                         'id' => $p->id,
+                        'slug' => $p->slug,
                         'title' => $p->title,
                         'price' => (float) $p->price,
                         'type' => $p->type,
                         'district' => $p->district_name ?? 'Samarinda',
+                        'image_url' => $imageUrl,
                     ],
                     'geometry' => [
                         'type' => 'Point',

@@ -23,69 +23,68 @@
     {{-- Stat Cards --}}
     <div class="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
         {{-- Card 1: Total Listing --}}
-        <div class="card bg-linear-to-br from-brand-primary/5 via-white to-white p-5 border-l-4 border-l-brand-primary hover:shadow-xl hover:shadow-brand-primary/10 hover:-translate-y-0.5 duration-300 transition">
+        <div class="card p-5 border-l-4 border-l-[#0F4C5C] hover:shadow-lg hover:shadow-[#0F4C5C]/5 hover:-translate-y-0.5 duration-300 transition bg-white">
             <div class="flex items-center justify-between">
-                <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Listing</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-brand-primary/5 text-brand-primary ring-1 ring-brand-primary/10">
-                    <svg class="size-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Total Listing</div>
+                <div class="grid size-10 place-items-center rounded-xl bg-brand-primary/5 text-brand-primary ring-1 ring-brand-primary/10">
+                    <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                 </div>
             </div>
-            <div class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalProperties) }}</div>
-            <div class="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center gap-1 text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md">{{ $availableProperties }} Aktif</span>
-                <span>·</span>
-                <span class="inline-flex items-center gap-1 text-slate-600 bg-slate-100 px-1.5 py-0.5 rounded-md">{{ $soldProperties }} Terjual</span>
+            <div class="mt-4 text-3xl font-black text-slate-900 tracking-tight">{{ number_format($totalProperties) }}</div>
+            <div class="mt-2.5 flex items-center gap-2 text-xs font-semibold text-slate-500">
+                <span class="inline-flex items-center gap-1 text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full ring-1 ring-emerald-100/30">{{ $availableProperties }} Aktif</span>
+                <span class="inline-flex items-center gap-1 text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full">{{ $soldProperties }} Terjual</span>
             </div>
         </div>
 
         {{-- Card 2: Total Penjual --}}
-        <div class="card bg-linear-to-br from-brand-accent/5 via-white to-white p-5 border-l-4 border-l-brand-accent hover:shadow-xl hover:shadow-brand-accent/15 hover:-translate-y-0.5 duration-300 transition">
+        <div class="card p-5 border-l-4 border-l-[#E36414] hover:shadow-lg hover:shadow-[#E36414]/5 hover:-translate-y-0.5 duration-300 transition bg-white">
             <div class="flex items-center justify-between">
-                <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Total Penjual</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-brand-accent/5 text-brand-accent ring-1 ring-brand-accent/10">
+                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Total Penjual</div>
+                <div class="grid size-10 place-items-center rounded-xl bg-brand-accent/5 text-brand-accent ring-1 ring-brand-accent/10">
                     <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
             </div>
-            <div class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalSellers) }}</div>
-            <div class="mt-2 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center bg-brand-accent/5 text-brand-accent px-2 py-0.5 rounded-md">Pengguna Terdaftar</span>
+            <div class="mt-4 text-3xl font-black text-slate-900 tracking-tight">{{ number_format($totalSellers) }}</div>
+            <div class="mt-2.5 text-xs font-semibold text-slate-500">
+                <span class="inline-flex items-center bg-brand-accent/5 text-brand-accent px-2.5 py-0.5 rounded-full ring-1 ring-brand-accent/10">Pengguna Terdaftar</span>
             </div>
         </div>
 
         {{-- Card 3: Fasilitas POI --}}
-        <div class="card bg-linear-to-br from-amber-500/5 via-white to-white p-5 border-l-4 border-l-amber-500 hover:shadow-xl hover:shadow-amber-500/10 hover:-translate-y-0.5 duration-300 transition">
+        <div class="card p-5 border-l-4 border-l-amber-500 hover:shadow-lg hover:shadow-amber-500/5 hover:-translate-y-0.5 duration-300 transition bg-white">
             <div class="flex items-center justify-between">
-                <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Fasilitas (POI)</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100/50">
+                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Fasilitas (POI)</div>
+                <div class="grid size-10 place-items-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100/50">
                     <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
             </div>
-            <div class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalAmenities) }}</div>
-            <div class="mt-2 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center bg-amber-50/50 text-amber-700 px-2 py-0.5 rounded-md">Titik Fasilitas Publik</span>
+            <div class="mt-4 text-3xl font-black text-slate-900 tracking-tight">{{ number_format($totalAmenities) }}</div>
+            <div class="mt-2.5 text-xs font-semibold text-slate-500">
+                <span class="inline-flex items-center bg-amber-500/5 text-amber-700 px-2.5 py-0.5 rounded-full ring-1 ring-amber-500/10">Titik Fasilitas Publik</span>
             </div>
         </div>
 
         {{-- Card 4: Zona Banjir --}}
-        <div class="card bg-linear-to-br from-brand-warning/5 via-white to-white p-5 border-l-4 border-l-brand-warning hover:shadow-xl hover:shadow-brand-warning/10 hover:-translate-y-0.5 duration-300 transition">
+        <div class="card p-5 border-l-4 border-l-brand-warning hover:shadow-lg hover:shadow-brand-warning/5 hover:-translate-y-0.5 duration-300 transition bg-white">
             <div class="flex items-center justify-between">
-                <div class="text-xs font-bold uppercase tracking-wider text-slate-400">Zona Banjir</div>
-                <div class="grid size-9 place-items-center rounded-xl bg-brand-warning/5 text-brand-warning ring-1 ring-brand-warning/10">
+                <div class="text-xs font-extrabold uppercase tracking-wider text-slate-400">Zona Banjir</div>
+                <div class="grid size-10 place-items-center rounded-xl bg-brand-warning/5 text-brand-warning ring-1 ring-brand-warning/10">
                     <svg class="size-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                 </div>
             </div>
-            <div class="mt-4 text-3xl font-extrabold text-slate-900 tracking-tight">{{ number_format($totalFloodZones) }}</div>
-            <div class="mt-2 text-xs font-semibold text-slate-500">
-                <span class="inline-flex items-center bg-brand-warning/5 text-brand-warning px-2 py-0.5 rounded-md">Kawasan Rawan Genangan</span>
+            <div class="mt-4 text-3xl font-black text-slate-900 tracking-tight">{{ number_format($totalFloodZones) }}</div>
+            <div class="mt-2.5 text-xs font-semibold text-slate-500">
+                <span class="inline-flex items-center bg-brand-warning/5 text-brand-warning px-2.5 py-0.5 rounded-full ring-1 ring-brand-warning/10">Kawasan Rawan Genangan</span>
             </div>
         </div>
     </div>

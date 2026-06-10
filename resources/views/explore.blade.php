@@ -1,4 +1,7 @@
-<x-layouts.blank>
+<x-layouts.blank
+    title="Peta Interaktif Properti Samarinda"
+    description="Eksplorasi geospasial real estate Samarinda. Filter properti berdasarkan batas kecamatan, kedekatan fasilitas penting, dan status mitigasi risiko banjir."
+>
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     @endpush
@@ -210,7 +213,7 @@
                     </label>
                     <label class="flex items-center justify-between gap-3 cursor-pointer">
                         <span class="text-xs font-semibold text-slate-700">Batas Admin</span>
-                        <input id="toggleDistricts" type="checkbox" class="size-4.5 rounded border-slate-300 accent-brand-primary cursor-pointer" checked />
+                        <input id="toggleDistricts" type="checkbox" class="size-4.5 rounded border-slate-300 accent-brand-primary cursor-pointer" />
                     </label>
                     <label class="flex items-center justify-between gap-3 cursor-pointer">
                         <span class="text-xs font-semibold text-slate-700">Mode Gelap Peta</span>
@@ -443,7 +446,7 @@
                     weight: 2,
                     fillOpacity: 0.06
                 }
-            }).addTo(map);
+            });
 
             const floodLayer = L.geoJSON(floodZones, {
                 style: {
@@ -958,7 +961,7 @@
                             <div style="padding:12px 0 0 0">
                                 <div style="font-size:14px;font-weight:900;color:#0F4C5C">Rp ${formatCurrency(p.price)}</div>
                                 <div style="margin-top:4px;font-size:12px;font-weight:800;color:#0f172a;line-height:1.4">${p.title}</div>
-                                <a href="/properties/${p.id}" style="margin-top:12px;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:10px;background:#E36414;color:#fff;font-size:11px;font-weight:800;text-decoration:none;width:100%;box-shadow:0 4px 12px rgba(227,100,20,0.15)">Lihat Detail Properti</a>
+                                <a href="/properties/${p.slug}" style="margin-top:12px;display:inline-flex;align-items:center;justify-content:center;padding:10px 12px;border-radius:10px;background:#E36414;color:#fff;font-size:11px;font-weight:800;text-decoration:none;width:100%;box-shadow:0 4px 12px rgba(227,100,20,0.15)">Lihat Detail Properti</a>
                             </div>
                         </div>
                     `;

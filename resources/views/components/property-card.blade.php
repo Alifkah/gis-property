@@ -29,7 +29,7 @@
 @endphp
 
 <div class="group card overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
-    <a href="{{ route('properties.show', ['property' => $property->id]) }}" class="block">
+    <a href="{{ route('properties.show', ['property' => $property]) }}" class="block">
         <div class="relative aspect-[16/10] overflow-hidden bg-slate-100">
             <img src="{{ $imageUrl }}" alt="{{ $property->title }}" class="h-full w-full object-cover transition duration-300 group-hover:scale-105 {{ $isSold ? 'opacity-60' : '' }}" loading="lazy" />
             <div class="absolute left-3 top-3 flex flex-wrap gap-2">
@@ -82,7 +82,7 @@
         </div>
     @endif
 
-    <a href="{{ route('properties.show', ['property' => $property->id]) }}" class="block p-4">
+    <a href="{{ route('properties.show', ['property' => $property]) }}" class="block p-4">
         <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
                 <div class="truncate text-sm font-bold text-slate-900">{{ $property->title }}</div>

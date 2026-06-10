@@ -55,21 +55,56 @@
                 <div class="card p-6">
                     <div class="text-sm font-extrabold text-slate-900">Statistik Kompetitor</div>
                     <div class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                        <div class="rounded-2xl bg-brand-primary/5 p-4 ring-1 ring-brand-primary/10">
-                            <div class="text-xs font-semibold text-brand-primary">Total Kompetitor</div>
-                            <div id="statTotal" class="mt-2 text-2xl font-extrabold text-brand-primary">-</div>
+                        {{-- Total Kompetitor --}}
+                        <div class="rounded-2xl bg-brand-primary/5 p-5 ring-1 ring-brand-primary/10 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Total Kompetitor</div>
+                                <div id="statTotal" class="mt-2 text-2xl font-extrabold text-brand-primary">-</div>
+                            </div>
+                            <div class="grid size-10 place-items-center rounded-xl bg-brand-primary/10 text-brand-primary shrink-0">
+                                <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="rounded-2xl bg-emerald-50 p-4 ring-1 ring-emerald-100">
-                            <div class="text-xs font-semibold text-emerald-600">Harga Rata-rata</div>
-                            <div id="statAvgPrice" class="mt-2 text-2xl font-extrabold text-emerald-900">-</div>
+
+                        {{-- Harga Rata-rata --}}
+                        <div class="rounded-2xl bg-emerald-50 p-5 ring-1 ring-emerald-100/50 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Harga Rata-rata</div>
+                                <div id="statAvgPrice" class="mt-2 text-2xl font-extrabold text-emerald-950">-</div>
+                            </div>
+                            <div class="grid size-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 shrink-0">
+                                <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="rounded-2xl bg-rose-50 p-4 ring-1 ring-rose-100">
-                            <div class="text-xs font-semibold text-rose-600">Harga per m²</div>
-                            <div id="statPricePerSqm" class="mt-2 text-2xl font-extrabold text-rose-900">-</div>
+
+                        {{-- Harga per m² --}}
+                        <div class="rounded-2xl bg-rose-50 p-5 ring-1 ring-rose-100/50 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs font-bold uppercase tracking-wider text-slate-500">Harga per m²</div>
+                                <div id="statPricePerSqm" class="mt-2 text-[17px] sm:text-xl lg:text-[15px] xl:text-xl font-extrabold text-rose-950">-</div>
+                            </div>
+                            <div class="grid size-10 place-items-center rounded-xl bg-rose-500/10 text-rose-700 shrink-0">
+                                <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                                </svg>
+                            </div>
                         </div>
-                        <div class="rounded-2xl bg-amber-50 p-4 ring-1 ring-amber-100 transition-all duration-300" id="pricePositionCard">
-                            <div class="text-xs font-semibold text-amber-600" id="pricePositionLabel">Posisi Harga Anda</div>
-                            <div id="statPosition" class="mt-2 text-lg font-extrabold text-amber-900">-</div>
+
+                        {{-- Posisi Harga --}}
+                        <div class="rounded-2xl bg-blue-50 p-5 ring-1 ring-blue-100/50 flex items-center justify-between transition-all duration-300" id="pricePositionCard">
+                            <div>
+                                <div class="text-xs font-bold uppercase tracking-wider text-slate-500" id="pricePositionLabel">Posisi Harga Anda</div>
+                                <div id="statPosition" class="mt-2 text-xl font-black text-blue-950">-</div>
+                            </div>
+                            <div class="grid size-10 place-items-center rounded-xl bg-blue-500/10 text-blue-700 shrink-0" id="pricePositionIcon">
+                                <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z" />
+                                </svg>
+                            </div>
                         </div>
                     </div>
 
@@ -87,13 +122,13 @@
                             <span>Rata-rata: <span id="meterAvg" class="text-slate-800 font-extrabold">-</span></span>
                             <span>Tertinggi: <span id="meterMax" class="text-slate-800 font-extrabold">-</span></span>
                         </div>
-                        <div class="relative w-full h-3.5 bg-slate-200/80 rounded-full ring-1 ring-slate-300/30 overflow-visible">
+                        <div class="relative w-full h-3 bg-gradient-to-r from-emerald-400 via-yellow-400 to-rose-500 rounded-full ring-1 ring-slate-300/30 overflow-visible">
                             <!-- Average Line Marker -->
-                            <div id="meterAvgLine" class="absolute top-0 bottom-0 w-0.5 bg-slate-400/80 z-10" style="left: 50%;"></div>
+                            <div id="meterAvgLine" class="absolute top-0 bottom-0 w-0.5 bg-slate-900/60 z-10" style="left: 50%;"></div>
                             <!-- User Price Marker -->
-                            <div id="meterUserMarker" class="absolute -top-0.5 w-4.5 h-4.5 rounded-full border-3 border-white shadow-md z-20 transition-all duration-500" style="left: 0%; background-color: #3b82f6;"></div>
+                            <div id="meterUserMarker" class="absolute -top-1 w-5 h-5 rounded-full border-4 border-white shadow-lg z-20 transition-all duration-500" style="left: 0%; background-color: #3b82f6;"></div>
                         </div>
-                        <div class="mt-2.5 text-center text-xs font-semibold text-slate-500 leading-relaxed" id="meterLabel"></div>
+                        <div class="mt-3 text-center text-xs font-semibold text-slate-600 leading-relaxed" id="meterLabel"></div>
                     </div>
 
                     <div class="mt-6 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/70">
@@ -132,21 +167,21 @@
                 <div class="card p-6">
                     <div class="text-sm font-extrabold text-slate-900">Daftar Kompetitor</div>
                     <div class="mt-4 overflow-x-auto">
-                        <table class="w-full text-left text-sm">
-                            <thead class="border-b border-slate-200 text-xs font-extrabold text-slate-700">
-                                <tr>
-                                    <th class="pb-3">Properti</th>
-                                    <th class="pb-3">Jarak</th>
-                                    <th class="pb-3">Harga</th>
-                                    <th class="pb-3">Luas Tanah</th>
-                                    <th class="pb-3">Harga/m²</th>
-                                    <th class="pb-3">Status</th>
-                                    <th class="pb-3">Aksi</th>
+                        <table class="w-full text-left text-sm border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50/75 border-b border-slate-100 text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    <th class="px-4 py-3">Properti</th>
+                                    <th class="px-4 py-3">Jarak</th>
+                                    <th class="px-4 py-3">Harga</th>
+                                    <th class="px-4 py-3">Luas Tanah</th>
+                                    <th class="px-4 py-3">Harga/m²</th>
+                                    <th class="px-4 py-3">Status</th>
+                                    <th class="px-4 py-3 text-right">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="competitorTable" class="divide-y divide-slate-100">
                                 <tr>
-                                    <td colspan="7" class="py-4 text-center text-slate-500">Belum ada data</td>
+                                    <td colspan="7" class="px-4 py-8 text-center text-slate-400 font-semibold">Belum ada data analisis. Silakan pilih properti Anda di atas.</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -248,6 +283,7 @@
                 // Price position gauge and card styling
                 const pricePositionCard = document.getElementById('pricePositionCard');
                 const pricePositionLabel = document.getElementById('pricePositionLabel');
+                const pricePositionIcon = document.getElementById('pricePositionIcon');
                 const meterMin = document.getElementById('meterMin');
                 const meterAvg = document.getElementById('meterAvg');
                 const meterMax = document.getElementById('meterMax');
@@ -256,34 +292,40 @@
                 const meterLabel = document.getElementById('meterLabel');
 
                 const pos = data.statistics.price_position;
-                let cardBg = 'bg-blue-50 ring-blue-100';
+                let cardBg = 'bg-blue-50 ring-blue-100/50';
                 let labelColor = 'text-blue-600';
-                let valueColor = 'text-blue-900';
+                let valueColor = 'text-blue-950';
+                let iconColor = 'bg-blue-500/10 text-blue-700';
                 let markerColor = '#3b82f6';
                 let labelText = 'Harga Anda kompetitif dan berada dalam kisaran rata-rata pasar.';
 
                 if (pos === 'di bawah rata-rata') {
-                    cardBg = 'bg-emerald-50 ring-emerald-100';
+                    cardBg = 'bg-emerald-50 ring-emerald-100/50';
                     labelColor = 'text-emerald-600';
-                    valueColor = 'text-emerald-900';
+                    valueColor = 'text-emerald-950';
+                    iconColor = 'bg-emerald-500/10 text-emerald-700';
                     markerColor = '#10b981';
                     labelText = 'Harga Anda di bawah rata-rata pasar (potensi laku lebih cepat).';
                 } else if (pos === 'di atas rata-rata') {
-                    cardBg = 'bg-rose-50 ring-rose-100';
+                    cardBg = 'bg-rose-50 ring-rose-100/50';
                     labelColor = 'text-rose-600';
-                    valueColor = 'text-rose-900';
+                    valueColor = 'text-rose-950';
+                    iconColor = 'bg-rose-500/10 text-rose-700';
                     markerColor = '#f43f5e';
                     labelText = 'Harga Anda di atas rata-rata pasar (disarankan optimasi harga).';
                 }
 
                 if (pricePositionCard) {
-                    pricePositionCard.className = `rounded-2xl p-4 ring-1 transition-all duration-300 ${cardBg}`;
+                    pricePositionCard.className = `rounded-2xl p-5 ring-1 flex items-center justify-between transition-all duration-300 ${cardBg}`;
                 }
                 if (pricePositionLabel) {
                     pricePositionLabel.className = `text-xs font-semibold ${labelColor}`;
                 }
+                if (pricePositionIcon) {
+                    pricePositionIcon.className = `grid size-10 place-items-center rounded-xl shrink-0 ${iconColor}`;
+                }
                 if (statPosition) {
-                    statPosition.className = `mt-2 text-lg font-extrabold ${valueColor}`;
+                    statPosition.className = `mt-2 text-[17px] sm:text-xl xl:text-2xl font-black ${valueColor}`;
                     statPosition.textContent = pos.toUpperCase();
                 }
 
@@ -384,7 +426,7 @@
                             style: {
                                 colors: '#64748b',
                                 fontSize: '11px',
-                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontFamily: "'Instrument Sans', 'Inter', sans-serif",
                                 fontWeight: 500
                             }
                         },
@@ -393,7 +435,7 @@
                             style: {
                                 color: '#0f172a',
                                 fontSize: '12px',
-                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontFamily: "'Instrument Sans', 'Inter', sans-serif",
                                 fontWeight: 700
                             }
                         }
@@ -407,7 +449,7 @@
                             style: {
                                 colors: '#64748b',
                                 fontSize: '11px',
-                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontFamily: "'Instrument Sans', 'Inter', sans-serif",
                                 fontWeight: 500
                             }
                         },
@@ -416,7 +458,7 @@
                             style: {
                                 color: '#0f172a',
                                 fontSize: '12px',
-                                fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                                fontFamily: "'Instrument Sans', 'Inter', sans-serif",
                                 fontWeight: 700
                             }
                         }
@@ -439,7 +481,7 @@
                         position: 'top',
                         horizontalAlign: 'right',
                         fontSize: '12px',
-                        fontFamily: 'Plus Jakarta Sans, Inter, sans-serif',
+                        fontFamily: "'Instrument Sans', 'Inter', sans-serif",
                         fontWeight: 600,
                         labels: {
                             colors: '#334155'
@@ -587,29 +629,31 @@
                 map.fitBounds(bounds, { padding: [50, 50] });
             }
 
-            function renderTable(competitors) {
+             function renderTable(competitors) {
                 if (competitors.length === 0) {
-                    competitorTable.innerHTML = '<tr><td colspan="7" class="py-4 text-center text-slate-500">Tidak ada kompetitor dalam radius ini</td></tr>';
+                    competitorTable.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-slate-500 font-semibold">Tidak ada kompetitor dalam radius ini</td></tr>';
                     return;
                 }
 
                 competitorTable.innerHTML = competitors.map((comp) => {
-                    const statusClass = comp.status === 'Terjual' ? 'bg-slate-100 text-slate-700' : 'bg-emerald-100 text-emerald-700';
+                    const statusClass = comp.status === 'Terjual' ? 'bg-slate-100 text-slate-700' : 'bg-emerald-50 text-emerald-700 ring-1 ring-emerald-100';
                     return `
-                        <tr class="hover:bg-slate-50">
-                            <td class="py-3">
-                                <div class="font-semibold text-slate-900">${comp.title}</div>
-                                <div class="text-xs text-slate-500">${comp.district_name || 'Samarinda'}</div>
+                        <tr class="group hover:bg-slate-50/50 transition-colors">
+                            <td class="px-4 py-3.5">
+                                <div class="font-bold text-slate-900">${comp.title}</div>
+                                <div class="text-xs text-slate-400 font-medium mt-0.5">Kecamatan ${comp.district_name || 'Samarinda'}</div>
                             </td>
-                            <td class="py-3 text-slate-700">${formatDistance(comp.distance_m)}</td>
-                            <td class="py-3 font-semibold text-brand-accent">${formatCurrency(comp.price)}</td>
-                            <td class="py-3 text-slate-700">${comp.land_area} m²</td>
-                            <td class="py-3 text-slate-700">Rp ${Math.round(comp.price_per_sqm).toLocaleString('id-ID')}</td>
-                            <td class="py-3">
-                                <span class="inline-flex items-center rounded-full px-2 py-1 text-xs font-semibold ${statusClass}">${comp.status}</span>
+                            <td class="px-4 py-3.5 text-slate-600 font-medium">${formatDistance(comp.distance_m)}</td>
+                            <td class="px-4 py-3.5 font-bold text-brand-accent">${formatCurrency(comp.price)}</td>
+                            <td class="px-4 py-3.5 text-slate-600 font-medium">${comp.land_area} m²</td>
+                            <td class="px-4 py-3.5 text-slate-600 font-medium whitespace-nowrap">Rp ${Math.round(comp.price_per_sqm).toLocaleString('id-ID')}/m²</td>
+                            <td class="px-4 py-3.5">
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold ${statusClass}">${comp.status}</span>
                             </td>
-                            <td class="py-3">
-                                <a href="/properties/${comp.id}" target="_blank" class="text-sm font-semibold text-brand-primary hover:text-brand-primary-hover">Lihat</a>
+                            <td class="px-4 py-3.5 text-right">
+                                <a href="/properties/${comp.id}" target="_blank" class="btn btn-outline min-h-0 h-8 py-1 px-3 text-xs inline-flex items-center">
+                                    Detail
+                                </a>
                             </td>
                         </tr>
                     `;

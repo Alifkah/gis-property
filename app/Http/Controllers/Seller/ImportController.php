@@ -99,7 +99,14 @@ class ImportController extends Controller
 
                     // Combine row values with headers
                     $row = array_combine($headers, $data);
-                    $row = array_map('trim', $row);
+                    $row = array_map(fn ($v) => trim((string) $v), $row);
+
+                    if (isset($row['latitude'])) {
+                        $row['latitude'] = str_replace(',', '.', $row['latitude']);
+                    }
+                    if (isset($row['longitude'])) {
+                        $row['longitude'] = str_replace(',', '.', $row['longitude']);
+                    }
 
                     // Validation rules for this specific row
                     $validator = Validator::make($row, [
@@ -149,7 +156,7 @@ class ImportController extends Controller
                     fread($handle, 3); // skip BOM again
                 }
 
-                $headers = fgetcsv($handle, 1000, $delimiter);
+                $headers = fgetcsv($handle, 0, $delimiter);
                 if (! $headers) {
                     fclose($handle);
 
@@ -179,7 +186,7 @@ class ImportController extends Controller
                 }
 
                 $lineNum = 1;
-                while (($data = fgetcsv($handle, 1000, $delimiter)) !== false) {
+                while (($data = fgetcsv($handle, 0, $delimiter)) !== false) {
                     $lineNum++;
 
                     // Skip empty lines
@@ -196,7 +203,14 @@ class ImportController extends Controller
 
                     // Combine row values with headers
                     $row = array_combine($headers, $data);
-                    $row = array_map('trim', $row);
+                    $row = array_map(fn ($v) => trim((string) $v), $row);
+
+                    if (isset($row['latitude'])) {
+                        $row['latitude'] = str_replace(',', '.', $row['latitude']);
+                    }
+                    if (isset($row['longitude'])) {
+                        $row['longitude'] = str_replace(',', '.', $row['longitude']);
+                    }
 
                     // Validation rules for this specific row
                     $validator = Validator::make($row, [

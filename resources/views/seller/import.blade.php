@@ -27,7 +27,7 @@
                             <span>Ditemukan kesalahan pada file Anda. Impor dibatalkan:</span>
                         </div>
                         <ul class="mt-2.5 max-h-40 overflow-y-auto space-y-1 text-[11px] font-semibold text-rose-600 list-disc list-inside">
-                            @foreach ($errors->get('csv_errors')[0] as $error)
+                            @foreach ($errors->get('csv_errors') as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
