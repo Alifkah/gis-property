@@ -44,6 +44,21 @@
         {{ $slot }}
 
         @stack('scripts')
+        <script>
+            // Global Ctrl+K shortcut to focus search input
+            document.addEventListener('keydown', function (e) {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    const searchInput = document.getElementById('catalogSearchInput') 
+                        || document.getElementById('mapSearchInput') 
+                        || document.querySelector('input[name="q"]');
+                    if (searchInput) {
+                        searchInput.focus();
+                        searchInput.select();
+                    }
+                }
+            });
+        </script>
     </body>
 </html>
 

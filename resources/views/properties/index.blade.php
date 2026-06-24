@@ -151,6 +151,31 @@
 
         {{-- Grid Properti --}}
         <div>
+            {{-- Top Premium Search Bar --}}
+            <div class="mb-6">
+                <form method="GET" action="{{ route('properties.index') }}" class="relative rounded-2xl border border-slate-200/60 bg-white p-1.5 shadow-xs flex items-center gap-2">
+                    {{-- Keep existing query parameters as hidden fields so they aren't lost when searching keywords --}}
+                    @foreach(request()->except('q') as $key => $value)
+                        @if(is_array($value))
+                            @foreach($value as $v)
+                                <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                            @endforeach
+                        @else
+                            <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                        @endif
+                    @endforeach
+
+                    <div class="pl-2.5 text-slate-400">
+                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </div>
+                    <input type="text" name="q" placeholder="Cari properti..." class="w-full bg-transparent py-2 text-sm text-slate-800 focus:outline-hidden" value="{{ request('q') }}" id="catalogSearchInput" />
+                    <div class="text-[10px] font-bold text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-md border border-slate-200 pointer-events-none hidden sm:block whitespace-nowrap shrink-0">Ctrl K</div>
+                    <button type="submit" class="btn btn-primary px-5 py-2 text-xs font-bold shrink-0">Cari</button>
+                </form>
+            </div>
+
             @if ($properties->isEmpty())
                 <div class="card flex flex-col items-center gap-3 p-10 text-center">
                     <div class="text-sm font-extrabold text-slate-900">Tidak ada properti yang sesuai</div>

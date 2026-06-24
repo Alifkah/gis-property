@@ -72,46 +72,61 @@
             {{-- Floating Search Bar --}}
             <div class="mx-auto mt-10 sm:mt-16 max-w-4xl">
                 <div class="p-4 sm:p-5 rounded-2xl border border-slate-200/40 shadow-2xl bg-white/95 backdrop-blur-md">
-                    <form action="{{ route('explore') }}" method="GET"
-                        class="grid gap-4 sm:grid-cols-2 md:grid-cols-4 sm:items-end">
+                    <form action="{{ route('explore') }}" method="GET" class="space-y-4">
+                        {{-- Row 1: Cari Properti (Full Width) --}}
                         <div>
-                            <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Tipe
-                                Properti</label>
-                            <select name="type" class="select mt-2" style="background: #ffffff; color: #0f172a;">
-                                <option value="">Semua</option>
-                                <option value="Rumah">Rumah</option>
-                                <option value="Tanah">Tanah</option>
-                            </select>
+                            <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Cari Properti</label>
+                            <div class="relative mt-2">
+                                <input type="text" name="q" placeholder="Nama, lokasi, dsb..." class="input pl-9" style="background: #ffffff; color: #0f172a; border: 1px solid #cbd5e1; border-radius: 0.75rem; width: 100%; height: 2.75rem; font-size: 0.875rem;" />
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                    </svg>
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Pilih
-                                Kecamatan</label>
-                            <select name="district" class="select mt-2" style="background: #ffffff; color: #0f172a;">
-                                <option value="">Semua</option>
-                                @foreach ($districts as $district)
-                                    <option value="{{ $district->name }}">{{ $district->name }}</option>
-                                @endforeach
-                            </select>
+
+                        {{-- Row 2: Advanced Filters --}}
+                        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 sm:items-end">
+                            <div>
+                                <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Tipe
+                                    Properti</label>
+                                <select name="type" class="select mt-2" style="background: #ffffff; color: #0f172a;">
+                                    <option value="">Semua</option>
+                                    <option value="Rumah">Rumah</option>
+                                    <option value="Tanah">Tanah</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Pilih
+                                    Kecamatan</label>
+                                <select name="district" class="select mt-2" style="background: #ffffff; color: #0f172a;">
+                                    <option value="">Semua</option>
+                                    @foreach ($districts as $district)
+                                        <option value="{{ $district->name }}">{{ $district->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Rentang
+                                    Harga</label>
+                                <select name="price" class="select mt-2" style="background: #ffffff; color: #0f172a;">
+                                    <option value="">Semua</option>
+                                    <option value="0-250000000">0 - 250 jt</option>
+                                    <option value="250000000-750000000">250 jt - 750 jt</option>
+                                    <option value="750000000-2000000000">750 jt - 2 M</option>
+                                </select>
+                            </div>
+                            <button type="submit"
+                                class="btn btn-accent w-full hover:shadow-lg hover:shadow-brand-accent/25 transition-all flex items-center justify-center gap-2">
+                                <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                                    stroke-width="2.5">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                                </svg>
+                                <span class="font-bold">Cari</span>
+                            </button>
                         </div>
-                        <div>
-                            <label class="text-[10px] font-extrabold uppercase tracking-wider text-slate-500">Rentang
-                                Harga</label>
-                            <select name="price" class="select mt-2" style="background: #ffffff; color: #0f172a;">
-                                <option value="">Semua</option>
-                                <option value="0-250000000">0 - 250 jt</option>
-                                <option value="250000000-750000000">250 jt - 750 jt</option>
-                                <option value="750000000-2000000000">750 jt - 2 M</option>
-                            </select>
-                        </div>
-                        <button type="submit"
-                            class="btn btn-accent w-full hover:shadow-lg hover:shadow-brand-accent/25 transition-all flex items-center justify-center gap-2">
-                            <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
-                                stroke-width="2.5">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                            </svg>
-                            <span class="font-bold">Cari</span>
-                        </button>
                     </form>
                 </div>
             </div>

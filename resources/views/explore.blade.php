@@ -4,6 +4,11 @@
 >
     @push('styles')
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+        <style>
+            .leaflet-top.leaflet-left {
+                margin-top: 55px !important;
+            }
+        </style>
     @endpush
 
     <div x-data="{ showResults: false, showFilters: false, showLayers: true }" class="flex h-dvh w-full overflow-hidden bg-brand-bg flex-col md:flex-row">
@@ -99,6 +104,19 @@
         {{-- Tengah: Peta --}}
         <main class="relative flex-1">
             <div id="map" class="h-full w-full z-0"></div>
+
+            {{-- Floating Search Bar on Map --}}
+            <div class="absolute top-3 left-3 z-[900] w-[calc(100%-1.5rem)] max-w-[280px] sm:max-w-xs transition-all duration-300">
+                <div class="relative rounded-2xl border border-slate-200/60 bg-white/95 backdrop-blur-md p-1 flex items-center shadow-lg focus-within:ring-2 focus-within:ring-brand-primary/20">
+                    <div class="pl-2.5 text-slate-400">
+                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                        </svg>
+                    </div>
+                    <input type="text" id="mapSearchInput" placeholder="Cari properti..." class="w-full bg-transparent pl-2.5 pr-8 py-1.5 text-xs text-slate-800 focus:outline-hidden" />
+                    <div class="absolute right-2 text-[9px] font-bold text-slate-400 bg-slate-100 px-1 py-0.5 rounded-md border border-slate-200 pointer-events-none hidden sm:block whitespace-nowrap shrink-0">Ctrl K</div>
+                </div>
+            </div>
 
             {{-- GPS Alert Banner --}}
             <div id="gpsAlert" style="display:none;" class="absolute top-4 left-1/2 -translate-x-1/2 z-[900] w-[90%] max-w-md bg-rose-50 border border-rose-200 rounded-2xl p-3 shadow-xl flex items-center justify-between gap-3 animate-fade-in">
@@ -485,6 +503,16 @@
             if (urlParams.get('district')) { filterDistrict.value = urlParams.get('district'); }
             if (urlParams.get('price')) { filterPrice.value = urlParams.get('price'); }
             if (urlParams.get('status')) { filterStatus.value = urlParams.get('status'); }
+            if (urlParams.get('q')) { document.getElementById('mapSearchInput').value = urlParams.get('q'); }
+
+            let searchTimeout = null;
+            document.getElementById('mapSearchInput').addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    meta.page = 1;
+                    apply();
+                }, 300);
+            });
 
             let selectedPills = new Set();
             let properties = [];
@@ -1019,6 +1047,7 @@
                 const price = filterPrice.value;
                 const sort = filterSort.value;
                 const status = filterStatus.value;
+                const q = document.getElementById('mapSearchInput').value;
                 const pillsLocal = new Set(selectedPills);
 
                 const floodSafe = pillsLocal.has('BebasBanjir') ? 1 : null;
@@ -1048,6 +1077,7 @@
                 try {
                     const [priceMin, priceMax] = price ? price.split('-') : ['', ''];
                     const payload = await fetchProperties({
+                        q: q || '',
                         type: remoteType || '',
                         district: district || '',
                         status: status || '',
@@ -1073,6 +1103,7 @@
 
                     try {
                         const geojson = await fetchGeojson({
+                            q: q || '',
                             type: remoteType || '',
                             district: district || '',
                             status: status || '',

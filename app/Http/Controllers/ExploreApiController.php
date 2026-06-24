@@ -375,6 +375,17 @@ class ExploreApiController extends Controller
             [self::DEFAULT_LNG, self::DEFAULT_LAT],
         );
 
+        if ($request->filled('q')) {
+            $q = $request->string('q')->toString();
+            $driver = config('scout.driver');
+            if ($driver && $driver !== 'null') {
+                $ids = Property::search($q)->keys();
+                $query->whereIn('properties.id', $ids);
+            } else {
+                $query->where('properties.title', 'ilike', "%{$q}%");
+            }
+        }
+
         if ($request->filled('type')) {
             $query->where('type', $request->string('type')->toString());
         }
@@ -412,6 +423,17 @@ class ExploreApiController extends Controller
     {
         $query = Property::query()
             ->where('geom', '!=', 'POINT('.self::DEFAULT_LNG.' '.self::DEFAULT_LAT.')');
+
+        if ($request->filled('q')) {
+            $q = $request->string('q')->toString();
+            $driver = config('scout.driver');
+            if ($driver && $driver !== 'null') {
+                $ids = Property::search($q)->keys();
+                $query->whereIn('id', $ids);
+            } else {
+                $query->where('title', 'like', "%{$q}%");
+            }
+        }
 
         if ($request->filled('type')) {
             $query->where('type', $request->string('type')->toString());
