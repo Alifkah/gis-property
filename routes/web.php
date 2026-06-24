@@ -24,7 +24,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -233,20 +232,3 @@ Route::get('/sitemap.xml', function () {
     return response($content, 200)
         ->header('Content-Type', 'text/xml');
 })->name('sitemap');
-
-Route::get('/test-email', function (Request $request) {
-    $to = $request->query('to');
-    if (! $to) {
-        return 'Silakan masukkan parameter email tujuan, contoh: /test-email?to=emailkamu@gmail.com';
-    }
-    try {
-        Mail::raw('Halo! Ini adalah email uji coba untuk memastikan integrasi Brevo SMTP online Anda berfungsi dengan sukses.', function ($message) use ($to) {
-            $message->to($to)
-                ->subject('Uji Coba Brevo SMTP Online');
-        });
-
-        return 'Email berhasil dikirim ke: '.e($to).'! Silakan periksa inbox atau folder spam email Anda.';
-    } catch (Exception $e) {
-        return 'Gagal mengirim email. Error: '.$e->getMessage();
-    }
-});
