@@ -58,6 +58,11 @@ class BrevoApiTransport extends AbstractTransport
             $payload['textContent'] = $text;
         }
 
+        $keyLength = strlen($this->key);
+        $maskedKey = $keyLength > 8
+            ? substr($this->key, 0, 4).'...'.substr($this->key, -4)
+            : '(empty/too short)';
+
         $response = Http::withHeaders([
             'api-key' => $this->key,
             'Content-Type' => 'application/json',
@@ -65,7 +70,7 @@ class BrevoApiTransport extends AbstractTransport
         ])->post('https://api.brevo.com/v3/smtp/email', $payload);
 
         if (! $response->successful()) {
-            throw new \Exception('Brevo API send failed: '.$response->body());
+            throw new \Exception('Brevo API send failed (Key Length: '.$keyLength.', Masked Key: '.$maskedKey.'): '.$response->body());
         }
     }
 
