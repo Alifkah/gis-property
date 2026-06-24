@@ -27,7 +27,13 @@ class PropertyController extends Controller
 
         // Keyword search
         if ($q = $request->get('q')) {
-            $query->where('title', 'ilike', "%{$q}%");
+            $driver = config('scout.driver');
+            if ($driver && $driver !== 'null') {
+                $ids = Property::search($q)->keys();
+                $query->whereIn('id', $ids);
+            } else {
+                $query->where('title', 'ilike', "%{$q}%");
+            }
         }
 
         // Type filter

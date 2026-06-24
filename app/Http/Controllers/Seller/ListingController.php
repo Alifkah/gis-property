@@ -188,9 +188,18 @@ class ListingController extends Controller
             fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF)); // BOM UTF-8
 
             fputcsv($file, [
-                'ID Properti', 'Judul', 'Tipe', 'Harga (Rp)', 'Luas Tanah (m2)',
-                'Luas Bangunan (m2)', 'Kamar Tidur', 'Kamar Mandi', 'Status',
-                'Kecamatan', 'Aman Banjir', 'Tanggal Pasang',
+                'ID Properti',
+                'Judul',
+                'Tipe',
+                'Harga (Rp)',
+                'Luas Tanah (m2)',
+                'Luas Bangunan (m2)',
+                'Kamar Tidur',
+                'Kamar Mandi',
+                'Status',
+                'Kecamatan',
+                'Aman Banjir',
+                'Tanggal Pasang',
             ]);
 
             foreach ($properties as $p) {

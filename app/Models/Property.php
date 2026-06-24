@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Str;
+use Laravel\Scout\Searchable;
 
 #[Fillable([
     'user_id',
@@ -27,7 +28,7 @@ use Illuminate\Support\Str;
 class Property extends Model
 {
     /** @use HasFactory<PropertyFactory> */
-    use HasFactory;
+    use HasFactory, Searchable;
 
     protected static function booted()
     {
@@ -90,6 +91,27 @@ class Property extends Model
             'building_area' => 'integer',
             'bedroom' => 'integer',
             'bathroom' => 'integer',
+        ];
+    }
+
+    /**
+     * Get the indexable data array for the model.
+     *
+     * @return array<string, mixed>
+     */
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => (int) $this->id,
+            'title' => $this->title,
+            'type' => $this->type,
+            'description' => $this->description,
+            'price' => (float) $this->price,
+            'land_area' => (int) $this->land_area,
+            'building_area' => (int) $this->building_area,
+            'bedroom' => (int) $this->bedroom,
+            'bathroom' => (int) $this->bathroom,
+            'status' => $this->status,
         ];
     }
 }
