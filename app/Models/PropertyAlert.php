@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Mail\PropertyAlertMail;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class PropertyAlert extends Model
 {
@@ -64,6 +66,7 @@ class PropertyAlert extends Model
         }
 
         $matchingAlerts = self::query()
+            ->with('user')
             ->where(function ($q) use ($property) {
                 $q->whereNull('type')->orWhere('type', $property->type);
             })
@@ -82,13 +85,28 @@ class PropertyAlert extends Model
         $notifiedUserIds = [];
 
         foreach ($matchingAlerts as $alert) {
+            $notificationTitle = 'Properti Baru yang Cocok!';
+            $notificationMessage = 'Properti baru "'.$property->title.'" di '.$districtName.' tersedia dengan harga Rp '.number_format($property->price, 0, ',', '.').'.';
+            $notificationUrl = route('properties.show', $property->id);
+
             Notification::query()->create([
                 'user_id' => $alert->user_id,
-                'title' => 'Properti Baru yang Cocok!',
-                'message' => 'Properti baru "'.$property->title.'" di '.$districtName.' tersedia dengan harga Rp '.number_format($property->price, 0, ',', '.').'.',
-                'url' => route('properties.show', $property->id),
+                'title' => $notificationTitle,
+                'message' => $notificationMessage,
+                'url' => $notificationUrl,
                 'is_read' => false,
             ]);
+
+            if ($alert->user && $alert->user->email) {
+                Mail::to($alert->user->email)->send(new PropertyAlertMail(
+                    recipient: $alert->user,
+                    property: $property,
+                    title: $notificationTitle,
+                    mailMessage: $notificationMessage,
+                    url: $notificationUrl
+                ));
+            }
+
             $notifiedUserIds[] = $alert->user_id;
         }
 
@@ -98,13 +116,27 @@ class PropertyAlert extends Model
             ->get();
 
         foreach ($otherUsers as $user) {
+            $notificationTitle = 'Listing Baru Terbit!';
+            $notificationMessage = 'Sebuah properti baru "'.$property->title.'" di '.$districtName.' telah diterbitkan dengan harga Rp '.number_format($property->price, 0, ',', '.').'.';
+            $notificationUrl = route('properties.show', $property->id);
+
             Notification::query()->create([
                 'user_id' => $user->id,
-                'title' => 'Listing Baru Terbit!',
-                'message' => 'Sebuah properti baru "'.$property->title.'" di '.$districtName.' telah diterbitkan dengan harga Rp '.number_format($property->price, 0, ',', '.').'.',
-                'url' => route('properties.show', $property->id),
+                'title' => $notificationTitle,
+                'message' => $notificationMessage,
+                'url' => $notificationUrl,
                 'is_read' => false,
             ]);
+
+            if ($user->email) {
+                Mail::to($user->email)->send(new PropertyAlertMail(
+                    recipient: $user,
+                    property: $property,
+                    title: $notificationTitle,
+                    mailMessage: $notificationMessage,
+                    url: $notificationUrl
+                ));
+            }
         }
     }
 }

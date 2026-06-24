@@ -1,5 +1,6 @@
 <?php
 
+use App\Mail\PropertyAlertMail;
 use App\Models\MarketDemand;
 use App\Models\Notification;
 use App\Models\Property;
@@ -7,6 +8,7 @@ use App\Models\PropertyAlert;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Mail;
 
 uses(RefreshDatabase::class);
 
@@ -98,6 +100,8 @@ it('triggers automatic notification to matching buyer when a new listing is crea
 
     expect(Notification::count())->toBe(0);
 
+    Mail::fake();
+
     // Seller sets the exact location on map (triggers match notification check)
     $this->put(route('seller.listings.location.update', $property->id), [
         'lat' => -0.5,
@@ -109,6 +113,12 @@ it('triggers automatic notification to matching buyer when a new listing is crea
     expect($notification->user_id)->toBe($buyer->id)
         ->and($notification->title)->toContain('Properti Baru yang Cocok')
         ->and($notification->is_read)->toBeFalse();
+
+    Mail::assertSent(PropertyAlertMail::class, function ($mail) use ($buyer, $property) {
+        return $mail->hasTo($buyer->email) &&
+               $mail->recipient->id === $buyer->id &&
+               $mail->property->id === $property->id;
+    });
 });
 
 it('triggers automatic notification to matching buyer when listing is imported via CSV', function () {
@@ -298,6 +308,8 @@ it('sends global notifications to all registered users except listing owner and 
 
     expect(Notification::count())->toBe(0);
 
+    Mail::fake();
+
     // Update location to trigger notifications
     $this->put(route('seller.listings.location.update', $property->id), [
         'lat' => -0.5,
@@ -321,4 +333,16 @@ it('sends global notifications to all registered users except listing owner and 
 
     // Make sure seller got no notifications
     expect(Notification::where('user_id', $seller->id)->count())->toBe(0);
+
+    Mail::assertSent(PropertyAlertMail::class, function ($mail) use ($buyerWithAlert) {
+        return $mail->hasTo($buyerWithAlert->email) && $mail->title === 'Properti Baru yang Cocok!';
+    });
+
+    Mail::assertSent(PropertyAlertMail::class, function ($mail) use ($buyerWithoutAlert) {
+        return $mail->hasTo($buyerWithoutAlert->email) && $mail->title === 'Listing Baru Terbit!';
+    });
+
+    Mail::assertNotSent(PropertyAlertMail::class, function ($mail) use ($seller) {
+        return $mail->hasTo($seller->email);
+    });
 });
