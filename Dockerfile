@@ -82,8 +82,12 @@ RUN php artisan config:clear \
     && php artisan route:clear \
     && php artisan view:clear
 
+# Copy startup script
+COPY render-startup.sh /usr/local/bin/render-startup.sh
+RUN chmod +x /usr/local/bin/render-startup.sh
+
 # Expose the port Render assigns
 EXPOSE ${PORT}
 
-# Start Apache
-CMD ["apache2-foreground"]
+# Start using startup script
+CMD ["/usr/local/bin/render-startup.sh"]
