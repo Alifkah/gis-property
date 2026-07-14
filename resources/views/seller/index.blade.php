@@ -113,7 +113,7 @@
                     @forelse ($properties as $property)
                         <div class="group relative flex flex-col justify-between rounded-2xl border border-slate-200/60 p-4 transition-all hover:shadow-md hover:border-slate-300 bg-white">
                             <div class="relative">
-                                <x-property-card :property="$property" />
+                                <x-property-card :property="$property" :show-favorite="false" />
                                 
                                 {{-- Inline Stats view --}}
                                 <div class="mt-3.5 flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-[10px] font-bold text-slate-500 border border-slate-100">

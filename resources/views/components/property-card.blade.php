@@ -1,7 +1,7 @@
 @props([
     'property',
-    'showFavorite' => false,
-    'isFavorited'  => false,
+    'showFavorite' => true,
+    'isFavorited'  => null,
 ])
 
 @php
@@ -26,6 +26,12 @@
         $imageUrl = 'data:image/svg+xml;base64,' . base64_encode($placeholderSvg);
     }
     $isSold = ($property->status ?? 'Tersedia') === 'Terjual';
+
+    if ($isFavorited === null) {
+        $isFavorited = auth()->check()
+            ? auth()->user()->favorites->contains('property_id', $property->id)
+            : false;
+    }
 @endphp
 
 <div class="group card overflow-hidden transition hover:-translate-y-0.5 hover:shadow-md">
@@ -74,12 +80,6 @@
                 </svg>
             </a>
         @endauth
-    @else
-        <div class="absolute right-3 top-3 grid size-9 place-items-center rounded-xl bg-white/90 text-slate-700 shadow-sm ring-1 ring-slate-200/70">
-            <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
-            </svg>
-        </div>
     @endif
 
     <a href="{{ route('properties.show', ['property' => $property]) }}" class="block p-4">
