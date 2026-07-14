@@ -346,3 +346,48 @@ it('sends global notifications to all registered users except listing owner and 
         return $mail->hasTo($seller->email);
     });
 });
+
+it('allows a user to schedule a visit and creates a notification for the seller', function () {
+    $seller = User::factory()->create();
+    $buyer = User::factory()->create();
+    $property = Property::factory()->create([
+        'user_id' => $seller->id,
+        'title' => 'Rumah Mewah Danau',
+    ]);
+
+    $this->actingAs($buyer);
+
+    expect(Notification::count())->toBe(0);
+
+    $response = $this->postJson(route('properties.schedule', $property->id), [
+        'date' => date('Y-m-d', strtotime('+2 days')),
+        'time' => '10:00',
+        'note' => 'Saya mau lihat kolam renang.',
+    ]);
+
+    $response->assertStatus(200)
+        ->assertJson(['success' => true]);
+
+    expect(Notification::count())->toBe(1);
+    $notification = Notification::first();
+    expect($notification->user_id)->toBe($seller->id)
+        ->and($notification->title)->toBe('Jadwal Kunjungan Baru')
+        ->and($notification->message)->toContain($buyer->name)
+        ->and($notification->message)->toContain('Rumah Mewah Danau')
+        ->and($notification->message)->toContain('pukul 10:00')
+        ->and($notification->message)->toContain('Saya mau lihat kolam renang.')
+        ->and($notification->url)->toBe(route('properties.show', $property->id));
+});
+
+it('validates schedule visit fields', function () {
+    $seller = User::factory()->create();
+    $property = Property::factory()->create(['user_id' => $seller->id]);
+
+    $response = $this->postJson(route('properties.schedule', $property->id), [
+        'date' => '',
+        'time' => '',
+    ]);
+
+    $response->assertStatus(422)
+        ->assertJsonValidationErrors(['date', 'time']);
+});

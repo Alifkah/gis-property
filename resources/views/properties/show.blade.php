@@ -45,6 +45,9 @@
                 . '</svg>';
             $imageUrl = 'data:image/svg+xml;base64,' . base64_encode($placeholderSvg);
         }
+        $waNumber = $property->user?->phone 
+            ? preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $property->user->phone))
+            : '';
     @endphp
 
     <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]">
@@ -53,7 +56,7 @@
             <div class="relative">
                 @if ($existingImages->isNotEmpty())
                     <div
-                        class="relative group overflow-hidden rounded-2xl bg-slate-900 shadow-xs w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10]">
+                        class="relative group overflow-hidden rounded-2xl bg-slate-900 shadow-xs w-full aspect-[16/10] sm:aspect-[16/9]">
                         {{-- Slider Viewport --}}
                         <div id="gallerySlider" class="flex h-full w-full transition-transform duration-500 ease-out">
                             @foreach ($existingImages as $image)
@@ -418,10 +421,7 @@
                 @endif
 
                 <div class="mt-5 grid gap-2.5">
-                    @if ($property->user?->phone)
-                        @php
-                            $waNumber = preg_replace('/^0/', '62', preg_replace('/[^0-9]/', '', $property->user->phone));
-                        @endphp
+                    @if ($waNumber)
                         <a id="whatsappBtn"
                             href="https://wa.me/{{ $waNumber }}?text={{ rawurlencode('Halo, saya tertarik dengan properti: ' . $property->title) }}"
                             target="_blank" rel="noopener"
@@ -435,7 +435,7 @@
                     @else
                         <button type="button" class="btn btn-primary w-full py-3" disabled>Hubungi via WhatsApp</button>
                     @endif
-                    <button type="button" class="btn btn-outline w-full py-3">Jadwalkan Kunjungan</button>
+                    <button type="button" onclick="openScheduleModal()" class="btn btn-outline w-full py-3">Jadwalkan Kunjungan</button>
                 </div>
 
                 <div class="mt-6 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/50 shadow-2xs">
@@ -555,21 +555,22 @@
 
     {{-- Lightbox Modal --}}
     @if ($existingImages->isNotEmpty())
-        <div id="lightboxModal" style="display:none;"
-            class="fixed inset-0 z-[1000] bg-black/95 flex flex-col justify-between p-4 transition-all duration-300">
-            {{-- Header --}}
-            <div class="flex items-center justify-between text-white pb-2">
-                <span id="lightboxCounter" class="text-xs font-bold pointer-events-none">1 / 1</span>
-                <button type="button" onclick="closeLightbox()"
-                    class="size-10 rounded-xl text-slate-300 hover:text-white hover:bg-white/10 flex items-center justify-center transition cursor-pointer bg-transparent border-0">
-                    <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
+        <div id="lightboxModal" style="display:none;" onclick="closeLightbox(event)"
+            class="fixed inset-0 z-[2000] bg-black/95 flex items-center justify-center p-4 transition-all duration-300">
+            
+            {{-- Counter Badge --}}
+            <span id="lightboxCounter" class="absolute top-6 left-6 z-[2010] rounded-full bg-black/50 backdrop-blur-md px-3.5 py-1.5 text-xs font-bold text-white shadow-sm pointer-events-none">1 / 1</span>
+            
+            {{-- Close Button --}}
+            <button type="button" onclick="closeLightbox(event)"
+                class="absolute top-6 right-6 z-[2010] size-11 rounded-full bg-black/50 backdrop-blur-md text-white hover:bg-black/80 flex items-center justify-center transition shadow-md border border-white/10 cursor-pointer">
+                <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
 
             {{-- Main Viewport --}}
-            <div class="flex-1 relative flex items-center justify-center overflow-hidden">
+            <div class="w-full h-full relative flex items-center justify-center overflow-hidden">
                 <div id="lightboxSlider" class="flex h-full w-full transition-transform duration-300 ease-out">
                     @foreach ($existingImages as $image)
                         <div class="w-full h-full shrink-0 flex items-center justify-center bg-transparent select-none">
@@ -583,24 +584,63 @@
                 @if ($existingImages->count() > 1)
                     {{-- Arrow controls --}}
                     <button type="button" onclick="prevLightbox(event)"
-                        class="absolute left-2 top-1/2 -translate-y-1/2 size-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shadow-lg cursor-pointer border-0">
+                        class="lightbox-nav-btn absolute left-4 top-1/2 -translate-y-1/2 size-12 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition shadow-lg cursor-pointer border-0">
                         <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                         </svg>
                     </button>
                     <button type="button" onclick="nextLightbox(event)"
-                        class="absolute right-2 top-1/2 -translate-y-1/2 size-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition shadow-lg cursor-pointer border-0">
+                        class="lightbox-nav-btn absolute right-4 top-1/2 -translate-y-1/2 size-12 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition shadow-lg cursor-pointer border-0">
                         <svg class="size-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
                         </svg>
                     </button>
                 @endif
             </div>
-
-            {{-- Bottom spacer --}}
-            <div class="h-6"></div>
         </div>
     @endif
+
+    {{-- Jadwalkan Kunjungan Modal --}}
+    <div id="scheduleModal" style="display:none;" class="fixed inset-0 z-[2000] items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs flex" onclick="closeScheduleModal()">
+        <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 relative ring-1 ring-slate-100 animate-in fade-in zoom-in-95 duration-200" onclick="event.stopPropagation()">
+            <button type="button" onclick="closeScheduleModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer bg-transparent border-0">
+                <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            
+            <h3 class="text-lg font-extrabold text-slate-900 mb-4">Jadwalkan Kunjungan</h3>
+            <p class="text-xs font-semibold text-slate-500 mb-4 leading-relaxed">Pilih tanggal dan waktu kunjungan Anda. Kami akan mengirimkan notifikasi ke penjual dan menghubungkan Anda via WhatsApp.</p>
+            
+            <form id="scheduleForm" onsubmit="submitSchedule(event)">
+                @csrf
+                <div class="grid gap-4">
+                    <div>
+                        <label for="scheduleDate" class="text-xs font-bold text-slate-700 block mb-1">Tanggal Kunjungan</label>
+                        <input type="date" id="scheduleDate" required min="{{ date('Y-m-d') }}"
+                            class="w-full rounded-xl border border-slate-200/80 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-hidden" />
+                    </div>
+                    <div>
+                        <label for="scheduleTime" class="text-xs font-bold text-slate-700 block mb-1">Waktu Kunjungan</label>
+                        <input type="time" id="scheduleTime" required
+                            class="w-full rounded-xl border border-slate-200/80 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-hidden" />
+                    </div>
+                    <div>
+                        <label for="scheduleNote" class="text-xs font-bold text-slate-700 block mb-1">Catatan Tambahan (Opsional)</label>
+                        <textarea id="scheduleNote" rows="3" placeholder="Halo, saya ingin meninjau lokasi..."
+                            class="w-full rounded-xl border border-slate-200/80 px-3.5 py-2.5 text-sm font-semibold text-slate-800 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-hidden resize-none"></textarea>
+                    </div>
+                </div>
+                
+                <button type="submit" id="submitScheduleBtn" class="mt-5 btn btn-primary w-full py-3.5 flex items-center justify-center gap-2 font-bold cursor-pointer border-0">
+                    <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span>Kirim & Hubungi Penjual</span>
+                </button>
+            </form>
+        </div>
+    </div>
 
     @push('scripts')
         <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
@@ -1133,7 +1173,12 @@
                     updateLightboxSlide();
                 };
 
-                window.closeLightbox = function () {
+                window.closeLightbox = function (e) {
+                    if (e && e.target && typeof e.target.closest === 'function') {
+                        if (e.target.tagName === 'IMG' || e.target.closest('.lightbox-nav-btn')) {
+                            return;
+                        }
+                    }
                     if (lightboxModal) lightboxModal.style.display = 'none';
                 };
 
@@ -1187,6 +1232,78 @@
                     }
                 });
             })();
+
+            // Visit Scheduling JS Functions
+            window.openScheduleModal = function () {
+                const modal = document.getElementById('scheduleModal');
+                if (modal) modal.style.display = 'flex';
+            };
+
+            window.closeScheduleModal = function () {
+                const modal = document.getElementById('scheduleModal');
+                if (modal) modal.style.display = 'none';
+            };
+
+            window.submitSchedule = function (e) {
+                e.preventDefault();
+                const submitBtn = document.getElementById('submitScheduleBtn');
+                const btnText = submitBtn.querySelector('span');
+                const originalText = btnText ? btnText.textContent : 'Kirim & Hubungi Penjual';
+                
+                // Disable button
+                submitBtn.disabled = true;
+                if (btnText) btnText.textContent = 'Mengirim...';
+                
+                const date = document.getElementById('scheduleDate').value;
+                const time = document.getElementById('scheduleTime').value;
+                const note = document.getElementById('scheduleNote').value;
+                
+                fetch('{{ route('properties.schedule', $property->id) }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ date, time, note })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const formattedDate = date.split('-').reverse().join('-');
+                        const propertyTitle = @json($property->title);
+                        const waNumber = @json($waNumber);
+                        
+                        let message = `Halo, saya ingin menjadwalkan kunjungan untuk melihat properti "${propertyTitle}" pada:\n`;
+                        message += `- Tanggal: ${formattedDate}\n`;
+                        message += `- Waktu: ${time} WITA\n`;
+                        if (note.trim() !== '') {
+                            message += `- Catatan: ${note}\n`;
+                        }
+                        message += `\nApakah Anda bersedia? Terima kasih!`;
+                        
+                        if (waNumber) {
+                            const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(message)}`;
+                            window.open(waUrl, '_blank');
+                        } else {
+                            alert('Jadwal kunjungan Anda berhasil dikirim ke Penjual!');
+                        }
+                        
+                        closeScheduleModal();
+                        document.getElementById('scheduleForm').reset();
+                    } else {
+                        alert(data.message || 'Terjadi kesalahan. Silakan coba lagi.');
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    alert('Terjadi kesalahan koneksi. Silakan coba lagi.');
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                    if (btnText) btnText.textContent = originalText;
+                });
+            };
         </script>
     @endpush
 </x-layouts.app>

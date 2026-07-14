@@ -160,6 +160,7 @@ Route::get('/properties', [PropertyController::class, 'browse'])->name('properti
 Route::get('/properties/geojson', [PropertyController::class, 'index'])->name('properties.geojson');
 Route::get('/properties/{property}', [PropertyController::class, 'show'])->name('properties.show');
 Route::post('/properties/{property}/whatsapp-click', [PropertyController::class, 'trackWhatsappClick'])->name('properties.whatsapp-click');
+Route::post('/properties/{property}/schedule', [PropertyController::class, 'scheduleVisit'])->name('properties.schedule');
 Route::get('/sellers/{user}', [ProfileController::class, 'showPublic'])->name('sellers.show');
 
 Route::middleware('auth')->group(function () {

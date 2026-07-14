@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Amenity;
 use App\Models\District;
 use App\Models\MarketDemand;
+use App\Models\Notification;
 use App\Models\Property;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -263,5 +264,30 @@ class PropertyController extends Controller
         $property->increment('whatsapp_clicks_count');
 
         return response()->json(['success' => true]);
+    }
+
+    public function scheduleVisit(Request $request, Property $property): JsonResponse
+    {
+        $request->validate([
+            'date' => 'required|date',
+            'time' => 'required',
+            'note' => 'nullable|string|max:500',
+        ]);
+
+        $buyerName = Auth::check() ? Auth::user()->name : 'Pengunjung (Guest)';
+        $dateFormatted = date('d-m-Y', strtotime($request->date));
+
+        Notification::query()->create([
+            'user_id' => $property->user_id,
+            'title' => 'Jadwal Kunjungan Baru',
+            'message' => "{$buyerName} menjadwalkan kunjungan untuk properti \"{$property->title}\" pada tanggal {$dateFormatted} pukul {$request->time}.".($request->note ? " Catatan: {$request->note}" : ''),
+            'url' => route('properties.show', $property->id),
+            'is_read' => false,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Jadwal kunjungan berhasil disimpan.',
+        ]);
     }
 }
