@@ -21,6 +21,7 @@ use App\Models\District;
 use App\Models\FloodZone;
 use App\Models\Property;
 use App\Models\User;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -149,7 +150,7 @@ Route::get('/explore', function (Request $request) {
     ]);
 })->name('explore');
 
-Route::prefix('api/explore')->group(function () {
+Route::prefix('api/explore')->middleware('throttle:api')->group(function () {
     Route::get('/amenities', [ExploreApiController::class, 'amenities'])->name('api.explore.amenities');
     Route::get('/properties', [ExploreApiController::class, 'properties'])->name('api.explore.properties');
     Route::get('/properties.geojson', [ExploreApiController::class, 'propertiesGeojson'])->name('api.explore.properties.geojson');
@@ -175,12 +176,29 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.store');
+Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login')->name('login.store');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('register.store');
+Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:login')->name('register.store');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::middleware('auth')->prefix('seller')->name('seller.')->group(function () {
+// Email Verification Routes
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect()->route('seller.listings.index')->with('success', 'Email Anda berhasil diverifikasi!');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+
+    return back()->with('success', 'Tautan verifikasi baru telah dikirim!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+Route::middleware(['auth', 'verified'])->prefix('seller')->name('seller.')->group(function () {
     Route::get('/listings/export', [ListingController::class, 'exportCsv'])->name('listings.export');
     Route::get('/listings', [ListingController::class, 'index'])->name('listings.index');
     Route::get('/listings/create', [ListingController::class, 'create'])->name('listings.create');
@@ -199,7 +217,7 @@ Route::middleware('auth')->prefix('seller')->name('seller.')->group(function () 
     Route::post('/listings/import', [ImportController::class, 'store'])->name('listings.import.store');
     Route::get('/listings/import/template', [ImportController::class, 'downloadTemplate'])->name('listings.import.template');
 
-    Route::post('/estimate-price', [EstimationController::class, 'estimate'])->name('estimate-price');
+    Route::post('/estimate-price', [EstimationController::class, 'estimate'])->middleware('throttle:estimation')->name('estimate-price');
 
     Route::get('/competitor-analysis/export/{property}', [CompetitorAnalysisController::class, 'exportCsv'])->name('competitor-analysis.export');
     Route::get('/competitor-analysis', [CompetitorAnalysisController::class, 'index'])->name('competitor-analysis.index');

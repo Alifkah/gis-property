@@ -53,7 +53,7 @@
             <div class="relative">
                 @if ($existingImages->isNotEmpty())
                     <div
-                        class="relative group overflow-hidden rounded-2xl bg-slate-900 shadow-xs aspect-[16/10] sm:h-[400px]">
+                        class="relative group overflow-hidden rounded-2xl bg-slate-900 shadow-xs w-full aspect-[16/10] sm:aspect-[16/9] lg:aspect-[21/10]">
                         {{-- Slider Viewport --}}
                         <div id="gallerySlider" class="flex h-full w-full transition-transform duration-500 ease-out">
                             @foreach ($existingImages as $image)

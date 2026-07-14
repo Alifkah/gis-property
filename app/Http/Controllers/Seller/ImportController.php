@@ -275,9 +275,20 @@ class ImportController extends Controller
                     'bathroom' => isset($row['kamar_mandi']) && $row['kamar_mandi'] !== '' ? (int) $row['kamar_mandi'] : 0,
                     'status' => 'Tersedia',
                     'geom' => $isPgsql
-                        ? DB::raw("ST_SetSRID(ST_MakePoint({$lng}, {$lat}), 4326)")
-                        : "POINT({$lng} {$lat})",
+                        ? DB::raw('ST_SetSRID(ST_MakePoint(117.15, -0.5), 4326)')
+                        : 'POINT(117.15 -0.5)',
                 ]);
+
+                if ($isPgsql) {
+                    DB::update(
+                        'UPDATE properties SET geom = ST_SetSRID(ST_MakePoint(?, ?), 4326) WHERE id = ?',
+                        [$lng, $lat, $property->id]
+                    );
+                } else {
+                    $property->update([
+                        'geom' => "POINT({$lng} {$lat})",
+                    ]);
+                }
 
                 PropertyAlert::checkAndNotify($property);
             }
