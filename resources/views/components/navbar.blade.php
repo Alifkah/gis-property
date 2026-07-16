@@ -14,9 +14,9 @@
     @keydown.escape.window="mobileMenuOpen = false">
     
     <div class="flex h-16 lg:h-[72px] w-full items-center justify-between gap-3 px-6 sm:px-10 lg:px-16 xl:px-24">
-        {{-- Logo (Max height 40px / h-10) --}}
+        {{-- Logo (Max height 80px / h-16 sm:h-20) --}}
         <a href="{{ route('home') }}" class="flex items-center shrink-0 group">
-            <img src="{{ asset('images/logo.png') }}" alt="Samarinda Properti Logo" class="h-10 w-auto transition-transform duration-300 group-hover:scale-105" />
+            <img src="{{ asset('images/logo.png') }}" alt="Samarinda Properti Logo" class="h-16 sm:h-20 w-auto transition-transform duration-300 group-hover:scale-105" />
         </a>
 
         {{-- Desktop Nav --}}

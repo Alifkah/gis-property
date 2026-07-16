@@ -19,7 +19,7 @@
 
             <!-- Sidebar -->
             <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-                   class="fixed inset-y-0 left-0 z-[1045] w-[260px] max-w-[85vw] bg-white border-r border-slate-200/60 transform transition-transform duration-300 ease-out lg:static lg:translate-x-0 lg:w-[260px] lg:h-screen lg:sticky lg:top-0 overflow-y-auto rounded-r-2xl lg:rounded-none flex flex-col justify-between shrink-0">
+                   class="fixed inset-y-0 left-0 z-[1045] w-[260px] max-w-[85vw] bg-white border-r border-slate-200/60 transform transition-transform duration-300 ease-out lg:static lg:translate-x-0 lg:w-[260px] lg:h-screen lg:sticky lg:top-0 overflow-y-auto rounded-r-2xl lg:rounded-2xl lg:border lg:border-slate-200/60 flex flex-col justify-between shrink-0">
                 
                 <div class="flex flex-col h-full justify-between">
                     <div>

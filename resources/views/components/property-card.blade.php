@@ -67,19 +67,23 @@
                     type="button"
                     data-favorite-id="{{ $property->id }}"
                     onclick="toggleFavorite(this, {{ $property->id }})"
-                    class="fav-btn grid size-9 place-items-center rounded-full shadow-sm transition-all duration-200 cursor-pointer hover:scale-110 active:scale-90
-                           {{ $isFavorited ? 'bg-rose-500 text-white ring-1 ring-rose-400' : 'bg-white/95 text-slate-700 hover:bg-rose-50 hover:text-rose-500' }}"
+                    class="fav-btn grid size-9 place-items-center rounded-full shadow-sm transition-all duration-200 cursor-pointer hover:scale-110 active:scale-90 bg-white/90 hover:bg-rose-50
+                           {{ $isFavorited ? 'text-rose-500' : 'text-slate-700 hover:text-rose-500' }}"
                     title="{{ $isFavorited ? 'Hapus dari favorit' : 'Simpan ke favorit' }}"
                 >
-                    <i class="{{ $isFavorited ? 'ti ti-heart-filled text-white text-base' : 'ti ti-heart text-slate-700 text-base' }}"></i>
+                    <svg class="size-5" viewBox="0 0 24 24" fill="{{ $isFavorited ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+                    </svg>
                 </button>
             @else
                 <a
                     href="{{ route('login') }}"
-                    class="grid size-9 place-items-center rounded-full bg-white/95 text-slate-700 shadow-sm transition-all hover:scale-110 hover:bg-rose-50 hover:text-rose-500"
+                    class="grid size-9 place-items-center rounded-full bg-white/90 text-slate-700 shadow-sm transition-all hover:scale-110 hover:bg-rose-50 hover:text-rose-500"
                     title="Login untuk menyimpan"
                 >
-                    <i class="ti ti-heart text-slate-700 text-base"></i>
+                    <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8Z" />
+                    </svg>
                 </a>
             @endauth
         </div>
@@ -131,16 +135,16 @@
                 })
                 .then(r => r.json())
                 .then(data => {
-                    const icon = btn.querySelector('i');
+                    const svg = btn.querySelector('svg');
                     if (data.favorited) {
-                        btn.classList.add('bg-rose-500', 'text-white', 'ring-rose-400');
-                        btn.classList.remove('bg-white/95', 'text-slate-700', 'hover:bg-rose-50', 'hover:text-rose-500');
-                        icon.className = 'ti ti-heart-filled text-white text-base';
+                        btn.classList.add('text-rose-500');
+                        btn.classList.remove('text-slate-700', 'hover:text-rose-500');
+                        svg.setAttribute('fill', 'currentColor');
                         btn.title = 'Hapus dari favorit';
                     } else {
-                        btn.classList.remove('bg-rose-500', 'text-white', 'ring-rose-400');
-                        btn.classList.add('bg-white/95', 'text-slate-700', 'hover:bg-rose-50', 'hover:text-rose-500');
-                        icon.className = 'ti ti-heart text-slate-700 text-base';
+                        btn.classList.remove('text-rose-500');
+                        btn.classList.add('text-slate-700', 'hover:text-rose-500');
+                        svg.setAttribute('fill', 'none');
                         btn.title = 'Simpan ke favorit';
                     }
                 })
