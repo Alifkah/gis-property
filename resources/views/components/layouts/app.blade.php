@@ -10,7 +10,8 @@
         @fonts
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
 
         <style>[x-cloak]{display:none!important}</style>
 
@@ -44,24 +45,18 @@
             }
 
             @media print {
-                /* Hide headers, footers, navigation, sidebars, buttons */
                 nav, aside, header, footer, button, .btn, .print\:hidden, #clearCenter, #applyFilters, #layerControlPanel, .modal-overlay {
                     display: none !important;
                 }
-                
-                /* Reset grid columns to stack nicely */
                 .grid {
                     display: block !important;
                 }
-                
-                /* Reset standard containers */
                 main {
                     padding: 0 !important;
                     margin: 0 !important;
                     max-width: 100% !important;
                     width: 100% !important;
                 }
-                
                 .card {
                     border: none !important;
                     box-shadow: none !important;
@@ -69,8 +64,6 @@
                     margin-bottom: 2rem !important;
                     page-break-inside: avoid;
                 }
-                
-                /* Ensure maps print nicely */
                 #map, .leaflet-container {
                     height: 400px !important;
                     width: 100% !important;
@@ -87,103 +80,152 @@
     </head>
     <body>
         {{-- Loading Screen --}}
-        <div id="global-loader" class="fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-[#FAF7F2] transition-opacity duration-300">
-            <div class="flex flex-col items-center gap-4">
-                <div class="grid size-16 place-items-center rounded-2xl bg-[#0F4C5C] text-white shadow-lg shadow-[#0F4C5C]/20 animate-bounce">
+        <div id="global-loader" class="fixed inset-0 z-[99999] flex items-center justify-center bg-[#FAF7F2] transition-opacity duration-300">
+            <div class="flex flex-col items-center justify-center">
+                <div class="grid size-16 place-items-center rounded-2xl bg-[#0F4C5C] text-white shadow-lg shadow-[#0F4C5C]/20 animate-pulse">
                     <span class="text-2xl font-black tracking-wider font-display">SP</span>
                 </div>
-                <div class="w-36 h-1.5 bg-slate-200 rounded-full overflow-hidden relative">
-                    <div class="absolute inset-y-0 left-0 bg-[#E36414] rounded-full w-24 animate-loading-bar"></div>
-                </div>
-                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 animate-pulse">Memuat Aplikasi...</span>
             </div>
         </div>
 
         <div class="min-h-dvh flex flex-col">
             <x-navbar />
 
+            {{-- Floating Flash Notifications (Toast) --}}
+            <div class="fixed top-24 right-6 z-[9999] flex flex-col gap-3 w-full max-w-sm pointer-events-none">
+                @if (session('success'))
+                    <div
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-init="setTimeout(() => show = false, 5000)"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-x-12 scale-95"
+                        x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-x-0"
+                        x-transition:leave-end="opacity-0 translate-x-12"
+                        class="pointer-events-auto flex items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-xl border border-emerald-100 ring-1 ring-emerald-500/10"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span class="grid size-9 place-items-center rounded-xl bg-emerald-50 text-emerald-600">
+                                <i class="ti ti-circle-check text-xl"></i>
+                            </span>
+                            <div class="min-w-0">
+                                <div class="text-xs font-black text-slate-900 uppercase">Sukses</div>
+                                <div class="text-[11px] text-slate-500 font-semibold mt-0.5 leading-normal">{{ session('success') }}</div>
+                            </div>
+                        </div>
+                        <button @click="show = false" class="shrink-0 text-slate-400 hover:text-slate-600 cursor-pointer">
+                            <i class="ti ti-x text-base"></i>
+                        </button>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div
+                        x-data="{ show: true }"
+                        x-show="show"
+                        x-init="setTimeout(() => show = false, 5000)"
+                        x-transition:enter="transition ease-out duration-300"
+                        x-transition:enter-start="opacity-0 translate-x-12 scale-95"
+                        x-transition:enter-end="opacity-100 translate-x-0 scale-100"
+                        x-transition:leave="transition ease-in duration-200"
+                        x-transition:leave-start="opacity-100 translate-x-0"
+                        x-transition:leave-end="opacity-0 translate-x-12"
+                        class="pointer-events-auto flex items-center justify-between gap-3 rounded-2xl bg-white p-4 shadow-xl border border-rose-100 ring-1 ring-rose-500/10"
+                    >
+                        <div class="flex items-center gap-3">
+                            <span class="grid size-9 place-items-center rounded-xl bg-rose-50 text-rose-600">
+                                <i class="ti ti-alert-circle text-xl"></i>
+                            </span>
+                            <div class="min-w-0">
+                                <div class="text-xs font-black text-slate-900 uppercase">Error</div>
+                                <div class="text-[11px] text-slate-500 font-semibold mt-0.5 leading-normal">{{ session('error') }}</div>
+                            </div>
+                        </div>
+                        <button @click="show = false" class="shrink-0 text-slate-400 hover:text-slate-600 cursor-pointer">
+                            <i class="ti ti-x text-base"></i>
+                        </button>
+                    </div>
+                @endif
+            </div>
+
             <main class="w-full px-6 py-6 sm:px-10 sm:py-8 lg:px-16 xl:px-24" style="padding-bottom: max(2rem, env(safe-area-inset-bottom))">
                 {{ $slot }}
             </main>
 
             {{-- Footer --}}
-            <footer class="bg-slate-100 text-slate-600 border-t border-slate-200 mt-auto">
+            <footer class="bg-slate-950 text-slate-400 mt-auto relative overflow-hidden">
+                <div class="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-brand-primary via-brand-accent to-brand-primary"></div>
                 <div class="w-full px-6 py-12 sm:px-10 lg:px-16 xl:px-24">
-                    <div class="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
-                        {{-- Brand Column --}}
+                    <div class="grid gap-12 md:grid-cols-3">
+                        {{-- Col 1: Brand Column --}}
                         <div class="space-y-4">
                             <a href="{{ route('home') }}" class="flex items-center shrink-0 group">
-                                <img src="{{ asset('images/logo.png') }}" alt="Samarinda Properti Logo" class="h-20 w-auto transition-transform duration-300 group-hover:scale-105" />
+                                <img src="{{ asset('images/logo.png') }}" alt="Samarinda Properti Logo" class="h-16 w-auto brightness-0 invert transition-transform duration-300 group-hover:scale-105" />
                             </a>
-                            <p class="text-xs leading-relaxed text-slate-500">
+                            <p class="text-xs leading-relaxed text-slate-400">
                                 Platform pencarian properti pertama di Kota Samarinda yang mengintegrasikan informasi spasial geospasial dengan pemetaan wilayah bebas banjir secara real-time.
                             </p>
                         </div>
 
-                        {{-- Nav Links --}}
-                        <div>
-                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Navigasi Utama</h3>
-                            <ul class="space-y-2 text-xs font-medium">
-                                <li><a href="{{ route('home') }}" class="hover:text-brand-primary transition">Beranda</a></li>
-                                <li><a href="{{ route('properties.index') }}" class="hover:text-brand-primary transition">Katalog Properti</a></li>
-                                <li><a href="{{ route('explore') }}" class="hover:text-brand-primary transition">Eksplorasi Peta</a></li>
-                                <li><a href="{{ route('seller.listings.create') }}" class="hover:text-brand-primary transition">Pasang Iklan Baru</a></li>
-                            </ul>
+                        {{-- Col 2: Navigation & Features Combined Links --}}
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-4 font-mono">Tautan</h3>
+                                <ul class="space-y-2 text-xs font-medium">
+                                    <li><a href="{{ route('home') }}" class="hover:text-white transition">Beranda</a></li>
+                                    <li><a href="{{ route('properties.index') }}" class="hover:text-white transition">Katalog</a></li>
+                                    <li><a href="{{ route('explore') }}" class="hover:text-white transition">Peta Eksplorasi</a></li>
+                                    <li><a href="{{ route('seller.listings.create') }}" class="hover:text-white transition">Pasang Iklan</a></li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-4 font-mono">Fitur GIS</h3>
+                                <ul class="space-y-2 text-xs font-medium text-slate-400">
+                                    <li class="flex items-center gap-1.5">
+                                        <span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                        <span>Bebas Banjir</span>
+                                    </li>
+                                    <li class="flex items-center gap-1.5">
+                                        <span class="size-1.5 rounded-full bg-brand-accent"></span>
+                                        <span>Rute Terdekat</span>
+                                    </li>
+                                    <li class="flex items-center gap-1.5">
+                                        <span class="size-1.5 rounded-full bg-blue-500"></span>
+                                        <span>Administrasi</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
-                        {{-- Spatial features --}}
-                        <div>
-                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Fitur Spasial</h3>
-                            <ul class="space-y-2.5 text-xs font-semibold">
-                                <li class="flex items-center gap-1.5">
-                                    <span class="size-1.5 rounded-full bg-emerald-500"></span>
-                                    <span>Zona Bebas Banjir</span>
-                                </li>
-                                <li class="flex items-center gap-1.5">
-                                    <span class="size-1.5 rounded-full bg-[#E36414]"></span>
-                                    <span>Rute Fasilitas Terdekat</span>
-                                </li>
-                                <li class="flex items-center gap-1.5">
-                                    <span class="size-1.5 rounded-full bg-blue-500"></span>
-                                    <span>Batas Administrasi Kecamatan</span>
-                                </li>
-                            </ul>
-                        </div>
-
-                        {{-- Contacts --}}
-                        <div>
-                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider mb-4">Hubungi Kami</h3>
+                        {{-- Col 3: Contacts --}}
+                        <div class="space-y-4">
+                            <h3 class="text-xs font-bold text-white uppercase tracking-wider font-mono">Hubungi Kami</h3>
                             <ul class="space-y-2.5 text-xs font-semibold">
                                 <li class="flex items-center gap-2">
-                                    <svg class="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
+                                    <i class="ti ti-map-pin text-slate-400 text-base"></i>
                                     <span>Samarinda, Kalimantan Timur</span>
                                 </li>
                                 <li class="flex items-center gap-2">
-                                    <svg class="size-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
+                                    <i class="ti ti-mail text-slate-400 text-base"></i>
                                     <span class="truncate">support@samarindaproperti.gis</span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
-                    <div class="mt-8 pt-8 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
-                        <p class="text-[10px] text-slate-400">&copy; {{ date('Y') }} Samarinda Properti GIS. Hak Cipta Dilindungi.</p>
-                        <p class="text-[10px] text-slate-400">Dibuat dengan dedikasi untuk tata kota Samarinda yang cerdas.</p>
+                    <div class="mt-12 pt-8 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p class="text-[10px] text-slate-500 font-mono">&copy; {{ date('Y') }} Samarinda Properti GIS. Hak Cipta Dilindungi.</p>
+                        <p class="text-[10px] text-slate-500 font-mono">Dibuat dengan dedikasi untuk kota Samarinda yang cerdas.</p>
                     </div>
                 </div>
             </footer>
         </div>
 
         {{-- Scroll to Top Button --}}
-        <button id="scrollToTopBtn" type="button" class="fixed bottom-6 right-6 z-[1000] size-11 rounded-full bg-[#0F4C5C] text-white shadow-lg shadow-[#0F4C5C]/20 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 pointer-events-none hover:bg-[#0b3945] hover:-translate-y-1 hover:shadow-xl cursor-pointer border-0">
-            <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-            </svg>
+        <button id="scrollToTopBtn" type="button" class="fixed bottom-6 right-6 z-[1000] size-10 rounded-full bg-brand-primary/90 backdrop-blur-md text-white shadow-lg shadow-brand-primary/20 flex items-center justify-center transition-all duration-300 opacity-0 translate-y-4 pointer-events-none hover:bg-brand-primary hover:-translate-y-1 hover:shadow-xl cursor-pointer border-0">
+            <i class="ti ti-chevron-up text-lg"></i>
         </button>
 
         @stack('scripts')
@@ -205,10 +247,10 @@
                 }
             });
 
-            // Loading Screen Handler with Minimum Duration (1200ms)
+            // Loading Screen Handler with Minimum Duration (500ms)
             window.addEventListener('load', function() {
                 const elapsedTime = Date.now() - _loaderStartTime;
-                const minDuration = 1200;
+                const minDuration = 500;
                 const remainingTime = Math.max(0, minDuration - elapsedTime);
 
                 setTimeout(function() {
@@ -242,4 +284,3 @@
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script>
     </body>
 </html>
-

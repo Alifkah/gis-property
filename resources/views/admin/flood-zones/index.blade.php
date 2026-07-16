@@ -1,99 +1,180 @@
 <x-layouts.admin>
-    <div class="card overflow-hidden">
-        {{-- Header --}}
-        <div class="p-6 border-b border-slate-100 flex flex-wrap items-center justify-between gap-4">
+    <div class="space-y-6" x-data="floodZonesPage()">
+        {{-- Page Header --}}
+        <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
-                <h1 class="text-sm font-bold text-slate-900">Kawasan Rawan Banjir</h1>
-                <p class="mt-1 text-xs text-slate-500">Kelola polygon area genangan air untuk mengidentifikasi tingkat kerawanan banjir properti secara otomatis.</p>
+                <h1 class="text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
+                    <span>Zona Rawan Banjir</span>
+                    <span class="bg-brand-primary/10 text-brand-primary text-xs font-bold px-2.5 py-0.5 rounded-full">
+                        {{ count($floodZones) }} Wilayah
+                    </span>
+                </h1>
+                <p class="mt-1.5 text-xs font-semibold text-slate-500">Kelola polygon area genangan air untuk mengidentifikasi tingkat kerawanan banjir properti secara otomatis.</p>
             </div>
-            <a href="{{ route('admin.flood-zones.create') }}" class="btn btn-primary cursor-pointer">+ Tambah Zona</a>
+            <a href="{{ route('admin.flood-zones.create') }}" class="btn btn-primary text-xs font-bold flex items-center gap-1 border-0 py-2.5 shadow-xs cursor-pointer">
+                <i class="ti ti-plus text-sm"></i>
+                <span>Tambah Zona</span>
+            </a>
         </div>
 
-        {{-- Table Container --}}
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+        {{-- Flash notifications --}}
+        @if (session('success'))
+            <div class="flex items-center gap-3 rounded-2xl bg-emerald-50 px-4 py-3.5 text-xs font-bold text-emerald-700 border border-emerald-100 shadow-2xs">
+                <i class="ti ti-circle-check text-emerald-600 text-lg shrink-0"></i>
+                <span>{{ session('success') }}</span>
+            </div>
+        @endif
+
+        {{-- Search bar --}}
+        <div class="flex items-center bg-white p-3.5 rounded-2xl border border-slate-200/50 shadow-sm">
+            <div class="relative w-full">
+                <div class="absolute inset-y-0 left-3 flex items-center text-slate-400 pointer-events-none">
+                    <i class="ti ti-search text-base"></i>
+                </div>
+                <input type="text" x-model="searchQuery" @input="currentPage = 1" placeholder="Cari berdasarkan nama kawasan atau risiko..." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-9.5 pr-4 text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-hidden focus:border-brand-primary focus:ring-1 focus:ring-brand-primary" />
+            </div>
+        </div>
+
+        {{-- Desktop Table --}}
+        <div class="overflow-hidden bg-white rounded-2xl border border-slate-200/50 shadow-sm">
+            <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                    <tr class="bg-slate-50/75 border-b border-slate-100">
-                        <th class="px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Nama Area / Kawasan</th>
-                        <th class="px-6 py-3.5 text-left text-xs font-bold uppercase tracking-wider text-slate-400">Tingkat Risiko</th>
-                        <th class="px-6 py-3.5 text-right text-xs font-bold uppercase tracking-wider text-slate-400">Aksi</th>
+                    <tr class="bg-slate-50 border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                        <th class="px-6 py-4">Nama Area / Kawasan</th>
+                        <th class="px-6 py-4">Tingkat Risiko</th>
+                        <th class="px-6 py-4 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100/75">
-                    @forelse ($floodZones as $zone)
-                        <tr class="group hover:bg-slate-50/50 transition-colors">
-                            <td class="px-6 py-4 font-bold text-slate-900">{{ $zone->area_name }}</td>
+                <tbody class="divide-y divide-slate-100">
+                    <template x-for="z in paginatedZones" :key="z.id">
+                        <tr class="hover:bg-slate-50/50 transition duration-150">
+                            <td class="px-6 py-4 font-bold text-slate-900" x-text="z.area_name"></td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                @php
-                                    $riskColors = [
-                                        'Tinggi' => 'bg-rose-50 text-rose-700 ring-rose-200/70',
-                                        'Sedang' => 'bg-amber-50 text-amber-700 ring-amber-200/70',
-                                        'Rendah' => 'bg-sky-50 text-sky-700 ring-sky-200/70',
-                                    ];
-                                    $colorClass = $riskColors[$zone->risk_level] ?? 'bg-slate-50 text-slate-700 ring-slate-200/70';
-                                @endphp
-                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 {{ $colorClass }}">
-                                    {{ $zone->risk_level }}
-                                </span>
+                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider border" :class="badgeClass(z.risk_level)" x-text="z.risk_level"></span>
                             </td>
                             <td class="px-6 py-4 text-right whitespace-nowrap">
-                                <div class="inline-flex items-center gap-2">
-                                    <a href="{{ route('admin.flood-zones.edit', $zone->id) }}" class="btn btn-outline text-xs px-2.5 py-1.5 border-slate-200 text-slate-700 hover:bg-slate-50">
-                                        Edit
+                                <div class="inline-flex items-center gap-1.5">
+                                    <a :href="z.edit_url" class="grid size-8 place-items-center rounded-xl bg-slate-50 border border-slate-200/50 text-slate-600 hover:bg-slate-100 transition shadow-3xs" title="Edit Kawasan">
+                                        <i class="ti ti-edit text-base"></i>
                                     </a>
-                                    <button
-                                        type="button"
-                                        onclick="openModal('del-zone-{{ $zone->id }}')"
-                                        class="btn btn-outline text-xs px-2.5 py-1.5 border-slate-200 text-rose-600 hover:border-rose-200 hover:bg-rose-50 cursor-pointer"
-                                    >
-                                        Hapus
+                                    <button type="button" @click="confirmDelete(z.id, z.area_name, z.delete_url)" class="grid size-8 place-items-center rounded-xl bg-rose-50 border border-rose-100 text-rose-600 hover:bg-rose-100 hover:border-rose-200 transition shadow-3xs cursor-pointer" title="Hapus Kawasan">
+                                        <i class="ti ti-trash text-base"></i>
                                     </button>
                                 </div>
-
-                                {{-- Delete Modal --}}
-                                <div id="del-zone-{{ $zone->id }}" class="modal-overlay">
-                                    <div class="modal-box text-left max-w-md">
-                                        <div class="flex items-center gap-3">
-                                            <div class="grid size-10 shrink-0 place-items-center rounded-full bg-rose-50 text-rose-600">
-                                                <svg class="size-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                </svg>
-                                            </div>
-                                            <div>
-                                                <div class="text-base font-bold text-slate-900">Hapus Zona Rawan Banjir?</div>
-                                                <div class="text-xs text-slate-400 mt-0.5">Tindakan ini tidak dapat dibatalkan.</div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="mt-4 text-sm text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                            Apakah Anda yakin ingin menghapus zona rawan banjir <span class="font-bold text-slate-900">"{{ $zone->area_name }}"</span>? Properti yang berada di dalam lingkup wilayah ini tidak akan lagi ditandai rawan banjir.
-                                        </div>
-                                        
-                                        <div class="mt-5 flex gap-3">
-                                            <button
-                                                type="button"
-                                                onclick="closeModal('del-zone-{{ $zone->id }}')"
-                                                class="btn btn-outline flex-1 cursor-pointer"
-                                            >Batal</button>
-                                            <form method="POST" action="{{ route('admin.flood-zones.destroy', $zone->id) }}" class="flex-1">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn w-full bg-rose-600 text-white hover:bg-rose-700 cursor-pointer">Ya, Hapus</button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
                             </td>
                         </tr>
-                    @empty
+                    </template>
+                    <template x-if="filteredZones.length === 0">
                         <tr>
-                            <td colspan="3" class="px-6 py-12 text-center text-sm font-semibold text-slate-400">
-                                Belum ada zona rawan banjir yang digambar. Klik tombol di atas untuk membuat polygon baru.
+                            <td colspan="3" class="px-6 py-12 text-center text-slate-400 font-semibold bg-white">
+                                <i class="ti ti-info-circle text-2xl text-slate-300 mb-2 block"></i>
+                                Tidak ada zona rawan banjir ditemukan.
                             </td>
                         </tr>
-                    @endforelse
+                    </template>
                 </tbody>
             </table>
         </div>
+
+        {{-- Custom Pagination --}}
+        <template x-if="totalPages > 1">
+            <div class="mt-4 flex items-center justify-between border-t border-slate-200/60 pt-4">
+                <button type="button" @click="currentPage = Math.max(1, currentPage - 1)" :disabled="currentPage === 1" class="btn btn-outline py-2 px-3 text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+                    <i class="ti ti-chevron-left text-sm"></i>
+                    <span>Sebelumnya</span>
+                </button>
+                <div class="text-xs font-bold text-slate-600">
+                    Halaman <span x-text="currentPage"></span> dari <span x-text="totalPages"></span>
+                </div>
+                <button type="button" @click="currentPage = Math.min(totalPages, currentPage + 1)" :disabled="currentPage === totalPages" class="btn btn-outline py-2 px-3 text-xs font-bold flex items-center gap-1 cursor-pointer disabled:opacity-40 disabled:pointer-events-none">
+                    <span>Selanjutnya</span>
+                    <i class="ti ti-chevron-right text-sm"></i>
+                </button>
+            </div>
+        </template>
+
+        {{-- Delete Confirmation Modal --}}
+        <div id="deleteConfirmModal" style="display:none;" x-show="deleteModalOpen" x-cloak class="fixed inset-0 z-[2000] items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs flex" @click="deleteModalOpen = false">
+            <div class="bg-white rounded-3xl shadow-xl max-w-md w-full p-6 relative ring-1 ring-slate-100 animate-in fade-in zoom-in-95 duration-200" @click.stopPropagation()>
+                <button type="button" @click="deleteModalOpen = false" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 cursor-pointer bg-transparent border-0">
+                    <i class="ti ti-x text-lg"></i>
+                </button>
+                
+                <div class="flex items-center gap-3">
+                    <div class="grid size-10 shrink-0 place-items-center rounded-full bg-rose-50 text-rose-600">
+                        <i class="ti ti-alert-triangle text-xl"></i>
+                    </div>
+                    <div>
+                        <div class="text-base font-bold text-slate-900">Hapus Zona Rawan Banjir?</div>
+                        <div class="text-xs text-slate-400 mt-0.5">Tindakan ini tidak dapat dibatalkan.</div>
+                    </div>
+                </div>
+                
+                <div class="mt-4 text-xs font-semibold text-slate-600 bg-slate-50 p-3.5 rounded-xl border border-slate-100/50 leading-relaxed">
+                    Apakah Anda yakin ingin menghapus zona rawan banjir <span class="font-extrabold text-slate-900" x-text="deleteName"></span>? Kawasan properti di sekitar tidak akan lagi ditandai rawan banjir pada halaman detail properti.
+                </div>
+                
+                <div class="mt-5 flex gap-3">
+                    <button type="button" @click="deleteModalOpen = false" class="btn btn-outline flex-1 cursor-pointer">Batal</button>
+                    <form method="POST" :action="deleteAction" class="flex-1">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn w-full bg-rose-600 text-white hover:bg-rose-700 cursor-pointer border-0 font-bold">Ya, Hapus</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
+
+    @push('scripts')
+        <script>
+            function floodZonesPage() {
+                return {
+                    searchQuery: '',
+                    currentPage: 1,
+                    itemsPerPage: 10,
+                    deleteModalOpen: false,
+                    deleteZoneId: null,
+                    deleteName: '',
+                    deleteAction: '',
+                    zones: [
+                        @foreach ($floodZones as $z)
+                            {
+                                id: {{ $z->id }},
+                                area_name: {!! json_encode($z->area_name) !!},
+                                risk_level: '{{ $z->risk_level }}',
+                                edit_url: '{{ route('admin.flood-zones.edit', $z->id) }}',
+                                delete_url: '{{ route('admin.flood-zones.destroy', $z->id) }}'
+                            },
+                        @endforeach
+                    ],
+                    get filteredZones() {
+                        return this.zones.filter(z => {
+                            return z.area_name.toLowerCase().includes(this.searchQuery.toLowerCase()) || 
+                                   z.risk_level.toLowerCase().includes(this.searchQuery.toLowerCase());
+                        });
+                    },
+                    get paginatedZones() {
+                        const start = (this.currentPage - 1) * this.itemsPerPage;
+                        return this.filteredZones.slice(start, start + this.itemsPerPage);
+                    },
+                    get totalPages() {
+                        return Math.ceil(this.filteredZones.length / this.itemsPerPage) || 1;
+                    },
+                    confirmDelete(id, name, action) {
+                        this.deleteZoneId = id;
+                        this.deleteName = name;
+                        this.deleteAction = action;
+                        this.deleteModalOpen = true;
+                    },
+                    badgeClass(level) {
+                        if (level === 'Tinggi') return 'bg-rose-50 text-rose-700 border-rose-100';
+                        if (level === 'Sedang') return 'bg-amber-50 text-amber-700 border-amber-100';
+                        if (level === 'Rendah') return 'bg-emerald-50 text-emerald-700 border-emerald-100';
+                        return 'bg-slate-50 text-slate-700 border-slate-200';
+                    }
+                };
+            }
+        </script>
+    @endpush
 </x-layouts.admin>

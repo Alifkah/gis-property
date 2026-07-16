@@ -1,113 +1,156 @@
 <x-layouts.seller>
+    <div class="max-w-2xl mx-auto">
+        {{-- Step Indicator --}}
+        <div class="flex items-center justify-center gap-3 sm:gap-4 mb-8">
+            <div class="flex items-center gap-2 shrink-0">
+                <span class="grid size-8 place-items-center rounded-full bg-brand-primary text-white text-xs font-bold ring-4 ring-brand-primary/10">1</span>
+                <span class="text-xs font-bold text-slate-900">Data Properti</span>
+            </div>
+            <div class="h-0.5 w-12 sm:w-16 bg-slate-200 shrink-0"></div>
+            <div class="flex items-center gap-2 shrink-0">
+                <span class="grid size-8 place-items-center rounded-full bg-slate-200 text-slate-500 text-xs font-bold">2</span>
+                <span class="text-xs font-bold text-slate-400">Lokasi Spasial</span>
+            </div>
+        </div>
 
-        <section class="card p-6">
-            <div class="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                    <div class="text-sm font-extrabold text-slate-900">Tambah Listing</div>
-                    <div class="mt-1 text-sm text-slate-600">Lengkapi data properti sebelum menentukan lokasi spasial.</div>
-                </div>
-                <div class="flex items-center gap-2 text-xs font-extrabold">
-                    <span class="grid size-8 place-items-center rounded-full bg-brand-primary text-white">1</span>
-                    <span class="text-slate-600">Data Properti</span>
-                    <span class="h-0.5 w-8 rounded bg-slate-200"></span>
-                    <span class="grid size-8 place-items-center rounded-full bg-slate-200 text-slate-600">2</span>
-                    <span class="text-slate-500">Lokasi Spasial</span>
-                </div>
+        {{-- Form Card --}}
+        <section class="card p-6 bg-white border border-slate-200/50 shadow-sm overflow-hidden mb-12">
+            <div class="mb-6">
+                <h1 class="text-lg font-extrabold text-slate-950 font-display">Tambah Properti Baru</h1>
+                <p class="text-xs font-semibold text-slate-500 mt-1">Lengkapi data properti Anda sebelum menentukan koordinat lokasi di peta.</p>
             </div>
 
-            <form method="POST" action="{{ route('seller.listings.store') }}" enctype="multipart/form-data" class="mt-6 grid gap-4">
+            <form method="POST" action="{{ route('seller.listings.store') }}" enctype="multipart/form-data" class="space-y-6">
                 @csrf
-                <div>
-                    <label class="text-xs font-semibold text-slate-600">Judul Listing</label>
-                    <input name="title" type="text" class="input mt-1" value="{{ old('title') }}" placeholder="Contoh: Rumah Minimalis Samarinda Ulu" required />
-                    @error('title')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="grid gap-4 md:grid-cols-2">
+                
+                {{-- Section 1: Informasi Dasar --}}
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                        <i class="ti ti-info-circle text-brand-primary"></i>
+                        <span>Informasi Dasar</span>
+                    </h3>
+                    
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Tipe Properti</label>
-                        <select name="type" class="select mt-1" required>
-                            @foreach (['Rumah', 'Tanah', 'Ruko', 'Apartemen'] as $type)
-                                <option value="{{ $type }}" @selected(old('type', 'Rumah') === $type)>{{ $type }}</option>
-                            @endforeach
-                        </select>
-                        @error('type')
+                        <label class="text-xs font-bold text-slate-700 block mb-1.5">Judul Listing <span class="text-rose-500">*</span></label>
+                        <input name="title" type="text" class="input" value="{{ old('title') }}" placeholder="Contoh: Rumah Minimalis Modern Bukit Mediterania" required />
+                        @error('title')
                             <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
                         @enderror
                     </div>
+
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 block mb-1.5">Tipe Properti <span class="text-rose-500">*</span></label>
+                            <select name="type" class="select" required>
+                                @foreach (['Rumah', 'Tanah', 'Ruko', 'Apartemen'] as $type)
+                                    <option value="{{ $type }}" @selected(old('type', 'Rumah') === $type)>{{ $type }}</option>
+                                @endforeach
+                            </select>
+                            @error('type')
+                                <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 block mb-1.5">Harga Penawaran (IDR) <span class="text-rose-500">*</span></label>
+                            <input id="price_display" type="text" class="input" placeholder="Contoh: 750.000.000" required />
+                            <input id="price_real" name="price" type="hidden" value="{{ old('price') }}" />
+                            @error('price')
+                                <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 2: Detail Properti --}}
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                        <i class="ti ti-home text-brand-primary"></i>
+                        <span>Detail Spesifikasi</span>
+                    </h3>
+
+                    <div class="grid gap-4 grid-cols-2">
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 block mb-1.5">Luas Tanah (m²) <span class="text-rose-500">*</span></label>
+                            <input name="land_area" type="number" class="input" value="{{ old('land_area') }}" placeholder="120" min="1" required />
+                            @error('land_area')
+                                <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 block mb-1.5">Luas Bangunan (m²) <span class="text-slate-400">(Opsional)</span></label>
+                            <input name="building_area" type="number" class="input" value="{{ old('building_area', 0) }}" placeholder="90" min="0" />
+                            @error('building_area')
+                                <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+
+                    <div class="grid gap-4 grid-cols-2">
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 block mb-1.5">Kamar Tidur <span class="text-slate-400">(Opsional)</span></label>
+                            <input name="bedroom" type="number" class="input" value="{{ old('bedroom', 0) }}" placeholder="3" min="0" />
+                            @error('bedroom')
+                                <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-700 block mb-1.5">Kamar Mandi <span class="text-slate-400">(Opsional)</span></label>
+                            <input name="bathroom" type="number" class="input" value="{{ old('bathroom', 0) }}" placeholder="2" min="0" />
+                            @error('bathroom')
+                                <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Section 3: Deskripsi --}}
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                        <i class="ti ti-file-text text-brand-primary"></i>
+                        <span>Deskripsi Properti</span>
+                    </h3>
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">Harga (IDR)</label>
-                        <input id="price_display" type="text" class="input mt-1" placeholder="500.000.000" required />
-                        <input id="price_real" name="price" type="hidden" value="{{ old('price') }}" />
-                        @error('price')
+                        <textarea name="description" rows="4" class="input resize-none" placeholder="Tuliskan spesifikasi lengkap, kelebihan lokasi, ketersediaan sertifikat (SHM/HGB), serta akses jalan masuk mobil...">{{ old('description') }}</textarea>
+                        @error('description')
                             <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
-                <div class="grid gap-3 sm:grid-cols-4">
+                {{-- Section 4: Foto Properti --}}
+                <div class="space-y-4">
+                    <h3 class="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                        <i class="ti ti-photo text-brand-primary"></i>
+                        <span>Foto Properti</span>
+                    </h3>
+                    
                     <div>
-                        <label class="text-xs font-semibold text-slate-600">LT (m²)</label>
-                        <input name="land_area" type="number" class="input mt-1" value="{{ old('land_area') }}" placeholder="120" min="0" required />
-                        @error('land_area')
+                        <div id="imageDropzone" class="flex cursor-pointer flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-center transition hover:border-brand-primary/45 hover:bg-brand-primary/5">
+                            <i class="ti ti-cloud-upload text-3xl text-slate-400 group-hover:text-brand-primary transition"></i>
+                            <div class="text-xs font-bold text-slate-700">Klik atau seret foto properti Anda ke sini</div>
+                            <p class="text-[10px] text-slate-400 font-semibold leading-none">Format: JPG, PNG, WebP (Maksimal 15 foto, 3 MB per foto)</p>
+                            <input id="imageInput" name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple class="hidden" />
+                        </div>
+                        <div id="imagePreview" class="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-5"></div>
+                        @error('images')
                             <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
                         @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600">LB (m²)</label>
-                        <input name="building_area" type="number" class="input mt-1" value="{{ old('building_area', 0) }}" placeholder="90" min="0" />
-                        @error('building_area')
-                            <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600">KT</label>
-                        <input name="bedroom" type="number" class="input mt-1" value="{{ old('bedroom', 0) }}" placeholder="3" min="0" />
-                        @error('bedroom')
-                            <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div>
-                        <label class="text-xs font-semibold text-slate-600">KM</label>
-                        <input name="bathroom" type="number" class="input mt-1" value="{{ old('bathroom', 0) }}" placeholder="2" min="0" />
-                        @error('bathroom')
+                        @error('images.*')
                             <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
                         @enderror
                     </div>
                 </div>
 
-                <div>
-                    <label class="text-xs font-semibold text-slate-600">Deskripsi</label>
-                    <textarea name="description" rows="4" class="input mt-1 resize-none" placeholder="Deskripsikan properti Anda: kondisi, keunggulan, akses jalan, dll.">{{ old('description') }}</textarea>
-                    @error('description')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div>
-                    <label class="text-xs font-semibold text-slate-600">Foto Properti <span class="font-normal text-slate-400">(maks. 15 foto, JPG/PNG/WebP, maks. 3 MB per foto)</span></label>
-                    <div id="imageDropzone" class="mt-1 flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center transition hover:border-brand-primary/40 hover:bg-brand-primary/5">
-                        <svg class="size-8 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                        <div class="text-sm font-semibold text-slate-600">Klik atau seret foto ke sini</div>
-                        <input id="imageInput" name="images[]" type="file" accept="image/jpeg,image/png,image/webp" multiple class="hidden" />
-                    </div>
-                    <div id="imagePreview" class="mt-3 grid grid-cols-3 gap-3 sm:grid-cols-5"></div>
-                    @error('images')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
-                    @enderror
-                    @error('images.*')
-                        <div class="mt-1 text-xs font-semibold text-rose-600">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="mt-2 flex items-center justify-end">
-                    <button type="submit" class="btn btn-primary">Lanjut Ke Lokasi &rarr;</button>
+                {{-- Sticky Bottom Actions Panel --}}
+                <div class="sticky bottom-0 bg-white/95 backdrop-blur-md border-t border-slate-100 -mx-6 px-6 py-4 mt-8 flex justify-end gap-3 z-10 shadow-lg -mb-6">
+                    <button type="submit" class="btn btn-primary text-xs font-bold px-6 py-3 shadow-sm flex items-center gap-1 border-0 cursor-pointer">
+                        <span>Lanjut ke Lokasi</span>
+                        <i class="ti ti-arrow-narrow-right text-base"></i>
+                    </button>
                 </div>
             </form>
         </section>
+    </div>
 
     @push('scripts')
         <script>
@@ -143,7 +186,7 @@
                     const reader = new FileReader();
                     reader.onload = (e) => {
                         const div = document.createElement('div');
-                        div.className = 'relative aspect-square overflow-hidden rounded-xl bg-slate-100';
+                        div.className = 'relative aspect-square overflow-hidden rounded-xl bg-slate-50 border border-slate-200/50';
                         div.innerHTML = `<img src="${e.target.result}" class="h-full w-full object-cover" />`;
                         preview.appendChild(div);
                     };
@@ -151,7 +194,7 @@
                 });
             }
 
-            // Price formatter logic
+            // Price formatter
             const priceReal = document.getElementById('price_real');
             const priceDisplay = document.getElementById('price_display');
 
@@ -173,7 +216,7 @@
 
             priceDisplay.addEventListener('input', updatePrice);
 
-            // Initialize formatting
+            // Initialize price
             if (priceReal.value) {
                 const initialVal = parseInt(priceReal.value, 10);
                 if (!isNaN(initialVal)) {

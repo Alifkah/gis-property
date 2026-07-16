@@ -11,53 +11,49 @@
         </style>
     @endpush
 
-    <div x-data="{ showResults: false, showFilters: false, showLayers: true }" class="flex h-dvh w-full overflow-hidden bg-brand-bg flex-col md:flex-row">
+    <div x-data="{ showResults: false, showFilters: false, showLayers: true, floodActive: true, districtsActive: false, darkActive: false }" class="flex h-dvh w-full overflow-hidden bg-brand-bg flex-col md:flex-row">
 
         {{-- Kiri: Hasil Pencarian (desktop sidebar / mobile bottom sheet) --}}
-        <aside class="hidden md:flex shrink-0 flex-col border-r border-slate-200/80 bg-white shadow-sm z-[900]"
-               style="width:310px;min-width:310px">
+        <aside class="hidden md:flex shrink-0 flex-col border-r border-slate-200/60 bg-white z-[900]"
+               style="width:380px;min-width:380px">
 
             {{-- Header: branding + tombol kembali --}}
-            <div class="px-4 py-3.5 border-b border-slate-100 flex items-center justify-between">
+            <div class="sticky top-0 z-10 bg-white/95 backdrop-blur px-4 py-3.5 border-b border-slate-100 flex items-center justify-between">
                 <a
                     href="{{ route('home') }}"
                     class="group inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-50 border border-slate-200/60 px-3 py-2.5 text-xs font-bold text-slate-600 transition hover:bg-slate-100 hover:text-brand-primary hover:border-brand-primary/20 shadow-3xs"
                 >
-                    <svg class="size-4 shrink-0 transition group-hover:-translate-x-0.5 text-slate-500 group-hover:text-brand-primary" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
+                    <i class="ti ti-arrow-left text-sm shrink-0 transition group-hover:-translate-x-0.5 text-slate-500 group-hover:text-brand-primary"></i>
                     <span>Kembali ke Beranda</span>
                 </a>
             </div>
 
             {{-- Results count --}}
             <div class="px-4 py-3 border-b border-slate-100 bg-slate-50/50">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Hasil Pencarian</div>
-                <div id="resultCount" class="mt-1 text-xs font-black text-slate-700">Memuat data...</div>
+                <div id="resultCount" class="text-sm font-medium text-slate-500">Memuat data...</div>
             </div>
 
             <div class="flex-1 overflow-y-auto px-3.5 py-4 scrollbar-thin">
                 <div id="propertyList" class="grid gap-3"></div>
             </div>
         </aside>
-            {{-- Mobile Results Bottom Sheet --}}
+
+        {{-- Mobile Results Bottom Sheet --}}
         <div x-show="showResults"
              x-cloak
-             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter="transition ease-out duration-300 transform"
              x-transition:enter-start="translate-y-full"
              x-transition:enter-end="translate-y-0"
-             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-y-0"
              x-transition:leave-end="translate-y-full"
-             class="fixed bottom-0 left-0 right-0 z-[950] bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 md:hidden"
+             class="fixed bottom-0 left-0 right-0 z-[950] bg-white rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)] border-t border-slate-200 md:hidden"
              style="max-height: 80vh;">
             <div class="sticky top-0 bg-white rounded-t-3xl px-4 pt-3 pb-3 border-b border-slate-100 flex items-center justify-between">
-                <div class="w-10 h-1 rounded-full bg-slate-200 mx-auto absolute top-2 left-1/2 -translate-x-1/2"></div>
+                <div class="w-10 h-1 rounded-full bg-slate-300 mx-auto absolute top-2 left-1/2 -translate-x-1/2 mt-2"></div>
                 <div class="text-xs font-black text-slate-900 mt-2">Hasil Pencarian</div>
-                <button @click="showResults = false" class="grid size-8 place-items-center rounded-xl text-slate-400 hover:bg-slate-50 mt-2">
-                    <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                <button @click="showResults = false" class="grid size-8 place-items-center rounded-xl text-slate-400 hover:bg-slate-50 mt-2 cursor-pointer">
+                    <i class="ti ti-x text-lg"></i>
                 </button>
             </div>
             <div class="overflow-y-auto px-3.5 py-4" style="max-height: calc(80vh - 60px);">
@@ -71,26 +67,22 @@
         {{-- Mobile Filter Bottom Sheet --}}
         <div x-show="showFilters"
              x-cloak
-             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter="transition ease-out duration-300 transform"
              x-transition:enter-start="translate-y-full"
              x-transition:enter-end="translate-y-0"
-             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave="transition ease-in duration-200 transform"
              x-transition:leave-start="translate-y-0"
              x-transition:leave-end="translate-y-full"
-             class="fixed bottom-0 left-0 right-0 z-[950] bg-white rounded-t-3xl shadow-2xl border-t border-slate-200 md:hidden"
+             class="fixed bottom-0 left-0 right-0 z-[950] bg-white rounded-t-3xl shadow-[0_-4px_30px_rgba(0,0,0,0.1)] border-t border-slate-200 md:hidden"
              style="max-height: 85vh;">
             <div class="sticky top-0 bg-white rounded-t-3xl px-4 pt-3 pb-3 border-b border-slate-100 flex items-center justify-between">
-                <div class="w-10 h-1 rounded-full bg-slate-200 mx-auto absolute top-2 left-1/2 -translate-x-1/2"></div>
+                <div class="w-10 h-1 rounded-full bg-slate-300 mx-auto absolute top-2 left-1/2 -translate-x-1/2 mt-2"></div>
                 <div class="text-xs font-black text-slate-900 mt-2 flex items-center gap-2">
-                    <svg class="size-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                    </svg>
+                    <i class="ti ti-adjustments-horizontal text-brand-primary text-base"></i>
                     Filter Pencarian
                 </div>
-                <button @click="showFilters = false" class="grid size-8 place-items-center rounded-xl text-slate-400 hover:bg-slate-50 mt-2">
-                    <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+                <button @click="showFilters = false" class="grid size-8 place-items-center rounded-xl text-slate-400 hover:bg-slate-50 mt-2 cursor-pointer">
+                    <i class="ti ti-x text-lg"></i>
                 </button>
             </div>
             <div class="flex flex-col min-h-0 h-[calc(85vh-60px)]" id="mobileFilterContent">
@@ -109,9 +101,7 @@
             <div class="absolute top-3 left-3 z-[900] w-[calc(100%-1.5rem)] max-w-[280px] sm:max-w-xs transition-all duration-300">
                 <div class="relative rounded-2xl border border-slate-200/60 bg-white/95 backdrop-blur-md p-1 flex items-center shadow-lg focus-within:ring-2 focus-within:ring-brand-primary/20">
                     <div class="pl-2.5 text-slate-400">
-                        <svg class="size-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-                        </svg>
+                        <i class="ti ti-search text-base"></i>
                     </div>
                     <input type="text" id="mapSearchInput" placeholder="Cari properti..." class="w-full bg-transparent pl-2.5 pr-8 py-1.5 text-xs text-slate-800 focus:outline-hidden" />
                     <div class="absolute right-2 text-[9px] font-bold text-slate-400 bg-slate-100 px-1 py-0.5 rounded-md border border-slate-200 pointer-events-none hidden sm:block whitespace-nowrap shrink-0">Ctrl K</div>
@@ -122,10 +112,7 @@
             <div id="gpsAlert" style="display:none;" class="absolute top-4 left-1/2 -translate-x-1/2 z-[900] w-[90%] max-w-md bg-rose-50 border border-rose-200 rounded-2xl p-3 shadow-xl flex items-center justify-between gap-3 animate-fade-in">
                 <div class="flex items-center gap-2.5 min-w-0">
                     <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-rose-500 text-white shadow-xs animate-pulse">
-                        <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                        </svg>
+                        <i class="ti ti-gps text-base"></i>
                     </span>
                     <div class="min-w-0">
                         <div class="text-xs font-black text-rose-950">GPS Tidak Aktif</div>
@@ -139,15 +126,11 @@
             <div id="routePanel" style="display:none;" class="absolute top-4 right-4 z-[900] w-[280px] bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-slate-200/60 transition duration-300">
                 <div class="text-xs font-black text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                        <svg class="size-4.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498l4.89-2.201a.75.75 0 00.407-.672V5.25a.75.75 0 00-1.077-.671L15 6.75l-6-2.25-4.89 2.201A.75.75 0 003.75 5.375v12.235a.75.75 0 001.077.671L9 15.75l6 2.25z" />
-                        </svg>
+                        <i class="ti ti-route text-lg text-brand-primary"></i>
                         <span>Informasi Rute Jalan</span>
                     </div>
                     <button type="button" onclick="clearRoutes()" class="size-6 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex items-center justify-center transition cursor-pointer">
-                        <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <i class="ti ti-x text-sm"></i>
                     </button>
                 </div>
                 <div class="mt-3.5 space-y-3">
@@ -174,27 +157,21 @@
                 </div>
             </div>
 
-            {{-- Mobile FAB Bar --}}
+            {{-- Mobile FAB Bar (rounded-2xl, shadow-lg) --}}
             <div class="absolute bottom-5 left-0 right-0 flex justify-center gap-2 z-[930] md:hidden px-4">
                 <button @click="showResults = !showResults; showFilters = false"
-                        class="flex items-center gap-1.5 bg-white text-slate-800 text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl border border-slate-200 active:scale-95 transition">
-                    <svg class="size-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
+                        class="flex items-center gap-1.5 bg-white text-slate-800 text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl border border-slate-200 active:scale-95 transition cursor-pointer">
+                    <i class="ti ti-list text-base text-brand-primary"></i>
                     <span id="resultCountMobile">Lihat Hasil</span>
                 </button>
                 <button @click="showFilters = !showFilters; showResults = false"
-                        class="flex items-center gap-1.5 bg-brand-primary text-white text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl active:scale-95 transition">
-                    <svg class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                    </svg>
+                        class="flex items-center gap-1.5 bg-brand-primary text-white text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl active:scale-95 transition cursor-pointer">
+                    <i class="ti ti-adjustments-horizontal text-base"></i>
                     <span>Filter</span>
                 </button>
                 <a href="{{ route('home') }}"
-                   class="flex items-center gap-1.5 bg-white text-slate-600 text-xs font-bold px-3 py-2.5 rounded-2xl shadow-xl border border-slate-200 active:scale-95 transition">
-                    <svg class="size-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-                    </svg>
+                   class="flex items-center gap-1.5 bg-white text-slate-600 text-xs font-bold px-3.5 py-2.5 rounded-2xl shadow-xl border border-slate-200 active:scale-95 transition">
+                    <i class="ti ti-arrow-left text-base"></i>
                 </a>
             </div>
         </main>
@@ -213,46 +190,58 @@
                  class="w-[220px] bg-white/95 backdrop-blur-md rounded-2xl p-4 shadow-xl border border-slate-200/60 transition duration-300">
                 <div class="text-xs font-black text-slate-900 border-b border-slate-100 pb-2 flex items-center justify-between">
                     <div class="flex items-center gap-1.5">
-                        <svg class="size-4 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
-                        </svg>
+                        <i class="ti ti-layers-intersect text-base text-brand-primary"></i>
                         <span>Lapisan Peta</span>
                     </div>
                     <button @click="showLayers = false" class="size-6 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-50 flex items-center justify-center transition cursor-pointer">
-                        <svg class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <i class="ti ti-x text-sm"></i>
                     </button>
                 </div>
+                
+                {{-- Toggle Switches using Alpine.js --}}
                 <div class="mt-3 grid gap-2.5">
-                    <label class="flex items-center justify-between gap-3 cursor-pointer">
+                    <div class="flex items-center justify-between gap-3">
                         <span class="text-xs font-semibold text-slate-700">Zona Banjir</span>
-                        <input id="toggleFlood" type="checkbox" class="size-4.5 rounded border-slate-300 accent-brand-primary cursor-pointer" checked />
-                    </label>
-                    <label class="flex items-center justify-between gap-3 cursor-pointer">
+                        <button type="button" @click="floodActive = !floodActive; triggerFlood(floodActive)"
+                            class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden"
+                            :class="floodActive ? 'bg-brand-primary' : 'bg-slate-200'">
+                            <span class="pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                                :class="floodActive ? 'translate-x-4' : 'translate-x-0'"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
                         <span class="text-xs font-semibold text-slate-700">Batas Admin</span>
-                        <input id="toggleDistricts" type="checkbox" class="size-4.5 rounded border-slate-300 accent-brand-primary cursor-pointer" />
-                    </label>
-                    <label class="flex items-center justify-between gap-3 cursor-pointer">
+                        <button type="button" @click="districtsActive = !districtsActive; triggerDistricts(districtsActive)"
+                            class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden"
+                            :class="districtsActive ? 'bg-brand-primary' : 'bg-slate-200'">
+                            <span class="pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                                :class="districtsActive ? 'translate-x-4' : 'translate-x-0'"></span>
+                        </button>
+                    </div>
+                    <div class="flex items-center justify-between gap-3">
                         <span class="text-xs font-semibold text-slate-700">Mode Gelap Peta</span>
-                        <input id="toggleDarkMode" type="checkbox" class="size-4.5 rounded border-slate-300 accent-brand-primary cursor-pointer" />
-                    </label>
+                        <button type="button" @click="darkActive = !darkActive; triggerDarkMode(darkActive)"
+                            class="relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden"
+                            :class="darkActive ? 'bg-brand-primary' : 'bg-slate-200'">
+                            <span class="pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                                :class="darkActive ? 'translate-x-4' : 'translate-x-0'"></span>
+                        </button>
+                    </div>
                 </div>
-                <div class="mt-3.5 pt-3.5 border-t border-slate-100">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Legenda</div>
-                    <div class="mt-2 grid gap-1.5">
-                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                            <span class="size-2.5 rounded-sm bg-emerald-600 ring-1 ring-emerald-700/10 shadow-3xs"></span>
-                            <span>Bebas Banjir</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                            <span class="size-2.5 rounded-sm bg-[var(--color-brand-warning)] ring-1 ring-brand-warning/10 shadow-3xs" style="background-color: #9A031E;"></span>
-                            <span>Zona Banjir</span>
-                        </div>
-                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-600">
-                            <span class="size-2.5 rounded-sm bg-[var(--color-brand-accent)] ring-1 ring-brand-accent/10 shadow-3xs" style="background-color: #E36414;"></span>
-                            <span>Properti</span>
-                        </div>
+
+                {{-- Legend (Inline color dots, text-xs) --}}
+                <div class="mt-3.5 pt-3.5 border-t border-slate-100 flex flex-col gap-1.5 text-xs text-slate-500 font-semibold">
+                    <div class="flex items-center gap-2">
+                        <span class="size-2 rounded-full bg-emerald-600"></span>
+                        <span>Bebas Banjir</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="size-2 rounded-full bg-rose-600"></span>
+                        <span>Zona Banjir</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="size-2 rounded-full bg-brand-accent"></span>
+                        <span>Properti</span>
                     </div>
                 </div>
             </div>
@@ -266,27 +255,24 @@
                     x-transition:enter-end="opacity-100 scale-100"
                     class="size-10 bg-white/95 backdrop-blur-md rounded-xl shadow-md border border-slate-200/60 flex items-center justify-center text-slate-700 hover:text-brand-primary hover:bg-white transition cursor-pointer"
                     title="Buka Lapisan Peta">
-                <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m11.142 0L21.75 12l-4.179-2.25M12 5.75L6.429 9.75 12 13.75l5.571-4L12 5.75zm-5.571 8l5.571 4 5.571-4" />
-                </svg>
+                <i class="ti ti-layers-intersect text-lg"></i>
             </button>
         </div>
 
         {{-- Kanan: Filter Pencarian (desktop only) --}}
-        <aside class="hidden md:flex shrink-0 flex-col bg-white border-l border-slate-200/80 shadow-sm z-10" style="width:310px;min-width:310px">
+        <aside class="hidden md:flex shrink-0 flex-col bg-white border-l border-slate-200/60 z-10" style="width:340px;min-width:340px">
             <div class="px-4 py-4 border-b border-slate-100 bg-slate-50/50">
                 <div class="text-xs font-black text-slate-900 flex items-center gap-2">
-                    <svg class="size-4.5 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 01-.659 1.591l-5.432 5.432a2.25 2.25 0 00-.659 1.591v2.927a2.25 2.25 0 01-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 00-.659-1.591L3.659 7.409A2.25 2.25 0 013 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0112 3z" />
-                    </svg>
+                    <i class="ti ti-adjustments-horizontal text-lg text-brand-primary"></i>
                     <span>Filter Pencarian</span>
                 </div>
             </div>
             <div id="desktopFilterParent" class="flex-1 flex flex-col min-h-0 overflow-hidden">
                 <div id="filterFormContainer" class="flex-1 flex flex-col min-h-0 overflow-hidden">
-                    <div class="flex-1 overflow-y-auto px-4 py-4 scrollbar-thin">
-                        <div class="grid gap-4">
-                            <div>
+                    <div class="flex-1 overflow-y-auto px-4 py-2 scrollbar-thin">
+                        <div class="divide-y divide-slate-100">
+                            {{-- Section: Tipe --}}
+                            <div class="py-4">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tipe Properti</label>
                                 <select id="filterType" class="select mt-1.5">
                                     <option value="">Semua</option>
@@ -295,7 +281,9 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div>
+
+                            {{-- Section: Kecamatan --}}
+                            <div class="py-4">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Kecamatan</label>
                                 <select id="filterDistrict" class="select mt-1.5">
                                     <option value="">Semua</option>
@@ -304,7 +292,9 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div>
+
+                            {{-- Section: Rentang Harga --}}
+                            <div class="py-4">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Rentang Harga</label>
                                 <select id="filterPrice" class="select mt-1.5">
                                     <option value="">Semua</option>
@@ -314,7 +304,9 @@
                                     <option value="2000000000-999999999999">2 M+</option>
                                 </select>
                             </div>
-                            <div>
+
+                            {{-- Section: Dekat Fasilitas --}}
+                            <div class="py-4">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Dekat Fasilitas</label>
                                 <select id="filterAmenityType" class="select mt-1.5">
                                     <option value="">Semua</option>
@@ -322,23 +314,25 @@
                                         <option value="{{ $amenityType }}">{{ $amenityType }}</option>
                                     @endforeach
                                 </select>
+                                <div id="amenityIdGroup" class="opacity-40 transition-opacity mt-3">
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Pilih Fasilitas</label>
+                                    <select id="filterAmenityId" class="select mt-1" disabled>
+                                        <option value="">Semua</option>
+                                    </select>
+                                </div>
+                                <div id="amenityRadiusGroup" class="opacity-40 transition-opacity mt-3">
+                                    <label class="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Radius Fasilitas</label>
+                                    <select id="filterAmenityRadius" class="select mt-1" disabled>
+                                        <option value="500">500 m</option>
+                                        <option value="1000" selected>1 km</option>
+                                        <option value="2000">2 km</option>
+                                        <option value="5000">5 km</option>
+                                    </select>
+                                </div>
                             </div>
-                            <div id="amenityIdGroup" class="opacity-40 transition-opacity">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Pilih Fasilitas <span class="text-[9px] font-normal text-slate-400">(pilih tipe dulu)</span></label>
-                                <select id="filterAmenityId" class="select mt-1.5" disabled>
-                                    <option value="">Semua</option>
-                                </select>
-                            </div>
-                            <div id="amenityRadiusGroup" class="opacity-40 transition-opacity">
-                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Radius Fasilitas <span class="text-[9px] font-normal text-slate-400">(pilih tipe dulu)</span></label>
-                                <select id="filterAmenityRadius" class="select mt-1.5" disabled>
-                                    <option value="500">500 m</option>
-                                    <option value="1000" selected>1 km</option>
-                                    <option value="2000">2 km</option>
-                                    <option value="5000">5 km</option>
-                                </select>
-                            </div>
-                            <div>
+
+                            {{-- Section: Status --}}
+                            <div class="py-4">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Status Listing</label>
                                 <select id="filterStatus" class="select mt-1.5">
                                     <option value="">Semua</option>
@@ -346,60 +340,69 @@
                                     <option value="Terjual">Terjual</option>
                                 </select>
                             </div>
-                            <div>
+
+                            {{-- Section: Urutan Harga --}}
+                            <div class="py-4">
                                 <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Urutan Harga</label>
                                 <select id="filterSort" class="select mt-1.5">
                                     <option value="desc">Tertinggi</option>
                                     <option value="asc">Terendah</option>
                                 </select>
                             </div>
- 
-                            <div class="flex flex-wrap gap-2 pt-1 border-t border-slate-100 pt-3">
-                                <button type="button" class="pill" data-pill="Rumah">Rumah</button>
-                                <button type="button" class="pill" data-pill="Tanah">Tanah</button>
-                                <button type="button" class="pill" data-pill="BebasBanjir">Bebas Banjir</button>
+
+                            {{-- Section: Quick Filter Pills --}}
+                            <div class="py-4">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Filter Cepat</label>
+                                <div class="flex flex-wrap gap-2 mt-2">
+                                    <button type="button" class="pill rounded-full border text-sm px-3 py-1 bg-white hover:bg-slate-50 transition duration-150 cursor-pointer" data-pill="Rumah">Rumah</button>
+                                    <button type="button" class="pill rounded-full border text-sm px-3 py-1 bg-white hover:bg-slate-50 transition duration-150 cursor-pointer" data-pill="Tanah">Tanah</button>
+                                    <button type="button" class="pill rounded-full border text-sm px-3 py-1 bg-white hover:bg-slate-50 transition duration-150 cursor-pointer" data-pill="BebasBanjir">Bebas Banjir</button>
+                                </div>
                             </div>
- 
-                            <div class="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60 shadow-3xs mt-2 mb-4">
-                                <div class="text-xs font-black text-slate-900 flex items-center gap-1.5">
-                                    <svg class="size-4 text-brand-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                                    </svg>
-                                    <span>Cari Sekitar Titik</span>
-                                </div>
-                                <div class="mt-1 text-[10px] font-semibold text-slate-500">Klik lokasi mana saja di peta untuk menentukan koordinat pusat.</div>
-                                <div class="mt-3 grid grid-cols-2 gap-2">
-                                    <div>
-                                        <label class="text-[9px] font-bold text-slate-400 uppercase">Latitude</label>
-                                        <input id="centerLat" type="text" class="input mt-1 text-center" readonly />
+
+                            {{-- Section: Sekitar Titik --}}
+                            <div class="py-4">
+                                <div class="rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200/60 shadow-3xs">
+                                    <div class="text-xs font-black text-slate-900 flex items-center gap-1.5">
+                                        <i class="ti ti-map-pin text-brand-accent"></i>
+                                        <span>Cari Sekitar Titik</span>
                                     </div>
-                                    <div>
-                                        <label class="text-[9px] font-bold text-slate-400 uppercase">Longitude</label>
-                                        <input id="centerLng" type="text" class="input mt-1 text-center" readonly />
+                                    <div class="mt-1 text-[10px] font-semibold text-slate-500 leading-normal">Klik lokasi mana saja di peta untuk menentukan koordinat pusat.</div>
+                                    <div class="mt-3 grid grid-cols-2 gap-2">
+                                        <div>
+                                            <label class="text-[9px] font-bold text-slate-400 uppercase">Latitude</label>
+                                            <input id="centerLat" type="text" class="input mt-1 text-center" readonly />
+                                        </div>
+                                        <div>
+                                            <label class="text-[9px] font-bold text-slate-400 uppercase">Longitude</label>
+                                            <input id="centerLng" type="text" class="input mt-1 text-center" readonly />
+                                        </div>
                                     </div>
+                                    <div class="mt-3">
+                                        <label class="text-[10px] font-bold text-slate-400 uppercase">Radius Jangkauan</label>
+                                        <select id="radiusM" class="select mt-1 bg-white">
+                                            <option value="">Tanpa radius</option>
+                                            <option value="500">500 m</option>
+                                            <option value="1000" selected>1 km</option>
+                                            <option value="2000">2 km</option>
+                                            <option value="5000">5 km</option>
+                                        </select>
+                                    </div>
+                                    <button id="clearCenter" type="button" class="btn btn-outline mt-3 w-full py-2.5 text-xs font-bold">Reset Titik Pusat</button>
                                 </div>
-                                <div class="mt-3.5">
-                                    <label class="text-[10px] font-bold text-slate-400 uppercase">Radius Jangkauan</label>
-                                    <select id="radiusM" class="select mt-1">
-                                        <option value="">Tanpa radius</option>
-                                        <option value="500">500 m</option>
-                                        <option value="1000" selected>1 km</option>
-                                        <option value="2000">2 km</option>
-                                        <option value="5000">5 km</option>
-                                    </select>
-                                </div>
-                                <button id="clearCenter" type="button" class="btn btn-outline mt-3 w-full py-2.5 text-xs font-bold">Reset Titik Pusat</button>
                             </div>
                         </div>
                     </div>
+                    
+                    {{-- Sticky Bottom Actions --}}
                     <div class="p-4 border-t border-slate-100 bg-slate-50/50 flex flex-col gap-2 shrink-0">
-                        <button id="applyFilters" @click="showFilters = false" class="btn btn-primary w-full py-3 font-bold shadow-md hover:shadow-brand-primary/20 transition">Terapkan Filter</button>
+                        <div class="flex gap-2">
+                            <button id="resetFilters" type="button" class="btn btn-outline flex-1 py-3 text-xs font-bold cursor-pointer">Reset</button>
+                            <button id="applyFilters" @click="showFilters = false" class="btn btn-accent flex-[2] py-3 font-bold shadow-md hover:shadow-brand-accent/20 transition cursor-pointer">Terapkan</button>
+                        </div>
                         @auth
                             <button id="activateSearchAlertBtn" type="button" class="btn btn-outline text-brand-primary bg-brand-primary/5 hover:bg-brand-primary/10 border-brand-primary/20 w-full flex items-center justify-center gap-2 py-2.5 text-xs font-bold cursor-pointer">
-                                <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                                </svg>
+                                <i class="ti ti-bell-plus text-base shrink-0"></i>
                                 <span>Aktifkan Alarm Properti</span>
                             </button>
                         @endauth
@@ -433,9 +436,10 @@
             });
             new LayerPanel().addTo(map);
 
-            const osmTiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; OpenStreetMap contributors'
+            const voyagerTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+                maxZoom: 20,
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+                subdomains: 'abcd'
             });
 
             const darkTiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
@@ -444,17 +448,34 @@
                 maxZoom: 20
             });
 
-            osmTiles.addTo(map);
+            voyagerTiles.addTo(map);
 
-            document.getElementById('toggleDarkMode').addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    map.removeLayer(osmTiles);
+            // Trigger mapping functions called by Alpine.js buttons
+            window.triggerFlood = function(active) {
+                if (active) {
+                    floodLayer.addTo(map);
+                } else {
+                    map.removeLayer(floodLayer);
+                }
+            };
+
+            window.triggerDistricts = function(active) {
+                if (active) {
+                    districtLayer.addTo(map);
+                } else {
+                    map.removeLayer(districtLayer);
+                }
+            };
+
+            window.triggerDarkMode = function(active) {
+                if (active) {
+                    map.removeLayer(voyagerTiles);
                     darkTiles.addTo(map);
                 } else {
                     map.removeLayer(darkTiles);
-                    osmTiles.addTo(map);
+                    voyagerTiles.addTo(map);
                 }
-            });
+            };
 
             const markerLayer = L.layerGroup().addTo(map);
 
@@ -474,11 +495,12 @@
                 }
             }).addTo(map);
 
+            // Leaflet Marker Icon sizing updated to 20px with stronger shadow
             const markerIcon = L.divIcon({
                 className: '',
-                html: '<div style="width:16px;height:16px;border-radius:9999px;background:#E36414;border:3.5px solid #ffffff;box-shadow:0 4px 10px rgba(15,23,42,.35)"></div>',
-                iconSize: [16, 16],
-                iconAnchor: [8, 8]
+                html: '<div style="width:20px;height:20px;border-radius:9999px;background:#E36414;border:3.5px solid #ffffff;box-shadow:0 6px 14px rgba(15,23,42,.45)"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
             });
 
             const propertyList = document.getElementById('propertyList');
@@ -535,10 +557,7 @@
                 onAdd: function() {
                     var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
                     var button = L.DomUtil.create('a', 'leaflet-bar-part', container);
-                    button.innerHTML = `<svg class="size-5 text-slate-700" style="margin: 5px auto;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
-                    </svg>`;
+                    button.innerHTML = `<i class="ti ti-gps text-lg text-slate-700" style="margin: 5px auto;"></i>`;
                     button.title = "Cari Lokasi Saya";
                     button.style.backgroundColor = '#ffffff';
                     button.style.cursor = 'pointer';
@@ -852,10 +871,28 @@
             function imageUrl(type, imageUrl) {
                 if (imageUrl) return imageUrl;
                 const typeUpper = (type || 'PROPERTI').toUpperCase();
-                const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" fill="none"><rect width="400" height="250" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#4f46e5" stop-opacity="0.12"/><stop offset="100%" stop-color="#6366f1" stop-opacity="0.04"/></linearGradient></defs><path d="M170 140 l30-25 30 25 M180 132 v18 h40 v-18" stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.4"/><text x="50%" y="185" dominant-baseline="middle" text-anchor="middle" fill="#4338ca" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="12" letter-spacing="1" opacity="0.5">${typeUpper}</text></svg>`;
+                const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 250" fill="none"><rect width="400" height="250" fill="url(#g)"/><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#0F4C5C" stop-opacity="0.12"/><stop offset="100%" stop-color="#0F4C5C" stop-opacity="0.04"/></linearGradient></defs><path d="M170 140 l30-25 30 25 M180 132 v18 h40 v-18" stroke="#0F4C5C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" stroke-opacity="0.4"/><text x="50%" y="185" dominant-baseline="middle" text-anchor="middle" fill="#0F4C5C" font-family="system-ui,-apple-system,sans-serif" font-weight="800" font-size="12" letter-spacing="1" opacity="0.5">${typeUpper}</text></svg>`;
                 return 'data:image/svg+xml;base64,' + btoa(svg);
             }
 
+            // Highlights the active/selected button item inside the sidebar list
+            window.selectListProperty = function(id) {
+                [propertyList, propertyListMobile].forEach((list) => {
+                    if (!list) return;
+                    Array.from(list.querySelectorAll('button[data-id]')).forEach((el) => {
+                        const buttonId = parseInt(el.dataset.id, 10);
+                        if (buttonId === id) {
+                            el.classList.add('bg-brand-primary/5', 'border-l-brand-accent');
+                            el.classList.remove('bg-white', 'hover:bg-slate-50', 'border-l-transparent');
+                        } else {
+                            el.classList.remove('bg-brand-primary/5', 'border-l-brand-accent');
+                            el.classList.add('bg-white', 'hover:bg-slate-50', 'border-l-transparent');
+                        }
+                    });
+                });
+            };
+
+            // Dynamic Sidebar Item Rendered as clean Horizontal card
             function renderList(items) {
                 const resultCount = document.getElementById('resultCount');
                 const resultCountMobile = document.getElementById('resultCountMobile');
@@ -875,22 +912,27 @@
                     const badges = isSold
                         ? '<span class="inline-flex items-center rounded-full bg-slate-700 px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Terjual</span>'
                         : [
-                            p.is_new ? '<span class="inline-flex items-center rounded-full bg-brand-primary px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Rumah Baru</span>' : '',
-                            p.is_flood_safe ? '<span class="inline-flex items-center rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Bebas Banjir</span>' : ''
+                            p.is_new ? '<span class="inline-flex items-center rounded-full bg-brand-primary px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Baru</span>' : '',
+                            p.is_flood_safe ? '<span class="inline-flex items-center rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold text-white shadow-3xs">Aman</span>' : ''
                           ].join('');
 
                     return `
-                        <button type="button" class="w-full text-left card overflow-hidden hover:shadow-md hover:ring-brand-primary/20 transition min-w-0" data-id="${p.id}">
-                            <div class="relative overflow-hidden bg-slate-100" style="height:120px">
-                                <img src="${imageUrl(p.type, p.image_url)}" alt="${p.title}" class="h-full w-full object-cover transition duration-300 hover:scale-[1.03] ${isSold ? 'opacity-60' : ''}" loading="lazy" />
-                                <div class="absolute left-2.5 top-2.5 flex flex-wrap gap-1">${badges}</div>
+                        <button type="button" class="w-full text-left flex items-start gap-3 p-3 bg-white border border-slate-100 hover:bg-slate-50 rounded-xl transition duration-200 min-w-0 border-l-4 border-l-transparent active:border-l-brand-accent active:bg-brand-primary/5 focus:border-l-brand-accent focus:bg-brand-primary/5" data-id="${p.id}">
+                            <div class="relative shrink-0 w-20 h-16 rounded-lg overflow-hidden bg-slate-100">
+                                <img src="${imageUrl(p.type, p.image_url)}" alt="${p.title}" class="h-full w-full object-cover ${isSold ? 'opacity-60' : ''}" loading="lazy" />
+                                <div class="absolute left-1 top-1 flex flex-wrap gap-0.5">${badges}</div>
                             </div>
-                            <div class="p-3">
-                                <div class="text-xs font-extrabold text-slate-800 truncate">${p.title}</div>
-                                <div class="mt-0.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider">${p.district_name ?? 'Samarinda'}</div>
-                                <div class="mt-2.5 flex items-center justify-between gap-2 border-t border-slate-50 pt-2">
-                                    <div class="text-xs font-extrabold ${isSold ? 'text-slate-400' : 'text-brand-primary'}">Rp ${formatCurrency(p.price)}</div>
-                                    <span class="text-[10px] font-bold text-slate-500">${p.amenity_distance_m !== null && p.amenity_distance_m !== undefined ? formatDistance(p.amenity_distance_m) : `${p.land_area} m²`}</span>
+                            <div class="min-w-0 flex-1 flex flex-col justify-between h-16">
+                                <div>
+                                    <div class="text-xs font-bold text-slate-900 truncate leading-tight">${p.title}</div>
+                                    <div class="text-[10px] text-slate-400 font-semibold mt-0.5 flex items-center gap-0.5">
+                                        <i class="ti ti-map-pin"></i>
+                                        <span>${p.district_name ?? 'Samarinda'}</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between gap-1.5 mt-1">
+                                    <div class="text-xs font-extrabold ${isSold ? 'text-slate-400' : 'text-brand-accent'}">Rp ${formatCurrency(p.price)}</div>
+                                    <div class="text-[10px] text-slate-500 font-semibold">${p.amenity_distance_m !== null && p.amenity_distance_m !== undefined ? formatDistance(p.amenity_distance_m) : `${p.land_area} m²`}</div>
                                 </div>
                             </div>
                         </button>
@@ -914,6 +956,7 @@
                                 marker.openPopup();
                             }
                             window.showPropertyRoute(id);
+                            window.selectListProperty(id);
                         });
                     });
                 });
@@ -984,7 +1027,7 @@
                     const imgSrc = imageUrl(p.type, listItem?.image_url ?? null);
 
                     const popupHtml = `
-                        <div style="width:240px; font-family:'Inter', sans-serif">
+                        <div style="width:240px; font-family:'Geist', sans-serif">
                             <img src="${imgSrc}" alt="${p.title}" style="width:100%;height:120px;object-fit:cover;border-radius:12px;box-shadow:0 2px 8px rgba(0,0,0,0.06)" />
                             <div style="padding:12px 0 0 0">
                                 <div style="font-size:14px;font-weight:900;color:#0F4C5C">Rp ${formatCurrency(p.price)}</div>
@@ -999,6 +1042,7 @@
 
                     marker.on('click', () => {
                         window.showPropertyRoute(Number(p.id));
+                        window.selectListProperty(Number(p.id));
                     });
 
                     if (Number.isFinite(Number(p.id))) {
@@ -1060,12 +1104,12 @@
                 const amenityRadius = filterAmenityRadius.disabled ? '' : (filterAmenityRadius.value || '');
 
                 const skeletonHtml = Array.from({ length: 4 }).map(() => `
-                    <div class="w-full card overflow-hidden animate-pulse border border-slate-100 bg-white rounded-2xl">
-                        <div class="bg-slate-200" style="height:120px"></div>
-                        <div class="p-3 space-y-2.5">
+                    <div class="w-full flex gap-3 p-3 bg-white border border-slate-100 rounded-xl animate-pulse">
+                        <div class="bg-slate-200 rounded-lg shrink-0 w-20 h-16"></div>
+                        <div class="flex-1 space-y-2.5">
                             <div class="h-3.5 bg-slate-200 rounded w-3/4"></div>
                             <div class="h-3 bg-slate-200 rounded w-1/2"></div>
-                            <div class="pt-2 flex items-center justify-between gap-2">
+                            <div class="flex items-center justify-between mt-1">
                                 <div class="h-4 bg-slate-200 rounded w-1/3"></div>
                                 <div class="h-3 bg-slate-200 rounded w-1/4"></div>
                             </div>
@@ -1136,15 +1180,53 @@
                     const key = pill.dataset.pill;
                     if (selectedPills.has(key)) {
                         selectedPills.delete(key);
-                        pill.classList.remove('pill-active');
+                        pill.classList.remove('bg-brand-primary', 'text-white', 'border-brand-primary');
+                        pill.classList.add('bg-white', 'text-slate-600');
                     } else {
                         selectedPills.add(key);
-                        pill.classList.add('pill-active');
+                        pill.classList.add('bg-brand-primary', 'text-white', 'border-brand-primary');
+                        pill.classList.remove('bg-white', 'text-slate-600');
                     }
                 });
             });
 
             applyFilters.addEventListener('click', () => {
+                meta.page = 1;
+                apply();
+            });
+
+            // Action to Reset Filters
+            document.getElementById('resetFilters').addEventListener('click', () => {
+                filterType.value = '';
+                filterDistrict.value = '';
+                filterPrice.value = '';
+                filterAmenityType.value = '';
+                filterAmenityId.innerHTML = '<option value="">Semua</option>';
+                filterAmenityId.disabled = true;
+                filterAmenityRadius.value = '1000';
+                filterAmenityRadius.disabled = true;
+                filterStatus.value = '';
+                filterSort.value = 'desc';
+                document.getElementById('mapSearchInput').value = '';
+                
+                selectedPills.clear();
+                pills.forEach((pill) => {
+                    pill.classList.remove('bg-brand-primary', 'text-white', 'border-brand-primary');
+                    pill.classList.add('bg-white', 'text-slate-600');
+                });
+
+                center = null;
+                centerLat.value = '';
+                centerLng.value = '';
+                if (centerMarker) {
+                    map.removeLayer(centerMarker);
+                    centerMarker = null;
+                }
+                if (centerCircle) {
+                    map.removeLayer(centerCircle);
+                    centerCircle = null;
+                }
+
                 meta.page = 1;
                 apply();
             });
@@ -1269,78 +1351,12 @@
                 apply();
             });
 
-            document.getElementById('toggleFlood').addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    floodLayer.addTo(map);
-                } else {
-                    map.removeLayer(floodLayer);
-                }
-            });
-
-            document.getElementById('toggleDistricts').addEventListener('change', (e) => {
-                if (e.target.checked) {
-                    districtLayer.addTo(map);
-                } else {
-                    map.removeLayer(districtLayer);
-                }
-            });
-
-            @auth
-            document.getElementById('activateSearchAlertBtn')?.addEventListener('click', function() {
-                const type = document.getElementById('filterType').value;
-                const district = document.getElementById('filterDistrict').value;
-                const priceRange = document.getElementById('filterPrice').value;
-                
-                let min_price = null;
-                let max_price = null;
-                if (priceRange) {
-                    const parts = priceRange.split('-');
-                    min_price = parts[0];
-                    max_price = parts[1];
-                }
-
-                fetch('{{ route('property-alerts.store') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        type: type || null,
-                        min_price: min_price || null,
-                        max_price: max_price || null,
-                        district_name: district || null
-                    })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        alert(data.message);
-                    } else {
-                        alert('Gagal mengaktifkan alarm.');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Terjadi kesalahan koneksi.');
-                });
-            });
-            @endauth
-
-            // Jalankan pelacakan GPS awal & preload semua data fasilitas untuk rute jalan
-            trackUserLocation(false);
-            fetchAmenities().then((data) => {
-                window.allAmenities = data;
-            }).catch((err) => {
-                console.error("Gagal memuat fasilitas untuk rute:", err);
+            // Handlers for Alpine.js switches
+            window.addEventListener('load', () => {
+                // Initialize default switches if necessary
             });
         </script>
         <style>
-            .pill { display:inline-flex; align-items:center; justify-content:center; border-radius:12px; padding:7px 11px; font-size:11px; font-weight:800; background:#f8fafc; color:#475569; border:1px solid #e2e8f0; transition:all .2s; cursor:pointer; }
-            .pill:hover { background:#f1f5f9; border-color:#cbd5e1 }
-            .pill-active { background:#0F4C5C; color:#fff; border-color:#0F4C5C; }
-            .pill-active:hover { background:#0b3945; border-color:#0b3945; }
-
             /* Custom Leaflet overrides */
             .leaflet-popup-content-wrapper {
                 border-radius: 16px !important;
